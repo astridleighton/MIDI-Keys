@@ -1,8 +1,9 @@
 import React from 'react';
+import { Route, Link, Routes, BrowserRouter } from 'react-router-dom';
 import logo from './logo.svg';
 import './App.css';
 import Midi from './Midi';
-import Keyboard from './Keyboard';
+import Home from './Home';
 
 /*
 * Note: To begin application, navigate to midi-controller and type "npm start"
@@ -17,8 +18,13 @@ MidiWebAPI !!
 function App() {
   return (
     <div className="App">
-          <Midi/>
-          <Keyboard/>
+      <BrowserRouter>
+        <Routes>
+        <Route exact path="/" element={<Home />} />
+        <Route exact path="/midi" element={<Midi />} />
+        </Routes>
+        <Link to="/midi">Connect MIDI Device</Link>
+      </BrowserRouter>
     </div>
   );
 }

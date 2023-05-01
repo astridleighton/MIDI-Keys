@@ -59,10 +59,33 @@ class Midi extends React.Component
     render()
     {
         return(
-            <div>
-                <p>Midi component</p>
-                <p>Browser Support: {this.state.support}</p>
-            </div>
+          <div>
+              <p>Midi component</p>
+              <p>Browser Support: {this.state.support}</p>
+              <p>Inputs: </p>
+              <ul>
+                <li>
+                  <label>
+                    <input
+                      type="radio"
+                      name="option"
+                      value="option1"
+                    />
+                    Option 1
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    <input
+                      type="radio"
+                      name="option"
+                      value="option2"
+                    />
+                    Option 2
+                  </label>
+                </li>
+            </ul>
+          </div>
         )
     }
 }

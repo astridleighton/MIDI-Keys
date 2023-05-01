@@ -1,5 +1,8 @@
 import React from 'react';
 
+/**
+ * Used to handle visual keyboard element
+ */
 class Keyboard extends React.Component
 {
     render()

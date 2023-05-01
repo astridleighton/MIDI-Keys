@@ -4,25 +4,34 @@ import App from './App.js';
 
 class MIDIAccess
 {
-
-    checkMIDIAccess = () =>
+    constructor()
     {
-        if (navigator.requestMIDIAccess)
-        {
-        console.log("Web Midi is supported.");
-        //navigator.requestMIDIAccess().then(onMIDISupport, onMIDIFailure);
-
-        } else {
-            console.log('WebMIDI is not supported in this browser.');
-            document.querySelector('.note-info').textContent = 'Error: This browser does not support WebMIDI.';
-        }
+        navigator.requestMIDIAccess()
+            .then(this.onMIDISuccess.bind(this), this.onMIDIFailure.bind(this));
     }
 
-    onMIDISupport = (midiAccess) =>
+    onMIDISuccess(midiAccess)
     {
-        console.log("test");
+        console.log("WebMIDI is supported in browser.");
         var midiIns = midiAccess.inputs;
         var midiOuts = midiAccess.outputs;
+
+        const inputs = midiIns.values();
+
+        // list midi inputs to console
+        if (inputs != null)
+        {
+            for(let input of inputs)
+            {
+                console.log(`Found MIDI input: ${input.name}`);
+                input.onMIDIMessage = this.onMIDIMessage.bind(this);
+            }
+        }
+        else
+        {
+            console.log("Please connect MIDI device.");
+        }
+        
     }
 
     onMIDIFailure =  () =>
@@ -30,25 +39,10 @@ class MIDIAccess
         console.log("Midi failure.");
     }
 
-    getMIDIInfo = (message) =>
+    getMIDIInfo = (event) =>
     {
-        var command = message.data[0];
-        var note = message.data[1];
-        var velocity = message.data[2];
-
-        switch (command)
-        {
-            case 144: // note on
-            /*document.querySelector('.note-info').textContent = 'Command: ' + command +
-            ' , Note: ' + note + ' , Velocity: ' + velocity;*/
-        //noteOnListener(note);
-        break;
-        }
-    }
-
-    noteOnListener = (note) =>
-    {
-        console.log("test");
+        const note = event.data[1];
+        console.log(`Playing note: ${note}`);
     }
 }
 

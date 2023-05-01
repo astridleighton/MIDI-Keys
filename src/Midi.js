@@ -28,21 +28,21 @@ class Midi extends React.Component
       */
       async componentDidMount()
       {
-        if(await this.checkBrowserSupport())
+        /*if(await this.checkBrowserSupport())
         {
           this.setState({ support : "yes" })
         }
         else
         {
           this.setState({ support : "no" });
-        }
+        }*/
       }
 
       /*
       * Checks if browser supports WebMidi API
       * Returns true or false
       */
-      checkBrowserSupport = async () =>
+      /*checkBrowserSupport = async () =>
       {
         try {
           const midiAccess = await navigator.requestMIDIAccess();
@@ -54,7 +54,7 @@ class Midi extends React.Component
           console.log("Browser does not support midi access.");
           return false;
         }
-      }
+      }*/
 
     render()
     {

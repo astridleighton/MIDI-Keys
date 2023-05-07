@@ -3,10 +3,11 @@
 This project will take months to complete. Here are the goals I have so far.
 
 1) Build JS logic within react to handle midi API
-2) Build react front-end to display notes being played
-3) Build express back-end to connect to SQL database
-4) Create SQL database with file paths to audio files
-5) Deploy application to Heroku
+2) Build react front-end to display notes being played, chord visualizer, and keyboard visualizer
+3) Implement sheet music learning system
+4) Build express back-end to connect to SQL database
+5) Create SQL database with file paths to audio files
+6) Deploy application to Heroku
 
 ## Available Scripts
 

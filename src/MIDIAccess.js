@@ -15,10 +15,12 @@ class MIDIAccess
     onMIDISuccess(midiAccess)
     {
         console.log("WebMIDI is supported in browser.");
+        console.log(midiAccess);
+        midiAccess.addEventListener('statechange', this.updateDevices);
         this.midi = midiAccess;
 
-        var midiIns = midiAccess.inputs;
-        var midiOuts = midiAccess.outputs;
+        const midiIns = midiAccess.inputs;
+        const midiOuts = midiAccess.outputs;
 
         const inputs = midiIns.values();
         const outputs = midiOuts.values();
@@ -40,7 +42,7 @@ class MIDIAccess
         }
         else
         {
-            console.log("Please connect MIDI device.");
+            console.log("No MIDI inputs detected.");
         }
 
         // list midi outputs to console
@@ -59,7 +61,12 @@ class MIDIAccess
         
     }
 
-    onMIDIFailure =  () =>
+    updateDevices(e)
+    {
+        console.log(`Name: ${e.port.name}, Brand: ${e.port.manufacturer}, State: ${e.port.state}, Type: ${e.port.type}`);
+    }
+
+    onMIDIFailure()
     {
         console.log("Midi failure.");
     }
@@ -76,27 +83,45 @@ class MIDIAccess
         console.log(message);
     }
 
+    noteOn(note, velocity)
+    {   
+        console.log(note, velocity);
+    }
+
+    noteOff(note)
+    {
+        console.log(note + " off")
+    }
+
     // NOTES: 0-127
     useKeyboard(keyboard)
     {
         keyboard.onmidimessage = function (event)
         {
-            var noteNumber = event.data[1];
+            const command = event.data[0];
+            const note = event.data[1];
+            const velocity = event.data[2];
 
-            if(event.data[0] === 144) // command is note on
+            switch (command)
             {
-                //this.currentNotes.push(noteNumber); // add note to array
-                console.log('Note number: ' + noteNumber);
-            }
-            else if (event.data[0] === 128)
-            {
-                //const index = this.currentNotes.indexOf(noteNumber);
-                console.log("Note off.");
-
-                /*if (index != -1) // remove from array
-                {
-                    this.currentNotes.splice(index, 1);
-                }*/
+                case 144: // note on
+                    if(velocity > 0)
+                    {
+                        console.log("Playing " + note);
+                        //this.noteOn(note, velocity);
+                    }
+                    else
+                    {
+                        console.log("Stopped playing " + note);
+                        //this.noteOff(note);
+                    }
+                    break;
+                case 128: // note off
+                    console.log("Stopped playing " + note);
+                    //this.noteOff();
+                    break;
+                default:
+                    break;
             }
         }
 

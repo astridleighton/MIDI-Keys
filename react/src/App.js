@@ -18,7 +18,10 @@ MidiWebAPI !!
 class App extends React.Component
 {
 
-  // TODO: pass midi devices into midi component
+  /* TODO:
+  * pass midi devices into midi component
+  * add bootstrap
+  */
 
   constructor(props) {
     super(props);
@@ -126,8 +129,10 @@ onMIDISuccess(midiAccess)
       keyboard.onmidimessage = function (event)
       {
           const command = event.data[0];
-          const note = event.data[1];
+          const noteInput = event.data[1];
           const velocity = event.data[2];
+
+          const note = midiToNote(noteInput);
 
           switch (command)
           {
@@ -150,6 +155,16 @@ onMIDISuccess(midiAccess)
               default:
                   break;
           }
+      }
+
+      function midiToNote(midiInput)
+      {
+        const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+        const octave = Math.floor(midiInput / 12) -1;
+        const noteIndex = midiInput % 12;
+
+        const noteName = noteNames[noteIndex];
+        return noteName + octave;
       }
 
   }

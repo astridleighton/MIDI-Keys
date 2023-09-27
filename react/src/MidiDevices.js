@@ -64,7 +64,8 @@ class Midi extends React.Component
               <h2>MIDI Devices</h2>
               <p>Browser Support: {this.state.support}</p>
               <p>Inputs: </p>
-              <ul>
+              {this.state.midiDevices ? (
+                <ul>
                 <li>
                   <label>
                     <input
@@ -86,7 +87,10 @@ class Midi extends React.Component
                   </label>
                 </li>
             </ul>
-          </div>
+              ) : (
+                <p>No MIDI device connected.</p>
+              )}
+              </div>
         )
     }
 }

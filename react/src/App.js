@@ -4,7 +4,7 @@ import './App.css';
 import Midi from './MidiDevices';
 import Home from './Home';
 import Navbar from './Navbar';
-import Tone from 'tone';
+import * as Tone from 'tone';
 
 /*
 * Note: To begin application, navigate to midi-controller and type "npm start"
@@ -146,8 +146,8 @@ onMIDISuccess(midiAccess)
                       //this.noteOn(note, velocity);
 
                       // play note with Tone.JS
-                      const synth = new Tone.Synth().toDestination();
-                      synth.triggerAttackRelease(Tone.Midi(note).toFrequency(), "8n");
+                      /*const synth = new Tone.Synth().toDestination();
+                      synth.triggerAttackRelease(Tone.Midi(note).toFrequency(), "8n");*/
                       
                   }
                   else

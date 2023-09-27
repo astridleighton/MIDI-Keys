@@ -4,6 +4,7 @@ import './App.css';
 import Midi from './MidiDevices';
 import Home from './Home';
 import Navbar from './Navbar';
+import Tone from 'tone';
 
 /*
 * Note: To begin application, navigate to midi-controller and type "npm start"
@@ -44,6 +45,7 @@ componentDidMount()
 
 onMIDISuccess(midiAccess)
   {
+      Tone.start();
       console.log("WebMIDI is supported in browser.");
       console.log(midiAccess);
       midiAccess.addEventListener('statechange', this.updateDevices);
@@ -126,6 +128,7 @@ onMIDISuccess(midiAccess)
   // NOTES: 0-127
   useKeyboard(keyboard)
   {
+    
       keyboard.onmidimessage = function (event)
       {
           const command = event.data[0];
@@ -141,6 +144,11 @@ onMIDISuccess(midiAccess)
                   {
                       console.log("Playing " + note);
                       //this.noteOn(note, velocity);
+
+                      // play note with Tone.JS
+                      const synth = new Tone.Synth().toDestination();
+                      synth.triggerAttackRelease(Tone.Midi(note).toFrequency(), "8n");
+                      
                   }
                   else
                   {
@@ -154,9 +162,19 @@ onMIDISuccess(midiAccess)
                   break;
               default:
                   break;
+
+                  /* COMMANDS:
+                  * command 224 = pitch wheel, 176 = mod wheel
+                  * 153/137 - pads
+                  * 176 - buttons 
+                  */
           }
       }
 
+      /*
+      * Converts MIDI input (number value) to note value and octave
+      * Example: #28 -> E1
+      */
       function midiToNote(midiInput)
       {
         const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]

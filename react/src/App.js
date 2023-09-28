@@ -146,8 +146,8 @@ onMIDISuccess(midiAccess)
                       //this.noteOn(note, velocity);
 
                       // play note with Tone.JS
-                      /*const synth = new Tone.Synth().toDestination();
-                      synth.triggerAttackRelease(Tone.Midi(note).toFrequency(), "8n");*/
+                      const synth = new Tone.Synth().toDestination();
+                      synth.triggerAttackRelease(Tone.Midi(note).toFrequency(), "8n");
                       
                   }
                   else

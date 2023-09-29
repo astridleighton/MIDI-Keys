@@ -4,6 +4,7 @@ import './App.css';
 import Midi from './MidiDevices';
 import Home from './Home';
 import Navbar from './Navbar';
+import Login from './Login';
 
 /*
 * Note: To begin application, navigate to midi-controller and type "npm start"
@@ -159,13 +160,6 @@ onMIDISuccess(midiAccess)
     return (
       <div className="App">
         <Navbar />
-        <BrowserRouter>
-          <Routes>
-          <Route exact path="/" element={<Home />} />
-          <Route exact path="/midi" element={<Midi />} />
-          </Routes>
-          <Link to="/midi" devices={this.props.midi}>Connect MIDI Device</Link>
-        </BrowserRouter>
       </div>
     );
   }

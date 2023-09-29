@@ -1,22 +1,24 @@
 import React from 'react';
+import { Route, Link, Routes, BrowserRouter } from 'react-router-dom';
+import Midi from './MidiDevices';
+import Home from './Home';
+import Login from './Login';
 
 class Navbar extends React.Component
 {
-    // TODO: fix links
-    
     render()
     {
         return(
-            <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#home">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#connectMidi">Connect MIDI Device</a>
-                    </li>
-                </ul>
-            </nav>
+        <BrowserRouter>
+          <Routes>
+            <Route exact path="/" element={<Home />} />
+            <Route exact path="/play" element={<Midi />} />
+            <Route exact path="/login" element={<Login />}/>
+          </Routes>
+            <Link to="/">Home</Link>
+            <Link to="/play" devices={this.props.midi}>Play</Link>
+            <Link to="/login">Login</Link>
+        </BrowserRouter>
         )
     }
 }

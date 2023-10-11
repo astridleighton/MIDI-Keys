@@ -1,10 +1,11 @@
 import React from 'react';
-import { Route, Link, Routes, BrowserRouter } from 'react-router-dom';
+import { Route, Link, Routes, BrowserRouter as Router} from 'react-router-dom';
 import './App.css';
 import Midi from './MidiDevices';
 import Home from './Home';
 import Navbar from './Navbar';
 import * as Tone from 'tone';
+import About from './About';
 
 /*
 * Note: To begin application, navigate to midi-controller and type "npm start"
@@ -191,14 +192,27 @@ onMIDISuccess(midiAccess)
   {
     return (
       <div className="App">
-        <Navbar />
-        <BrowserRouter>
+        <Router>
           <Routes>
-          <Route exact path="/" element={<Home />} />
-          <Route exact path="/midi" element={<Midi />} />
+            <Route exact path="/" element={<Home />} />
+            <Route exact path="/midi" element={<Midi />} />
+            <Route exact path="/about" element={<About />} />
           </Routes>
-          <Link to="/midi" devices={this.props.midi}>Connect MIDI Device</Link>
-        </BrowserRouter>
+          <ul>
+            <li>
+                <Link to="/">Home</Link>
+            </li>
+            <li>
+                <Link to="/about">About</Link>
+            </li>
+            <li>
+                <Link to="/midi" devices={this.props.midi}>Connect MIDI Device</Link>
+            </li>
+            <li>
+                <Link to="/login">Login</Link>
+            </li>
+          </ul>
+        </Router>
       </div>
     );
   }

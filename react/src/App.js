@@ -1,9 +1,11 @@
 import React from 'react';
-import { Route, Link, Routes, BrowserRouter } from 'react-router-dom';
+import { Route, Link, Routes, BrowserRouter as Router} from 'react-router-dom';
 import './App.css';
 import Midi from './MidiDevices';
 import Home from './Home';
 import Navbar from './Navbar';
+import * as Tone from 'tone';
+import About from './About';
 import Login from './Login';
 
 /*
@@ -19,7 +21,10 @@ MidiWebAPI !!
 class App extends React.Component
 {
 
-  // TODO: pass midi devices into midi component
+  /* TODO:
+  * pass midi devices into midi component
+  * add bootstrap
+  */
 
   constructor(props) {
     super(props);
@@ -42,6 +47,7 @@ componentDidMount()
 
 onMIDISuccess(midiAccess)
   {
+      Tone.start();
       console.log("WebMIDI is supported in browser.");
       console.log(midiAccess);
       midiAccess.addEventListener('statechange', this.updateDevices);
@@ -124,11 +130,14 @@ onMIDISuccess(midiAccess)
   // NOTES: 0-127
   useKeyboard(keyboard)
   {
+    
       keyboard.onmidimessage = function (event)
       {
           const command = event.data[0];
-          const note = event.data[1];
+          const noteInput = event.data[1];
           const velocity = event.data[2];
+
+          const note = midiToNote(noteInput);
 
           switch (command)
           {
@@ -137,6 +146,11 @@ onMIDISuccess(midiAccess)
                   {
                       console.log("Playing " + note);
                       //this.noteOn(note, velocity);
+
+                      // play note with Tone.JS
+                      const synth = new Tone.Synth().toDestination();
+                      synth.triggerAttackRelease(Tone.Midi(note).toFrequency(), "8n");
+                      
                   }
                   else
                   {
@@ -150,7 +164,27 @@ onMIDISuccess(midiAccess)
                   break;
               default:
                   break;
+
+                  /* COMMANDS:
+                  * command 224 = pitch wheel, 176 = mod wheel
+                  * 153/137 - pads
+                  * 176 - buttons 
+                  */
           }
+      }
+
+      /*
+      * Converts MIDI input (number value) to note value and octave
+      * Example: #28 -> E1
+      */
+      function midiToNote(midiInput)
+      {
+        const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+        const octave = Math.floor(midiInput / 12) -1;
+        const noteIndex = midiInput % 12;
+
+        const noteName = noteNames[noteIndex];
+        return noteName + octave;
       }
 
   }
@@ -159,7 +193,27 @@ onMIDISuccess(midiAccess)
   {
     return (
       <div className="App">
-        <Navbar />
+        <Router>
+          <Routes>
+            <Route exact path="/" element={<Home />} />
+            <Route exact path="/midi" element={<Midi />} />
+            <Route exact path="/about" element={<About />} />
+          </Routes>
+          <ul>
+            <li>
+                <Link to="/">Home</Link>
+            </li>
+            <li>
+                <Link to="/about">About</Link>
+            </li>
+            <li>
+                <Link to="/midi" devices={this.props.midi}>Connect MIDI Device</Link>
+            </li>
+            <li>
+                <Link to="/login">Login</Link>
+            </li>
+          </ul>
+        </Router>
       </div>
     );
   }

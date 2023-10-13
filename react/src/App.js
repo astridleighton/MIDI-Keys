@@ -2,10 +2,12 @@ import React from 'react';
 import { Route, Link, Routes, BrowserRouter as Router} from 'react-router-dom';
 import './App.css';
 import Midi from './MidiDevices';
-import Home from './Home';
+import Play from './Play';
 import Navbar from './Navbar';
 import * as Tone from 'tone';
 import About from './About';
+import Login from './Login';
+import Register from './Register';
 
 /*
 * Note: To begin application, navigate to midi-controller and type "npm start"
@@ -30,10 +32,16 @@ class App extends React.Component
     this.state = {
         selectedDevice: null,
         midi: null,
-        currentNotes: []
+        currentNotes: [],
+        loggedIn: false
     };
     /*this.midi = null;
     this.currentNotes = [];*/
+}
+
+handleDeviceSelect = (selectedDevice) => {
+    this.setState({ selectedDevice });
+    console.log("test");
 }
 
 // initializes midi access
@@ -42,6 +50,8 @@ componentDidMount()
   navigator.requestMIDIAccess()
   .then((midiAccess) => this.onMIDISuccess(midiAccess), 
         (error) => this.onMIDIFailure(error));
+
+    this.handleDeviceSelect();
 }
 
 onMIDISuccess(midiAccess)
@@ -194,19 +204,21 @@ onMIDISuccess(midiAccess)
       <div className="App">
         <Router>
           <Routes>
-            <Route exact path="/" element={<Home />} />
-            <Route exact path="/midi" element={<Midi />} />
+            <Route exact path="/" element={<Play />} />
+            <Route exact path="/connect" element={<Midi />} />
             <Route exact path="/about" element={<About />} />
+            <Route exact path="/login" element={<Login />} />
+            <Route exact path="/register" element={<Register />} />
           </Routes>
           <ul>
             <li>
-                <Link to="/">Home</Link>
+                <Link to="/">Play</Link>
+            </li>
+            <li>
+                <Link to="/connect" devices={this.props.midi}>Connect</Link>
             </li>
             <li>
                 <Link to="/about">About</Link>
-            </li>
-            <li>
-                <Link to="/midi" devices={this.props.midi}>Connect MIDI Device</Link>
             </li>
             <li>
                 <Link to="/login">Login</Link>

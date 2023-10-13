@@ -1,7 +1,7 @@
 import React from 'react';
 import * as Tone from 'tone';
 
-class Home extends React.Component
+class Play extends React.Component
 {
     // used for testing
     constructor() {
@@ -17,15 +17,14 @@ class Home extends React.Component
     render()
     {
         return(
-            <div className="Home">
-                <h1>Welcome to the MIDI App</h1>
-                <p>MIDI stands for Musical Instrument Digital Interface. MIDI allows musical devices to be able to communicate with computers to pass information such as notes, velocity, and pitch.</p>
-                <p>To get started, please connect a MIDI device by navigating to the MIDI page.</p>
+            <div className="Play">
+                <h1>MIDI Made Simple.</h1>
                 <button onClick={this.playNote}>Play Note</button>
+                <p>Connected Device: ...</p>
             </div>
             
         )
     }
 }
 
-export default Home;
+export default Play;

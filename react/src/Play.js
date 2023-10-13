@@ -20,6 +20,11 @@ class Play extends React.Component
             <div className="Play">
                 <h1>MIDI Made Simple.</h1>
                 <button onClick={this.playNote}>Play Note</button>
+                <h1>Sounds</h1>
+                <ul>
+                    <li>Sound #1</li>
+                    <li>Sound #2</li>
+                </ul>
                 <p>Connected Device: ...</p>
             </div>
             

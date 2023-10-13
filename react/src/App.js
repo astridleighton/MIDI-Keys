@@ -27,22 +27,33 @@ class App extends React.Component
   * add bootstrap
   */
 
+  
+
   constructor(props) {
     super(props);
     this.state = {
+        loginData: {
+            username: 'test',
+            password: 'test',
+            loggedIn: false,
+            test: 'testing123'
+        },
         selectedDevice: null,
+        //selectedDevice: "TEST DEVICE 1", // used for testing
         midi: null,
         currentNotes: [],
         loggedIn: false
     };
+    //this.selectedDevice = this.selectDevice.bind(this);
     /*this.midi = null;
     this.currentNotes = [];*/
 }
 
-handleDeviceSelect = (selectedDevice) => {
+// TODO: wait for selected device
+/*selectDevice = async (selectedDevice) => {
     this.setState({ selectedDevice });
     console.log("test");
-}
+}*/
 
 // initializes midi access
 componentDidMount()
@@ -51,7 +62,7 @@ componentDidMount()
   .then((midiAccess) => this.onMIDISuccess(midiAccess), 
         (error) => this.onMIDIFailure(error));
 
-    this.handleDeviceSelect();
+    //this.handleDeviceSelect();
 }
 
 onMIDISuccess(midiAccess)
@@ -196,6 +207,8 @@ onMIDISuccess(midiAccess)
         return noteName + octave;
       }
 
+      // TODO: bind to connected device
+
   }
 
   render()
@@ -221,7 +234,7 @@ onMIDISuccess(midiAccess)
                 <Link to="/about">About</Link>
             </li>
             <li>
-                <Link to="/login">Login</Link>
+                <Link to="/login" loginData={this.props.loginData}>Login</Link>
             </li>
           </ul>
         </Router>

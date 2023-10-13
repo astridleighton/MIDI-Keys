@@ -6,14 +6,15 @@ class Login extends React.Component
 
     // TODO: send credentials to database, create POST method
     // create secure login page, create error page
-
+    // pass props to here
+    
     constructor(props) {
         super(props);
 
         this.state = {
             username: '',
             password: '',
-            loggedIn: false
+            isLoggedIn: false
         };
     }
 
@@ -28,14 +29,14 @@ class Login extends React.Component
         console.log('Username:', this.state.username);
         console.log('Password:', this.state.password);
 
-        this.loggedIn = true; // used for testing, log user in
+        //this.loggedIn = true; // used for testing, log user in
 
     }
     render()
     {
         return(
             <div>
-                <h1>Login Page</h1>
+                <h1>Login Page + {this.state.username}</h1>
                 <form onSubmit={this.handleSubmit}>
                     <div className="form-group">
                         <label htmlFor="username">Username:</label>

@@ -246,7 +246,7 @@ onMIDISuccess(midiAccess)
                 <Route exact path="/connect" element={<Midi updateConnectedDevice={this.updateConnectedDevice}/>} />
                 <Route exact path="/about" element={<About />} />
                 <Route exact path="/login" element={<Login updateIsLoggedIn={this.updateIsLoggedIn} updateFullName={this.updateFullName} />} />
-                <Route exact path="/register" element={<Register />} />
+                <Route exact path="/register" element={<Register updateIsLoggedIn={this.updateIsLoggedIn} updateFullName={this.updateFullName} />} />
             </Routes>
         </Router>
       </div>

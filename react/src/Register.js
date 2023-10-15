@@ -30,7 +30,7 @@ class Register extends React.Component
         console.log('Username:', this.state.username);
         console.log('Password:', this.state.password);
 
-        this.loggedIn = true; // used for testing, log user in
+        this.props.updateIsLoggedIn = true; // used for testing
 
     }
     render()

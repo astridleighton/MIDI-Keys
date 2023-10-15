@@ -18,14 +18,22 @@ class Play extends React.Component
     {
         return(
             <div className="Play">
-                <h1>MIDI Made Simple.</h1>
+                {this.props.isLoggedIn ? (
+                    <h1>Welcome, {this.props.fullName}!</h1>
+                ) : (
+                    <h1>MIDI Made Simple</h1>
+                )}
                 <button onClick={this.playNote}>Play Note</button>
                 <h1>Sounds</h1>
                 <ul>
                     <li>Sound #1</li>
                     <li>Sound #2</li>
                 </ul>
-                <p>Connected Device: ...</p>
+                {this.props.selectedDevice ? (
+                    <p>Connected Device: {this.props.selectedDevice}</p>
+                ) : (
+                    <p>No device connected.</p>
+                )}
             </div>
             
         )

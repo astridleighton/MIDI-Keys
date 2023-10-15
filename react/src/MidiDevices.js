@@ -49,6 +49,7 @@ class Midi extends React.Component
         if (this.state.selectedDevice)
         {
           // pass to app
+          this.props.updateConnectedDevice(this.state.selectedDevice);
           alert(`You selected: ${this.state.selectedDevice}`);
         }
         else

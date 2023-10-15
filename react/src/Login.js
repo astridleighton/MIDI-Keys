@@ -46,7 +46,7 @@ class Login extends React.Component
     {
         return(
             <div>
-                <h1>Login Page + {this.state.username}</h1>
+                <h1>Login Page</h1>
                 <form onSubmit={this.handleSubmit}>
                     <div className="form-group">
                         <label htmlFor="username">Username:</label>

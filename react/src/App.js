@@ -229,7 +229,10 @@ onMIDISuccess(midiAccess)
 
   updateFullName = (value) => {
     this.setState({ fullName: value });
-    window.alert("Welcome, " + value);
+  }
+
+  updateConnectedDevice = (value) => {
+    this.setState( { selectedDevice: value });
   }
 
   render()
@@ -238,8 +241,8 @@ onMIDISuccess(midiAccess)
       <div className="App">
         <Router>
           <Routes>
-            <Route exact path="/" element={<Play />} />
-            <Route exact path="/connect" element={<Midi />} />
+            <Route exact path="/" element={<Play selectedDevice={this.state.selectedDevice} isLoggedIn={this.state.isLoggedIn} fullName={this.state.fullName}/>} />
+            <Route exact path="/connect" element={<Midi updateConnectedDevice={this.updateConnectedDevice}/>} />
             <Route exact path="/about" element={<About />} />
             <Route exact path="/login" element={<Login updateIsLoggedIn={this.updateIsLoggedIn} updateFullName={this.updateFullName} />} />
             <Route exact path="/register" element={<Register />} />

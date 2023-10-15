@@ -29,14 +29,14 @@ class App extends React.Component
 
   
 
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
     this.state = {
+        isLoggedIn: false,
         loginData: {
             username: 'test',
             password: 'test',
-            loggedIn: false,
-            test: 'testing123'
+            isLoggedIn: false,
         },
         selectedDevice: null,
         //selectedDevice: "TEST DEVICE 1", // used for testing
@@ -211,6 +211,21 @@ onMIDISuccess(midiAccess)
 
   }
 
+  updateIsLoggedIn = (value) => {
+
+    this.setState({ isLoggedIn: value });
+
+    if(value == true)
+    {
+        window.alert("Login successful. isLoggedIn =" + this.state.isLoggedIn);
+    }
+    else
+    {
+        window.alert("Login failed. isLoggedIn =" + this.state.isLoggedIn);
+
+    }
+  }
+
   render()
   {
     return (
@@ -220,7 +235,7 @@ onMIDISuccess(midiAccess)
             <Route exact path="/" element={<Play />} />
             <Route exact path="/connect" element={<Midi />} />
             <Route exact path="/about" element={<About />} />
-            <Route exact path="/login" element={<Login />} />
+            <Route exact path="/login" element={<Login updateIsLoggedIn={this.updateIsLoggedIn} fullName={this.fullName} />} />
             <Route exact path="/register" element={<Register />} />
           </Routes>
           <ul>
@@ -234,7 +249,7 @@ onMIDISuccess(midiAccess)
                 <Link to="/about">About</Link>
             </li>
             <li>
-                <Link to="/login" loginData={this.props.loginData}>Login</Link>
+                <Link to="/login">Login</Link>
             </li>
           </ul>
         </Router>

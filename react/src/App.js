@@ -33,10 +33,10 @@ class App extends React.Component
     super();
     this.state = {
         isLoggedIn: false,
+        fullName: "",
         loginData: {
             username: 'test',
             password: 'test',
-            isLoggedIn: false,
         },
         selectedDevice: null,
         //selectedDevice: "TEST DEVICE 1", // used for testing
@@ -213,17 +213,23 @@ onMIDISuccess(midiAccess)
 
   updateIsLoggedIn = (value) => {
 
+    // TODO: select userID?
     this.setState({ isLoggedIn: value });
 
     if(value == true)
     {
-        window.alert("Login successful. isLoggedIn =" + this.state.isLoggedIn);
+        window.alert("Login successful.");
     }
     else
     {
-        window.alert("Login failed. isLoggedIn =" + this.state.isLoggedIn);
+        window.alert("Login failed.");
 
     }
+  }
+
+  updateFullName = (value) => {
+    this.setState({ fullName: value });
+    window.alert("Welcome, " + value);
   }
 
   render()
@@ -235,7 +241,7 @@ onMIDISuccess(midiAccess)
             <Route exact path="/" element={<Play />} />
             <Route exact path="/connect" element={<Midi />} />
             <Route exact path="/about" element={<About />} />
-            <Route exact path="/login" element={<Login updateIsLoggedIn={this.updateIsLoggedIn} fullName={this.fullName} />} />
+            <Route exact path="/login" element={<Login updateIsLoggedIn={this.updateIsLoggedIn} updateFullName={this.updateFullName} />} />
             <Route exact path="/register" element={<Register />} />
           </Routes>
           <ul>

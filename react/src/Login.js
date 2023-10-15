@@ -14,7 +14,6 @@ class Login extends React.Component
         this.state = {
             username: '',
             password: '',
-            //isLoggedIn: false
         };
     }
 
@@ -28,6 +27,8 @@ class Login extends React.Component
 
         console.log('Username:', this.state.username);
         console.log('Password:', this.state.password);
+
+        this.props.updateFullName("Astrid"); // used for testing
 
         // TODO: check login credentials in back-end -- used for testing
         if(this.state.username == "t" && this.state.password)

@@ -240,27 +240,14 @@ onMIDISuccess(midiAccess)
     return (
       <div className="App">
         <Router>
-          <Routes>
-            <Route exact path="/" element={<Play selectedDevice={this.state.selectedDevice} isLoggedIn={this.state.isLoggedIn} fullName={this.state.fullName}/>} />
-            <Route exact path="/connect" element={<Midi updateConnectedDevice={this.updateConnectedDevice}/>} />
-            <Route exact path="/about" element={<About />} />
-            <Route exact path="/login" element={<Login updateIsLoggedIn={this.updateIsLoggedIn} updateFullName={this.updateFullName} />} />
-            <Route exact path="/register" element={<Register />} />
-          </Routes>
-          <ul>
-            <li>
-                <Link to="/">Play</Link>
-            </li>
-            <li>
-                <Link to="/connect" devices={this.props.midi}>Connect</Link>
-            </li>
-            <li>
-                <Link to="/about">About</Link>
-            </li>
-            <li>
-                <Link to="/login">Login</Link>
-            </li>
-          </ul>
+            <Navbar />
+            <Routes>
+                <Route exact path="/" element={<Play selectedDevice={this.state.selectedDevice} isLoggedIn={this.state.isLoggedIn} fullName={this.state.fullName}/>} />
+                <Route exact path="/connect" element={<Midi updateConnectedDevice={this.updateConnectedDevice}/>} />
+                <Route exact path="/about" element={<About />} />
+                <Route exact path="/login" element={<Login updateIsLoggedIn={this.updateIsLoggedIn} updateFullName={this.updateFullName} />} />
+                <Route exact path="/register" element={<Register />} />
+            </Routes>
         </Router>
       </div>
     );

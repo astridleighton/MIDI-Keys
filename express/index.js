@@ -34,8 +34,8 @@ app.get('/', (req, res) => {
 // TODO: add hashing
 app.post('/login', function(req, res, next) {
 
-    let username = req.body.username;
-    let password = req.body.password;
+    const username = req.body.username;
+    const password = req.body.password;
 
     // TODO: check that values are not blank, add promise?
     connection.query("SELECT * FROM users WHERE username = ? AND password = ?", [username, password], function (error, results, fields)
@@ -52,6 +52,43 @@ app.post('/login', function(req, res, next) {
         }
         
     });
+})
+
+// TODO: add error handling
+app.post('/register', function(req, res, next) {
+
+    // TODO: remove id
+    const id = 1;
+    const firstName = req.body.firstName;
+    const username = req.body.username;
+    const password = req.body.password;
+
+    var sql = "INSERT INTO users (id, username, password, firstName) VALUES ?";
+    var values = [
+        [id, username, password, firstName]
+    ];
+
+    connection.query(sql, [values], function (error, result)
+    {
+        if (error) throw error;
+
+        if(result.length > 0)
+        {
+            res.status(200).send("Registration successful");
+        }
+        else
+        {
+            res.status(400).send("Registration failure. Duplicate value.");
+        }
+
+    })
+
+
+    /*//var user = { username: username, password: password, firstName: firstName }
+    connection.query("INSERT INTO users (ID, USERNAME, PASSWORD, firstName) VALUES (?,?,?,?)", [username, password, firstName], function(errors, results, fields)
+    {
+        if(error) throw error;
+    })*/
 })
 
 /*app.get('/test', (req, res) => {

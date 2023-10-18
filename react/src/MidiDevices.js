@@ -23,7 +23,9 @@ class Midi extends React.Component
       {
         super(props);
         this.state = {
-          midiDevices: this.props.devices
+          //midiDevices: this.props.devices
+          midiDevices: [],
+          selectedDevice: null
         }
       }
 
@@ -31,11 +33,37 @@ class Midi extends React.Component
         support: ".",
       }
 
+      // used for testing -- replace with connected MIDI devices
+      setDevice = () => {
+        this.setState({
+          midiDevices: ["MIDI device1", "MIDI device2"],
+        })
+      }
+
+      // connect to selected device
+      handleDeviceChange = (event) => {
+        this.setState({ selectedDevice: event.target.value });
+      };
+
+      handleSelect = () => {
+        if (this.state.selectedDevice)
+        {
+          // pass to app
+          this.props.updateConnectedDevice(this.state.selectedDevice);
+          alert(`You selected: ${this.state.selectedDevice}`);
+        }
+        else
+        {
+          alert(`Please select a MIDI device first.`);
+        }
+      }
+
       /*
       * Checks browser support when component mounts
       */
       componentDidMount()
       {
+        this.setDevice();
         console.log("DEVICES:" + this.state.midiDevices);
       }
 
@@ -61,31 +89,28 @@ class Midi extends React.Component
     {
         return(
           <div>
-              <h2>MIDI Devices</h2>
-              <p>Browser Support: {this.state.support}</p>
-              <p>Inputs: </p>
-              <ul>
-                <li>
-                  <label>
-                    <input
-                      type="radio"
-                      name="option"
-                      value="option1"
-                    />
-                    Option 1
-                  </label>
-                </li>
-                <li>
-                  <label>
-                    <input
-                      type="radio"
-                      name="option"
-                      value="option2"
-                    />
-                    Option 2
-                  </label>
-                </li>
-            </ul>
+              <h2>MIDI devices: </h2>
+                <form>
+                  {this.state.midiDevices.map((device, index) => (
+                    <div key={index}>
+                      <input
+                        type="radio"
+                        id={device}
+                        name="midiDevice"
+                        value={device}
+                        checked={this.state.selectedDevice === device}
+                        onChange={this.handleDeviceChange}
+                      />
+                      <label htmlFor={device}>{device}</label>
+                    </div>
+                  ))}
+                </form>
+                {this.state.selectedDevice && (
+                  <div>
+                    <button onClick={this.handleSelect}>Connect</button>
+                  </div>
+                )}
+                {!this.state.selectedDevice && <p>Please select a MIDI device.</p>}
           </div>
         )
     }

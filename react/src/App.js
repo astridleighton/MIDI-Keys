@@ -2,11 +2,12 @@ import React from 'react';
 import { Route, Link, Routes, BrowserRouter as Router} from 'react-router-dom';
 import './App.css';
 import Midi from './MidiDevices';
-import Home from './Home';
+import Play from './Play';
 import Navbar from './Navbar';
 import * as Tone from 'tone';
 import About from './About';
 import Login from './Login';
+import Register from './Register';
 
 /*
 * Note: To begin application, navigate to midi-controller and type "npm start"
@@ -26,16 +27,33 @@ class App extends React.Component
   * add bootstrap
   */
 
-  constructor(props) {
-    super(props);
+  
+
+  constructor() {
+    super();
     this.state = {
+        isLoggedIn: false,
+        fullName: "",
+        loginData: {
+            username: 'test',
+            password: 'test',
+        },
         selectedDevice: null,
+        //selectedDevice: "TEST DEVICE 1", // used for testing
         midi: null,
-        currentNotes: []
+        currentNotes: [],
+        loggedIn: false
     };
+    //this.selectedDevice = this.selectDevice.bind(this);
     /*this.midi = null;
     this.currentNotes = [];*/
 }
+
+// TODO: wait for selected device
+/*selectDevice = async (selectedDevice) => {
+    this.setState({ selectedDevice });
+    console.log("test");
+}*/
 
 // initializes midi access
 componentDidMount()
@@ -43,6 +61,8 @@ componentDidMount()
   navigator.requestMIDIAccess()
   .then((midiAccess) => this.onMIDISuccess(midiAccess), 
         (error) => this.onMIDIFailure(error));
+
+    //this.handleDeviceSelect();
 }
 
 onMIDISuccess(midiAccess)
@@ -187,6 +207,32 @@ onMIDISuccess(midiAccess)
         return noteName + octave;
       }
 
+      // TODO: bind to connected device
+
+  }
+
+  updateIsLoggedIn = (value) => {
+
+    // TODO: select userID?
+    this.setState({ isLoggedIn: value });
+
+    if(value == true)
+    {
+        window.alert("Login successful.");
+    }
+    else
+    {
+        window.alert("Login failed.");
+
+    }
+  }
+
+  updateFullName = (value) => {
+    this.setState({ fullName: value });
+  }
+
+  updateConnectedDevice = (value) => {
+    this.setState( { selectedDevice: value });
   }
 
   render()
@@ -194,25 +240,14 @@ onMIDISuccess(midiAccess)
     return (
       <div className="App">
         <Router>
-          <Routes>
-            <Route exact path="/" element={<Home />} />
-            <Route exact path="/midi" element={<Midi />} />
-            <Route exact path="/about" element={<About />} />
-          </Routes>
-          <ul>
-            <li>
-                <Link to="/">Home</Link>
-            </li>
-            <li>
-                <Link to="/about">About</Link>
-            </li>
-            <li>
-                <Link to="/midi" devices={this.props.midi}>Connect MIDI Device</Link>
-            </li>
-            <li>
-                <Link to="/login">Login</Link>
-            </li>
-          </ul>
+            <Navbar />
+            <Routes>
+                <Route exact path="/" element={<Play selectedDevice={this.state.selectedDevice} isLoggedIn={this.state.isLoggedIn} fullName={this.state.fullName}/>} />
+                <Route exact path="/connect" element={<Midi updateConnectedDevice={this.updateConnectedDevice}/>} />
+                <Route exact path="/about" element={<About />} />
+                <Route exact path="/login" element={<Login updateIsLoggedIn={this.updateIsLoggedIn} updateFullName={this.updateFullName} />} />
+                <Route exact path="/register" element={<Register updateIsLoggedIn={this.updateIsLoggedIn} updateFullName={this.updateFullName} />} />
+            </Routes>
         </Router>
       </div>
     );

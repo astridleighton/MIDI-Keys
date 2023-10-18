@@ -1,12 +1,18 @@
 import React from 'react';
+import { Redirect, Link } from 'react-router-dom';
 
 class Login extends React.Component
 {
-<<<<<<< Updated upstream
 
-    // TODO: add link in home page
-=======
->>>>>>> Stashed changes
+    // TODO: send credentials to database, create POST method
+    // create secure login page, create error page
+    // pass props to here
+    
+    constructor(props) {
+        super(props);
+
+class Login extends React.Component
+{
     
     constructor(props)
     {
@@ -17,30 +23,30 @@ class Login extends React.Component
         };
     }
 
-    handleChange = (e) => {
-        this.setState({
-            [e.target.name]: e.target.value,
-        });
+    handleInputChange = (event) => {
+        const { name, value } = event.target;
+        this.setState({ [name]: value });
     }
 
+    handleSubmit = (event) => {
+        event.preventDefault();
 
-    handleSubmit = async (e) => {
-        e.preventDefault();
+        console.log('Username:', this.state.username);
+        console.log('Password:', this.state.password);
 
-<<<<<<< Updated upstream
-        const {username, password } = this.state;
-=======
-        const { username, password } = this.state;
->>>>>>> Stashed changes
+        this.props.updateFullName("Astrid"); // used for testing
 
-        try{
-
-            //send post request to express
-        }
-        catch (error)
+        // TODO: check login credentials in back-end -- used for testing
+        if(this.state.username == "t" && this.state.password)
         {
-
+            this.props.updateIsLoggedIn(true);
         }
+        else
+        {
+            this.props.updateIsLoggedIn(false);
+        }
+
+        // TODO: make sure props update right away
     }
 
     render() {
@@ -49,12 +55,6 @@ class Login extends React.Component
         return (
             <div>
                 <h2>Login</h2>
-<<<<<<< Updated upstream
-            </div>
-        )
-    }
-}
-=======
                 <form onSubmit={this.handleSubmit}>
                 <div className="form-group">
                     <label htmlFor="username">Username:</label>
@@ -78,12 +78,11 @@ class Login extends React.Component
                     required
                     />
                 </div>
-          <button type="submit">Login</button>
-        </form>
-            </div>
+              <button type="submit">Login</button>
+            </form>
+          </div>
         )
     }
 }
 
 export default Login;
->>>>>>> Stashed changes

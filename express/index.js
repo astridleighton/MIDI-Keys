@@ -13,7 +13,7 @@ const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: 'root',
-    database: 'capstone',
+    database: 'capstone'
 })
 
 connection.connect((error) => {
@@ -29,6 +29,29 @@ connection.connect((error) => {
 
 app.get('/', (req, res) => {
     res.send("Testing express app");
+})
+
+// TODO: add hashing
+app.post('/login', function(req, res, next) {
+
+    let username = req.body.username;
+    let password = req.body.password;
+
+    // TODO: check that values are not blank, add promise?
+    connection.query("SELECT * FROM users WHERE username = ? AND password = ?", [username, password], function (error, results, fields)
+    {
+        if (error) throw error;
+
+        if(results.length > 0)
+        {
+            res.send("Login success");
+        }
+        else
+        {
+            res.send("Login fail");
+        }
+        
+    });
 })
 
 /*app.get('/test', (req, res) => {

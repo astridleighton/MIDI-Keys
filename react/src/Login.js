@@ -11,6 +11,12 @@ class Login extends React.Component
     constructor(props) {
         super(props);
 
+class Login extends React.Component
+{
+    
+    constructor(props)
+    {
+        super(props);
         this.state = {
             username: '',
             password: '',
@@ -42,37 +48,39 @@ class Login extends React.Component
 
         // TODO: make sure props update right away
     }
-    render()
-    {
-        return(
+
+    render() {
+        const {username, password} = this.state;
+
+        return (
             <div>
-                <h1>Login Page</h1>
+                <h2>Login</h2>
                 <form onSubmit={this.handleSubmit}>
-                    <div className="form-group">
-                        <label htmlFor="username">Username:</label>
-                        <input
-                            type="text"
-                            id="username"
-                            name="username"
-                            value={this.state.username}
-                            onChange={this.handleInputChange}
-                            required
-                            />
-                    </div>
-                    <div>
-                        <label for="password">Password:</label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            value={this.state.password}
-                            onChange={this.handleInputChange}
-                            />
-                    </div>
-                    <input type="submit" value="Login"/>
-                    <p>New? <Link to="/register">CREATE AN ACCOUNT</Link></p>
-                </form>
-            </div>
+                <div className="form-group">
+                    <label htmlFor="username">Username:</label>
+                    <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    value={this.state.username}
+                    onChange={this.handleInputChange}
+                    required
+                    />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="password">Password:</label>
+                    <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    value={this.state.password}
+                    onChange={this.handleInputChange}
+                    required
+                    />
+                </div>
+              <button type="submit">Login</button>
+            </form>
+          </div>
         )
     }
 }

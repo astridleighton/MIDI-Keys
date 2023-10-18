@@ -1,15 +1,6 @@
 import React from 'react';
 import { Redirect, Link } from 'react-router-dom';
-
-class Login extends React.Component
-{
-
-    // TODO: send credentials to database, create POST method
-    // create secure login page, create error page
-    // pass props to here
-    
-    constructor(props) {
-        super(props);
+import axios from 'axios';
 
 class Login extends React.Component
 {
@@ -31,22 +22,25 @@ class Login extends React.Component
     handleSubmit = (event) => {
         event.preventDefault();
 
-        console.log('Username:', this.state.username);
-        console.log('Password:', this.state.password);
-
         this.props.updateFullName("Astrid"); // used for testing
 
-        // TODO: check login credentials in back-end -- used for testing
-        if(this.state.username == "t" && this.state.password)
-        {
-            this.props.updateIsLoggedIn(true);
-        }
-        else
-        {
-            this.props.updateIsLoggedIn(false);
-        }
+        this.processLogin(this.state);
 
         // TODO: make sure props update right away
+        // redirect to home page (secure)
+    }
+
+    processLogin = async (loginCredentials) => {
+
+        console.log("Details: " + JSON.stringify(loginCredentials));
+        try {
+            const result = await axios.post(`http://localhost:3000/login`, loginCredentials);
+            console.log(result);
+        }
+            catch (error)
+        {
+            console.log(error);
+        }
     }
 
     render() {

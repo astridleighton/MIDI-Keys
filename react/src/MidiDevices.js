@@ -47,6 +47,7 @@ class Midi extends React.Component
       };
 
       handleSelect = () => {
+
         if (this.state.selectedDevice)
         {
           // pass to app

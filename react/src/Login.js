@@ -38,10 +38,21 @@ class Login extends React.Component
             const result = await axios.post(`http://localhost:3000/login`, loginCredentials);
             console.log(result);
         }
-            catch (error)
-        {
-            alert("Login error. Please try again.");
-            console.log(error);
+        catch (error) {
+            if (error.response)
+            {
+                if(error.response.status === 401) {
+                    alert("Invalid login credentials. Please try again.");
+                } else if (error.response.status === 404) {
+                    alert("Login Error (401): Resource not found.");
+                } else {
+                    alert("An error occurred during login. Please try again.");
+                }
+                console.log(error);
+            } else {
+                alert("An error occurred during login. Please try again.");
+                console.log(error);
+            }
         }
     }
 

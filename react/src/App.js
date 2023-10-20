@@ -37,7 +37,8 @@ class App extends React.Component
         midi: null,
         currentNotes: [],
         loggedIn: false,
-        token: null
+        token: null,
+        midiInputs: []
     };
     //this.selectedDevice = this.selectDevice.bind(this);
     /*this.midi = null;

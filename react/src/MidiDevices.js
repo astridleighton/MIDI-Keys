@@ -23,7 +23,8 @@ class Midi extends React.Component
       {
         super(props);
         this.state = {
-          //midiDevices: this.props.devices
+          //const { inputDeviceNames } = props,
+          //midiDevices = props,
           midiDevices: [],
           selectedDevice: null
         }
@@ -33,9 +34,8 @@ class Midi extends React.Component
         support: ".",
       }
 
-      // used for testing -- replace with connected MIDI devices
+      // TODO: replace with connected MIDI devices
       setDevice = () => {
-        console.log("MIDI: " + this.midiDevices);
         this.setState({
           midiDevices: ["MIDI device1", "MIDI device2"],
         })
@@ -66,7 +66,6 @@ class Midi extends React.Component
       componentDidMount()
       {
         this.setDevice();
-        console.log("DEVICES:" + this.state.midiDevices);
       }
 
       /*

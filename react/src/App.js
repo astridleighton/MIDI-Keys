@@ -1,6 +1,5 @@
 import React from 'react';
 import { Route, Link, Routes, BrowserRouter as Router} from 'react-router-dom';
-import axios from 'axios';
 import './App.css';
 import Midi from './MidiDevices';
 import Play from './Play';
@@ -33,12 +32,11 @@ class App extends React.Component
             password: 'test',
         },
         selectedDevice: null,
-        //selectedDevice: "TEST DEVICE 1", // used for testing
         midi: null,
         currentNotes: [],
         loggedIn: false,
         token: null,
-        midiInputs: []
+        inputDeviceNames: []
     };
     //this.selectedDevice = this.selectDevice.bind(this);
     /*this.midi = null;
@@ -57,8 +55,6 @@ componentDidMount()
   navigator.requestMIDIAccess()
   .then((midiAccess) => this.onMIDISuccess(midiAccess), 
         (error) => this.onMIDIFailure(error));
-
-    //this.handleDeviceSelect();
 }
 
 onMIDISuccess(midiAccess)
@@ -80,8 +76,13 @@ onMIDISuccess(midiAccess)
       // list midi inputs to console
       if (inputs != null)
       {
+          const midiInputDevices = [];
+
+
           for(let input of inputs)
           {
+             midiInputDevices.push(input.name);
+
               console.log(`Found MIDI input: ${input.name}, ID: ${input.id}`);
               if(input.name === "V49")
               {
@@ -89,6 +90,12 @@ onMIDISuccess(midiAccess)
               }
               //input.onMIDIMessage = this.onMIDIMessage.bind(this);
           }
+
+
+          this.setState({ inputDeviceNames: midiInputDevices }, () => {
+            // This callback is executed after the state has been updated
+            console.log("Devices: " + this.state.inputDeviceNames);
+          });
       }
       else
       {
@@ -96,13 +103,13 @@ onMIDISuccess(midiAccess)
       }
 
       // list midi outputs to console
-      if(outputs != null)
+      /*if(outputs != null)
       {
           for(let output of outputs)
           {
               console.log(`Found MIDI output: ${output.name}, ID: ${output.id}`);
           }
-      }
+      }*/
 
       if(keyboard != null)
       {
@@ -207,12 +214,7 @@ onMIDISuccess(midiAccess)
 
   }
 
-  processLogin = (value) => {
-    
-    // update!
-
-  }
-
+  // TODO: replace with cookie
   updateIsLoggedIn = (value) => {
 
     // TODO: select userID?
@@ -246,7 +248,7 @@ onMIDISuccess(midiAccess)
             <Navbar />
             <Routes>
                 <Route exact path="/" element={<Play selectedDevice={this.state.selectedDevice} isLoggedIn={this.state.isLoggedIn} fullName={this.state.fullName}/>} />
-                <Route exact path="/connect" element={<Midi updateConnectedDevice={this.updateConnectedDevice}/>} />
+                <Route exact path="/connect" element={<Midi updateConnectedDevice={this.updateConnectedDevice} midiInputs={this.state.inputDeviceNames}/>} />
                 <Route exact path="/about" element={<About />} />
                 <Route exact path="/login" element={<Login updateIsLoggedIn={this.updateIsLoggedIn} updateFullName={this.updateFullName} />} />
                 <Route exact path="/register" element={<Register updateIsLoggedIn={this.updateIsLoggedIn} updateFullName={this.updateFullName} />} />

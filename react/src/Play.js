@@ -9,7 +9,7 @@ class Play extends React.Component
     // used for testing
     constructor() {
         super();
-        this.selectedInstrument = ' synth';
+        this.selectedInstrument = 'synth';
         this.synth = new Tone.Synth().toDestination(); // Create a simple synth
         this.amSynth = new Tone.AMSynth().toDestination();
         this.monosynth = new Tone.MonoSynth({

@@ -5,10 +5,10 @@ const mysql = require('mysql');
 const cors = require('cors');
 
 // bcrypt
-//const db = require('../models');
 var bcrypt = require('bcrypt');
 const saltRounds = 10;
 
+// jwt
 const jwt = require('jsonwebtoken');
 const secretKey = "astrid";
 
@@ -16,28 +16,6 @@ app.use(cors());
 app.use(express.json());
 
 // TODO: separate database logic from this file
-
-// used to verify token from user
-/*const authenticateToken = (req, res, next) => {
-    const token = req.header('Authorization');
-
-    if(!token)
-    {
-        return res.status(401).json({ message: 'Access denied. No token provided.'});
-    }
-
-    try
-    {
-        const decoded = jwt.verify(token, secretKey);
-        req.user = decoded;
-        next();
-    }
-    catch (error)
-    {
-        return res.status(403).json({ message: "Invalid token." });
-    }
-    
-}*/
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -61,10 +39,28 @@ app.get('/', (req, res) => {
     res.send("Testing express app");
 })
 
-app.post('/login', function(req, res, next) {
+app.post('/login', async function(req, res, next) {
 
     const username = req.body.username;
     const password = req.body.password;
+
+    // create JWT token
+    const payload = {
+        username: username,
+    }
+
+    const token = await new Promise((resolve, reject) => {
+        jwt.sign(payload, secretKey, {expiresIn: '1h'}, (err, token) => {
+            if (err)
+            {
+                console.error(err);
+                return res.status(500).json({ error: 'Failed to generated token'});
+            } else {
+                resolve(token);
+            }
+            
+        })
+    })
 
     connection.query("SELECT * FROM users WHERE username = ?", [username], function (error, results) {
         if (error) {
@@ -84,32 +80,17 @@ app.post('/login', function(req, res, next) {
         if (error)
         {
             console.error(error);
-            res.status(500).send("Internal server error.");
+            res.json({ message: 'Database error.', status: 500});
             return;
         }
 
         if (result) {
-            res.status(200).send("Login successful.");
+            console.log("test");
+            res.json({ message: 'Login successful.', status: 200, token: token});
         } else {
-            res.status(401).send("Login failed.");
+            res.json({ message: 'Login failed.', status: 401});
         }
     })
-
-    // TODO: check that values are not blank, add promise?
-    /*connection.query("SELECT * FROM users WHERE username = ? AND password = ?", [username, password], function (error, results, fields)
-    {
-        if (error) throw error;
-
-        if(results.length > 0)
-        {
-            res.send("Login success");
-        }
-        else
-        {
-            res.send("Login fail");
-        }
-        
-    });*/
 })
 })
 
@@ -140,21 +121,6 @@ app.post('/register', function(req, res, next) {
                     res.status(500).send("Server Error");
                     return;
                 }
-        
-                // create JWT token
-                const payload = {
-                    username: username,
-                }
-
-                jwt.sign(payload, secretKey, {expiresIn: '1h'}, (err, token) => {
-                    if (err)
-                    {
-                        console.error(err);
-                        return res.status(500).json({ error: 'Failed to generated token'});
-                    }
-                    console.log("Token:" + token);
-                    res.json({ token: token});
-                })
         
             // inserts new user into database
             var sql = "INSERT INTO users (username, password, fullname) VALUES ?";

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Redirect, Link, useHistory } from 'react-router-dom';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 class Login extends React.Component
 {
@@ -35,13 +36,9 @@ class Login extends React.Component
 
         console.log("Details: " + JSON.stringify(loginCredentials));
         try {
-            const result = await axios.post(`http://localhost:3000/login`, loginCredentials)
-            /*.then(response => {
-                const token = response.data.token;
-                localStorage.setItem("token", token);
-                //setAuthToken(token);
-            })*/;
-            console.log(result);
+            const result = await axios.post(`http://localhost:3000/login`, loginCredentials);
+            const token = result.json.token;
+            Cookies.set('token', token, { expires: 1});
         }
         catch (error) {
             if (error.response)

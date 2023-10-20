@@ -81,6 +81,7 @@ app.post('/login', function(req, res, next) {
     }
 
     const storedHashedPassword = results[0].password;
+    console.log("Password: " + password + ", hash: " + )
 
     bcrypt.compare(password, storedHashedPassword, function (error, result) {
         if (error)

@@ -35,7 +35,12 @@ class Login extends React.Component
 
         console.log("Details: " + JSON.stringify(loginCredentials));
         try {
-            const result = await axios.post(`http://localhost:3000/login`, loginCredentials);
+            const result = await axios.post(`http://localhost:3000/login`, loginCredentials)
+            /*.then(response => {
+                const token = response.data.token;
+                localStorage.setItem("token", token);
+                //setAuthToken(token);
+            })*/;
             console.log(result);
         }
         catch (error) {

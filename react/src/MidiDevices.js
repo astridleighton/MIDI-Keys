@@ -35,6 +35,7 @@ class Midi extends React.Component
 
       // used for testing -- replace with connected MIDI devices
       setDevice = () => {
+        console.log("MIDI: " + this.midiDevices);
         this.setState({
           midiDevices: ["MIDI device1", "MIDI device2"],
         })

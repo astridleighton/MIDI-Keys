@@ -1,20 +1,19 @@
 import React from 'react';
 import { Redirect, Link } from 'react-router-dom';
+import axios from 'axios';
 
 class Register extends React.Component
 {
-
-    // TODO: send credentials to database, create POST method
     // create secure login page, create error page
 
     constructor(props) {
         super(props);
 
         this.state = {
-            fullName: '',
+            id: 3,
             username: '',
             password: '',
-            loggedIn: false
+            fullname: ''
         };
     }
 
@@ -26,26 +25,42 @@ class Register extends React.Component
     handleSubmit = (event) => {
         event.preventDefault();
 
-        console.log('Full Name', this.state.fullName);
+        console.log('First Name', this.state.fullname);
         console.log('Username:', this.state.username);
         console.log('Password:', this.state.password);
 
-        this.props.updateIsLoggedIn = true; // used for testing
+        //this.props.updateIsLoggedIn = true; // used for testing
+
+        this.processRegister(this.state);
 
     }
+
+    processRegister = async (registerCredentials) => {
+
+        console.log("Details: " + JSON.stringify(registerCredentials));
+        try {
+            const result = await axios.post(`http://localhost:3000/register`, registerCredentials);
+            console.log(result);
+        }
+            catch (error)
+        {
+            console.log(error);
+        }
+    }
+
     render()
     {
         return(
             <div>
                 <h1>Create An Account</h1>
                 <form onSubmit={this.handleSubmit}>
-                    <div className="form-group">
-                            <label htmlFor="fullName">Full Name:</label>
+                        <div className="form-group">
+                            <label htmlFor="fullname">First Name:</label>
                             <input
                                 type="text"
                                 id="fullname"
                                 name="fullname"
-                                value={this.state.fullName}
+                                value={this.state.fullname}
                                 onChange={this.handleInputChange}
                                 required
                                 />

@@ -23,13 +23,6 @@ MidiWebAPI !!
 class App extends React.Component
 {
 
-  /* TODO:
-  * pass midi devices into midi component
-  * add bootstrap
-  */
-
-  
-
   constructor() {
     super();
     this.state = {
@@ -43,7 +36,8 @@ class App extends React.Component
         //selectedDevice: "TEST DEVICE 1", // used for testing
         midi: null,
         currentNotes: [],
-        loggedIn: false
+        loggedIn: false,
+        token: null
     };
     //this.selectedDevice = this.selectDevice.bind(this);
     /*this.midi = null;

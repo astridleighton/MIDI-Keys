@@ -1,5 +1,5 @@
 import React from 'react';
-import { Redirect, Link } from 'react-router-dom';
+import { Redirect, Link, useHistory } from 'react-router-dom';
 import axios from 'axios';
 
 class Login extends React.Component
@@ -22,12 +22,13 @@ class Login extends React.Component
     handleSubmit = (event) => {
         event.preventDefault();
 
-        this.props.updateFullName("Astrid"); // used for testing
-
         this.processLogin(this.state);
 
+        // TODO: get full name from DB - use error handling
+        this.props.updateFullName("Astrid"); // used for testing
+
         // TODO: make sure props update right away
-        // redirect to home page (secure)
+        // redirect to home page (secure) - protected route?
     }
 
     processLogin = async (loginCredentials) => {
@@ -39,6 +40,7 @@ class Login extends React.Component
         }
             catch (error)
         {
+            alert("Login error. Please try again.");
             console.log(error);
         }
     }
@@ -72,6 +74,9 @@ class Login extends React.Component
                     required
                     />
                 </div>
+                <span>
+                <Link to="/register">New? CREATE ACCOUNT</Link>
+                </span>
               <button type="submit">Login</button>
             </form>
           </div>

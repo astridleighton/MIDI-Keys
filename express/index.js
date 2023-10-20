@@ -9,7 +9,8 @@ const cors = require('cors');
 var bcrypt = require('bcrypt');
 const saltRounds = 10;
 
-//const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
+const secretKey = "astrid";
 
 app.use(cors());
 app.use(express.json());
@@ -122,13 +123,15 @@ app.post('/register', function(req, res, next) {
     connection.query("SELECT * FROM users WHERE username = ?", [username], function (error, results) {
         if (error) {
             console.error(error);
-            results.status(500).send("Database Error");
+            res.status(500).send("Database Error");
             return;
         }
 
         if (results.length > 0) {
-            results.send("Username exists in the database.");
+            res.status(401).send("Username exists in the database.");
+            return;
         } else {
+
             // hashes password
             bcrypt.hash(password, saltRounds, function (error, hash) {
         
@@ -138,7 +141,20 @@ app.post('/register', function(req, res, next) {
                     return;
                 }
         
-                console.log(hash);
+                // create JWT token
+                const payload = {
+                    username: username,
+                }
+
+                jwt.sign(payload, secretKey, {expiresIn: '1h'}, (err, token) => {
+                    if (err)
+                    {
+                        console.error(err);
+                        return res.status(500).json({ error: 'Failed to generated token'});
+                    }
+                    console.log("Token:" + token);
+                    res.json({ token: token});
+                })
         
             // inserts new user into database
             var sql = "INSERT INTO users (username, password, fullname) VALUES ?";
@@ -161,10 +177,12 @@ app.post('/register', function(req, res, next) {
     
 })
 
-// ADD method to retrieve name from user?
+// retrieves full name from the user based on username -- needed?
+app.get('/name/:username', (req, res, next) => {
 
+    // TODO: add logic
 
-
+})
 
 app.listen(3000, () => {
     console.log("Server started on port 3000");

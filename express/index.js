@@ -38,7 +38,6 @@ app.use(express.json());
     
 }*/
 
-
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -61,7 +60,6 @@ app.get('/', (req, res) => {
     res.send("Testing express app");
 })
 
-// TODO: add hashing
 app.post('/login', function(req, res, next) {
 
     const username = req.body.username;
@@ -73,7 +71,6 @@ app.post('/login', function(req, res, next) {
                 results.status(500).send("Database Error");
                 return;
         }
-    
 
     if (results.length === 0) {
         res.status(401).send("Username not found.");
@@ -81,7 +78,6 @@ app.post('/login', function(req, res, next) {
     }
 
     const storedHashedPassword = results[0].password;
-    console.log("Password: " + password + ", hash: " + )
 
     bcrypt.compare(password, storedHashedPassword, function (error, result) {
         if (error)
@@ -122,42 +118,48 @@ app.post('/register', function(req, res, next) {
     const username = req.body.username;
     const password = req.body.password;
 
-    bcrypt.hash(password, saltRounds, function (error, hash) {
-        
+    // checks if username already exists in the database -- FIXME
+    connection.query("SELECT * FROM users WHERE username = ?", [username], function (error, results) {
         if (error) {
             console.error(error);
-            res.status(500).send("Server Error");
+            results.status(500).send("Database Error");
             return;
         }
 
-        console.log(hash);
-
-    var sql = "INSERT INTO users (username, password, fullname) VALUES ?";
-    var values = [
-        [username, hash, fullname]
-    ];
-
-    // TODO: add promise here to remove error message
-
-    connection.query(sql, [values], function (error, result)
-    {
-        if (error) throw error;
-
-        if(result.length > 0)
-        {
-            res.status(200).send("Registration successful");
+        if (results.length > 0) {
+            results.send("Username exists in the database.");
+        } else {
+            // hashes password
+            bcrypt.hash(password, saltRounds, function (error, hash) {
+        
+                if (error) {
+                    console.error(error);
+                    res.status(500).send("Server Error");
+                    return;
+                }
+        
+                console.log(hash);
+        
+            // inserts new user into database
+            var sql = "INSERT INTO users (username, password, fullname) VALUES ?";
+            var values = [
+                [username, hash, fullname]
+            ];
+        
+            connection.query(sql, [values], function (error, result)
+            {
+                if (error) {
+                    throw error;
+                } else {
+                    res.status(200).send("Registration successful.");
+                }
+        
+            })
+            })
         }
-        else
-        {
-            res.status(400).send("Registration failure.");
-        }
-
-    })
-    })
+    }) 
     
 })
-
-// ADD method to check if username exists
 
 // ADD method to retrieve name from user?
 

@@ -44,8 +44,17 @@ class Register extends React.Component
         }
             catch (error)
         {
-            console.log(error);
+            if(error.response.status === 401) {
+                alert("Username already exists.");
+            } else if (error.response.status === 500) {
+                alert("Database error. Please try again.");
+            } else {
+                console.log(error);
+            }
+            
         }
+
+        // TODO: redirect to home page (protected)
     }
 
     render()

@@ -25,11 +25,9 @@ class Login extends React.Component
 
         this.processLogin(this.state);
 
-        // TODO: get full name from DB - use error handling
-        this.props.updateFullName("Astrid"); // used for testing
+        this.props.updateFullName(this.state.name); // used for testing
 
-        // TODO: make sure props update right away
-        // redirect to home page (secure) - protected route?
+        // redirect to secure page
     }
 
     processLogin = async (loginCredentials) => {
@@ -37,8 +35,22 @@ class Login extends React.Component
         console.log("Details: " + JSON.stringify(loginCredentials));
         try {
             const result = await axios.post(`http://localhost:3000/login`, loginCredentials);
-            const token = result.json.token;
-            Cookies.set('token', token, { expires: 1});
+
+            if (result.status === 200) {
+                const token = result.data.token;
+                const name = result.data.firstName;
+                if (token && name)
+                {
+                    Cookies.set('token', token, { expires: 1 });
+                    Cookies.set('name', name, {expires: 1 });
+                    this.state.firstName = name;
+                } else {
+                    // TODO: add error message
+                }
+                
+            } else {
+                // TODO: add error message
+            }
         }
         catch (error) {
             if (error.response)
@@ -52,7 +64,7 @@ class Login extends React.Component
                 }
                 console.log(error);
             } else {
-                alert("An error occurred during login. Please try again.");
+                alert("An error occurred during login. Please try again!!");
                 console.log(error);
             }
         }
@@ -88,7 +100,7 @@ class Login extends React.Component
                     />
                 </div>
                 <span>
-                <Link to="/register">New? CREATE ACCOUNT</Link>
+                    <Link to="/register">New? CREATE ACCOUNT</Link>
                 </span>
               <button type="submit">Login</button>
             </form>

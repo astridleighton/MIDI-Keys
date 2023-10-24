@@ -1,6 +1,7 @@
 import React from 'react';
 import * as Tone from 'tone';
 import AudioKeys from 'audiokeys';
+import Cookies from 'js-cookie';
 
 // https://musicjoeyoung.medium.com/build-a-piano-with-tone-js-618e2403d9de
 
@@ -58,15 +59,31 @@ class Play extends React.Component
         }
       }
 
+      handleLogout = () => {
+        // TODO: ask user is they are sure they want to log out, add error handling
+        Cookies.remove('token');
+        Cookies.remove('name');
+        window.location.reload();
+      }
+
     // TODO: look into samples, organize better
     render()
     {
+        const isAuthenticated = !!Cookies.get('token');
+        const firstName = Cookies.get('name');
+
         return(
+
             <div className="Play">
-                {this.props.isLoggedIn ? (
-                    <h1>Welcome, {this.props.fullName}!</h1>
+                {isAuthenticated ? (
+                    <div>
+                        <h1>Welcome, {firstName}!</h1>
+                        <button onClick={(e) => this.handleLogout()}>Log Out</button>
+                    </div>
                 ) : (
-                    <h1>MIDI Made Simple</h1>
+                    <div>
+                        <h1>MIDI Made Simple</h1>
+                    </div>
                 )}
                 
                 <h1>Sounds</h1>

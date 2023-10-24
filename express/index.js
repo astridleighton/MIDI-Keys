@@ -85,8 +85,8 @@ app.post('/login', async function(req, res, next) {
         }
 
         if (result) {
-            console.log("test");
-            res.json({ message: 'Login successful.', status: 200, token: token});
+            // TODO: pull first name from database
+            res.json({ message: 'Login successful.', status: 200, token: token, firstName: "test"});
         } else {
             res.json({ message: 'Login failed.', status: 401});
         }

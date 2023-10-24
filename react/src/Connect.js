@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import WebMidi from 'webmidi';
 
-class Midi extends React.Component
+class Connect extends React.Component
 {
 
   //var levelNotes = [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72];
@@ -26,7 +26,8 @@ class Midi extends React.Component
           //const { inputDeviceNames } = props,
           //midiDevices = props,
           midiDevices: [],
-          selectedDevice: null
+          selectedDevice: null,
+
         }
       }
 
@@ -47,6 +48,8 @@ class Midi extends React.Component
       };
 
       handleSelect = () => {
+
+        alert("test");
 
         if (this.state.selectedDevice)
         {
@@ -118,4 +121,4 @@ class Midi extends React.Component
 }
 
 
-export default Midi;
+export default Connect;

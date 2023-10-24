@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Link, Routes, BrowserRouter as Router} from 'react-router-dom';
 import './App.css';
-import Midi from './MidiDevices';
+import Connect from './Connect';
 import Play from './Play';
 import Navbar from './Navbar';
 import * as Tone from 'tone';
@@ -73,29 +73,31 @@ onMIDISuccess(midiAccess)
 
       let keyboard = null;
 
+      const midiInputDevices = inputs.map((input) => input.name);
+      this.setState({inputDeviceNames:midiInputDevices});
+      
+      console.log("DEVICES TEST:");
+      midiInputDevices.map((item) => {
+        console.log(item);
+      })
+
       // list midi inputs to console
       if (inputs != null)
       {
-          const midiInputDevices = [];
+          
 
 
           for(let input of inputs)
           {
-             midiInputDevices.push(input.name);
 
               console.log(`Found MIDI input: ${input.name}, ID: ${input.id}`);
               if(input.name === "V49")
               {
                   keyboard = input;
+                  this.state.selectedDevice = input.name; // used for testing
               }
               //input.onMIDIMessage = this.onMIDIMessage.bind(this);
           }
-
-
-          this.setState({ inputDeviceNames: midiInputDevices }, () => {
-            // This callback is executed after the state has been updated
-            console.log("Devices: " + this.state.inputDeviceNames);
-          });
       }
       else
       {
@@ -159,6 +161,7 @@ onMIDISuccess(midiAccess)
           const command = event.data[0];
           const noteInput = event.data[1];
           const velocity = event.data[2];
+          //const instrument = this.state.
 
           const note = midiToNote(noteInput);
 
@@ -214,28 +217,6 @@ onMIDISuccess(midiAccess)
 
   }
 
-  // TODO: replace with cookie
-  updateIsLoggedIn = (value) => {
-
-    // TODO: select userID?
-
-    this.setState({ isLoggedIn: value });
-
-    if(value == true)
-    {
-        window.alert("Login successful.");
-    }
-    else
-    {
-        window.alert("Login failed.");
-
-    }
-  }
-
-  updateFullName = (value) => {
-    this.setState({ fullName: value });
-  }
-
   updateConnectedDevice = (value) => {
     this.setState( { selectedDevice: value });
   }
@@ -248,10 +229,10 @@ onMIDISuccess(midiAccess)
             <Navbar />
             <Routes>
                 <Route exact path="/" element={<Play selectedDevice={this.state.selectedDevice} isLoggedIn={this.state.isLoggedIn} fullName={this.state.fullName}/>} />
-                <Route exact path="/connect" element={<Midi updateConnectedDevice={this.updateConnectedDevice} midiInputs={this.state.inputDeviceNames}/>} />
+                <Route exact path="/connect" element={<Connect updateConnectedDevice={this.updateConnectedDevice} midiInputs={this.state.inputDeviceNames}/>} />
                 <Route exact path="/about" element={<About />} />
-                <Route exact path="/login" element={<Login updateIsLoggedIn={this.updateIsLoggedIn} updateFullName={this.updateFullName} />} />
-                <Route exact path="/register" element={<Register updateIsLoggedIn={this.updateIsLoggedIn} updateFullName={this.updateFullName} />} />
+                <Route exact path="/login" element={<Login />} />
+                <Route exact path="/register" element={<Register />} />
             </Routes>
         </Router>
       </div>

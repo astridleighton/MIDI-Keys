@@ -2,12 +2,14 @@ import React from 'react';
 import * as Tone from 'tone';
 import AudioKeys from 'audiokeys';
 import Cookies from 'js-cookie';
+import { useState } from 'react';
 
 // https://musicjoeyoung.medium.com/build-a-piano-with-tone-js-618e2403d9de
 
 class Play extends React.Component
 {
     // used for testing
+    // TODO: add midi functionality here
     constructor() {
         super();
         this.selectedInstrument = 'synth';
@@ -21,7 +23,16 @@ class Play extends React.Component
                 attack: 0.1
             }
         }).toDestination();
+        this.state = {
+            selectedDevice: '',
+        }
+        //const [devices, setDevices] = useState([]);
 
+      }
+
+      componentDidMount () {
+        alert(this.props.selectedDevice);
+        this.state.selectedDevice = this.props.selectedDevice;
       }
 
       initalizeKeyboard () {

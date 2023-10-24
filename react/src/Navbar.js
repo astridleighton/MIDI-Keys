@@ -9,7 +9,7 @@ class Navbar extends React.Component
 {
     render()
     {
-        const isAuthenticated = !!Cookies.get('authenticationCookie');
+        const isAuthenticated = !!Cookies.get('token');
 
         return(
             <div className="navbar">

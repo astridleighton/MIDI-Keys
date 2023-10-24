@@ -25,9 +25,7 @@ class Login extends React.Component
 
         this.processLogin(this.state);
 
-        this.props.updateFullName(this.state.name); // used for testing
-
-        // redirect to secure page
+        // TODO: redirect to login
     }
 
     processLogin = async (loginCredentials) => {

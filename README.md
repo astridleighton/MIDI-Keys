@@ -1,19 +1,29 @@
-# Project Goals
+# Project Status
 
-This project will take months to complete. Here are the goals I have so far.
+This project will take the entire school year to complete. Here is what I have completed so far:
 
-1) Build JS logic within react to handle midi API
-2) Build react front-end to display notes being played, chord visualizer, and keyboard visualizer
-3) Build express back-end to connect to SQL database
-4) Create SQL database with file paths to audio files
-5) Deploy application to Heroku
+- React front-end to display the visual elements of the website and allow site navigation
+- Express back-end to contain login, register, and add/remove sound endpoints
+- SQL database to hold user information and saved sounds
+- Playback functionality from V49 MIDI device
+- Basic playback functionality with a few sounds from the Tone.JS library
+- JWT token authentication and session cookies
 
-# Future Ideas
+# Future Goals
+
+- Add more sound and synth packs
+- Allow user to select a device
+- Allow user to add/remove sounds from the favorites tab
+- Secure website using HTTPS and secured pages
+- Implement chord API: https://rapidapi.com/jsdisco/api/piano-chords
+
+# Out of Scope
+- Deploy to cloud
+- Dockerize
+- Show visual keyboard
+- Colorize
 - Add record functionality
-- Add different synth sound packs
 - Add sheet music learning
-- Colorize keys
-- Get chord API? https://rapidapi.com/jsdisco/api/piano-chords
 
 # Files
 https://archive.org/details/SalamanderGrandPianoV3

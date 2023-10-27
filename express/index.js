@@ -113,38 +113,49 @@ app.post('/register', async function(req, res, next) {
     }
     
 })
-/*
-app.delete('/remove-sound/:id/:soundID', (req, res) => {
 
-    const id = req.params.id;
-    const deleteSound = req.params.soundID;
-    
-    // TODO: validate index
-    // TODO: get all sounds from database at specified user
-    // TODO: update json and remove selected sound
-    // TODO: add response messages
-
-})
-
-/*
-app.post('/add-sound/:id/:soundID', (req, res) => {
+app.put('/add-sound/:soundID/:id', (req, res) => {
 
     const id = req.params.id;
     const newSound = req.params.soundID;
 
-    // TODO: get values from database and add to array
-    // TODO: update database with new sound
-    // TODO: data validation
+    // TODO: use function in security class
 
-    if(!addedSound) {
-        // retrn 400 error
-    }
+    res.status(200).send("Add - Nothing set here yet.");
 
-    sounds.push(addedSound);
+})
 
-    // TODO: ADD success response
+app.put('/remove-sound/:username', (req, res) => {
 
-})*/
+    // TODO: get token from session
+
+    /*const username = req.params.username;
+    
+    const validateToken = await Security.validateToken(token);*/
+    
+    // TODO: validate token against username
+
+    // TODO: retrieve and parse all sounds
+
+    res.status(200).send("Remove sound - Nothing set here yet.");
+
+})
+
+app.get('/all-sounds/:username', async (req, res) => {
+
+    // TODO: get token from session
+
+    /*const username = req.params.username;
+    
+    const validateToken = await Security.validateToken(token);*/
+    
+    // TODO: validate token against username
+
+    // TODO: retrieve and parse all sounds
+
+    res.status(200).send("All sounds - Nothing set here yet.");
+
+})
 
 app.listen(3000, () => {
     console.log("Server started on port 3000");

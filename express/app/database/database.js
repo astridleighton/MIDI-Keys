@@ -41,6 +41,68 @@ class Database {
         })
     }
 
+    async deleteSound(connection, username, sound)
+    {
+        /*return new Promise((resolve, reject) => {
+            connection.query("SELECT sounds FROM users WHERE username = ?", [username], (error, results) => {
+                if (error) {
+                    reject(error);
+                } else {
+
+                    try {
+                        const soundData = JSON.parse(results[0].sounds);
+                        const updatedData = userData.filter(item => item !== sound);
+
+                        connection.query("UPDATE users SET sounds = ? WHERE username = ?", [JSON.stringify(updatedData), username], (updateError, updateResults) => {
+                            if (updateError) {
+                                reject(updateError);
+                            } else {
+                                resolve(updateResults);
+                            }
+                        })
+                    } catch (parseError) {
+                        reject(parseError);
+                    }
+                    
+                }
+            })
+        })*/
+    }
+
+    async addSound(connection, username, sound)
+    {
+        /*return new Promise((resolve, reject) => {
+            connection.query("SELECT sounds FROM users WHERE username = ?", [username], (error, results) => {
+                if (error) {
+                    reject(error);
+                } else {
+
+                    try {
+                        const soundData = JSON.parse(results[0].sounds);
+                        const updatedData = userData.filter(item => item !== sound);
+
+                        connection.query("UPDATE users SET sounds = ? WHERE username = ?", [JSON.stringify(updatedData), username], (updateError, updateResults) => {
+                            if (updateError) {
+                                reject(updateError);
+                            } else {
+                                resolve(updateResults);
+                            }
+                        })
+                    } catch (parseError) {
+                        reject(parseError);
+                    }
+                    
+                }
+            })
+        })*/
+    
+    }
+
+    async getAllSoundsFromUser(connection, username)
+    {
+        // TODO: get all sounds from user in the database
+    }
+
 }
 
 module.exports = new Database();

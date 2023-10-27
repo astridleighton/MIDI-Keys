@@ -46,6 +46,18 @@ class Security {
             console.error(error);
         }
 
+
+    }
+
+    static async verifyToken(token) {
+        try {
+            const decoded = jwt.verify(token, secretKey);
+
+            return decoded;
+        } catch (error) {
+            console.error('Token verification error.', error);
+            return null;
+        }
     }
 
 }

@@ -28,8 +28,6 @@ class Register extends React.Component
         console.log('Username:', this.state.username);
         console.log('Password:', this.state.password);
 
-        //this.props.updateIsLoggedIn = true; // used for testing
-
         this.processRegister(this.state);
 
     }
@@ -43,17 +41,17 @@ class Register extends React.Component
         }
             catch (error)
         {
-            if(error.response.status === 401) {
-                alert("Username already exists.");
+            if(error.response.status === 403) {
+                alert("Username already exists. Please choose another one.");
             } else if (error.response.status === 500) {
                 alert("Database error. Please try again.");
             } else {
-                console.log(error);
+                alert("An error occurred. Please try again.");
             }
             
         }
 
-        // TODO: redirect to home page (protected)
+        // TODO: redirect to login page (protected)
     }
 
     render()

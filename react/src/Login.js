@@ -35,35 +35,29 @@ class Login extends React.Component
             const result = await axios.post(`http://localhost:3000/login`, loginCredentials);
 
             if (result.status === 200) {
+                
                 const token = result.data.token;
-                const name = result.data.firstname;
-                if (token && name)
-                {
+                const name = result.data.firstName;
+
+                if (token && name) {
                     Cookies.set('token', token, { expires: 1 });
                     Cookies.set('name', name, {expires: 1 });
-                    this.state.firstname = name;
+                    this.state.firstname = name; // pass state to play
+                    alert("Login successful.");
                 } else {
-                    // TODO: add error message
+                    alert("Did not receive token and/or name from database. Please try again.");
                 }
-                
             } else {
-                // TODO: add error message
+                alert("An error occurred during login. Please try again!");
             }
         }
         catch (error) {
-            if (error.response)
-            {
-                if(error.response.status === 401) {
-                    alert("Invalid login credentials. Please try again.");
-                } else if (error.response.status === 404) {
-                    alert("Login Error (401): Resource not found.");
-                } else {
-                    alert("An error occurred during login. Please try again.");
-                }
-                console.log(error);
+            if (error.response.status === 401) {
+                alert("Invalid login credentials. Please try again.");
+            } else if (error.response.status === 500) {
+                alert("A server error occurred during login. Please try again!");
             } else {
-                alert("An error occurred during login. Please try again!!");
-                console.log(error);
+                alert("An error occurred. Please try again.");
             }
         }
     }

@@ -25,22 +25,13 @@ class App extends React.Component
   constructor() {
     super();
     this.state = {
-        isLoggedIn: false,
         fullName: "",
-        loginData: {
-            username: 'test',
-            password: 'test',
-        },
         selectedDevice: null,
         midi: null,
         currentNotes: [],
-        loggedIn: false,
         token: null,
         inputDeviceNames: []
     };
-    //this.selectedDevice = this.selectDevice.bind(this);
-    /*this.midi = null;
-    this.currentNotes = [];*/
 }
 
 // TODO: wait for selected device
@@ -66,27 +57,16 @@ onMIDISuccess(midiAccess)
       this.midi = midiAccess;
 
       const midiIns = midiAccess.inputs;
-      const midiOuts = midiAccess.outputs;
+      //const midiOuts = midiAccess.outputs;
 
       const inputs = midiIns.values();
-      const outputs = midiOuts.values();
+      //const outputs = midiOuts.values();
 
       let keyboard = null;
-
-      const midiInputDevices = inputs.map((input) => input.name);
-      this.setState({inputDeviceNames:midiInputDevices});
-      
-      console.log("DEVICES TEST:");
-      midiInputDevices.map((item) => {
-        console.log(item);
-      })
 
       // list midi inputs to console
       if (inputs != null)
       {
-          
-
-
           for(let input of inputs)
           {
 
@@ -228,7 +208,7 @@ onMIDISuccess(midiAccess)
         <Router>
             <Navbar />
             <Routes>
-                <Route exact path="/" element={<Play selectedDevice={this.state.selectedDevice} isLoggedIn={this.state.isLoggedIn} fullName={this.state.fullName}/>} />
+                <Route exact path="/" element={<Play selectedDevice={this.state.selectedDevice} fullName={this.state.fullName}/>} />
                 <Route exact path="/connect" element={<Connect updateConnectedDevice={this.updateConnectedDevice} midiInputs={this.state.inputDeviceNames}/>} />
                 <Route exact path="/about" element={<About />} />
                 <Route exact path="/login" element={<Login />} />

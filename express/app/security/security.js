@@ -37,6 +37,17 @@ class Security {
         })
     }
 
+    static async hashPassword(plainPassword) {
+
+        try {
+            const hash = await bcrypt.hash(plainPassword, saltRounds);
+            return hash;
+        } catch (error) {
+            console.error(error);
+        }
+
+    }
+
 }
 
 module.exports = Security;

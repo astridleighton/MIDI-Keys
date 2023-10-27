@@ -9,7 +9,8 @@ import { useState } from 'react';
 class Play extends React.Component
 {
     // used for testing
-    // TODO: add midi functionality here
+    // needs to only know about selected device and the instrument needed -- all audio should come from here
+
     constructor() {
         super();
         this.selectedInstrument = 'synth';
@@ -26,13 +27,12 @@ class Play extends React.Component
         this.state = {
             selectedDevice: '',
         }
-        //const [devices, setDevices] = useState([]);
 
       }
 
       componentDidMount () {
-        alert(this.props.selectedDevice);
-        this.state.selectedDevice = this.props.selectedDevice;
+        //alert(this.props.selectedDevice);
+        //this.state.selectedDevice = this.props.selectedDevice;
       }
 
       initalizeKeyboard () {

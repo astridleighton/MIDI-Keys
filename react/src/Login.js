@@ -36,12 +36,12 @@ class Login extends React.Component
 
             if (result.status === 200) {
                 const token = result.data.token;
-                const name = result.data.firstName;
+                const name = result.data.firstname;
                 if (token && name)
                 {
                     Cookies.set('token', token, { expires: 1 });
                     Cookies.set('name', name, {expires: 1 });
-                    this.state.firstName = name;
+                    this.state.firstname = name;
                 } else {
                     // TODO: add error message
                 }

@@ -8,6 +8,26 @@ const Database = require('./app/database/database');
 app.use(cors());
 app.use(express.json());
 
+const mysql = require('mysql');
+
+const dbConfig = {
+    host: 'localhost',
+    user: 'root',
+    password: 'root',
+    database: 'capstone'
+}
+
+const connection = mysql.createConnection(dbConfig);
+
+// Connect to the database
+connection.connect((err) => {
+    if (err) {
+      console.error('Error connecting to the database:', err);
+    } else {
+      console.log('Connected to the database');
+    }
+  });
+
 app.get('/', (req, res) => {
     res.send("Testing express app");
 })
@@ -22,7 +42,7 @@ app.post('/login', async function(req, res, next) {
     }
 
     try {
-        const usernameCheck = await Database.findByUsername(username);
+        const usernameCheck = await Database.findPasswordAndNameByUsername(connection, username);
 
         if (usernameCheck.length === 0) {
             res.status(401).send("Username does not exist.");
@@ -40,7 +60,7 @@ app.post('/login', async function(req, res, next) {
 
            if (validPassword)
            {
-            res.json({ message: 'Login successful.', status: 200, token, firstName });
+            res.status(200).json({ message: 'Login successful.', status: 200, token, firstName });
            } else {
             res.status(401).json({ message: 'Login failed.', status: 401 });
            }
@@ -53,52 +73,44 @@ app.post('/login', async function(req, res, next) {
 
 });
 
-app.post('/register', function(req, res, next) {
+app.post('/register', async function(req, res, next) {
 
     const firstname = req.body.firstname;
     const username = req.body.username;
     const password = req.body.password;
 
-    // checks if username already exists in the database -- FIXME
-    connection.query("SELECT * FROM users WHERE username = ?", [username], function (error, results) {
-        if (error) {
-            console.error(error);
-            res.status(500).send("Database Error");
-            return;
-        }
+    try {
+        
+        const usernameCheck = await Database.findByUsername(connection, username); // checks if username exists
 
-        if (results.length > 0) {
-            res.status(401).send("Username exists in the database.");
+        if(usernameCheck.length > 0) {
+            res.status(403).send("Username already exists.");
             return;
         } else {
+            const hashedPassword = await Security.hashPassword(password); // hashes password
 
-            // hashes password
-            bcrypt.hash(password, saltRounds, function (error, hash) {
-        
-                if (error) {
-                    console.error(error);
-                    res.status(500).send("Server Error");
-                    return;
-                }
-        
-            // inserts new user into database
-            var sql = "INSERT INTO users (username, password, firstname) VALUES ?";
-            var values = [
-                [username, hash, firstname]
-            ];
-        
-            connection.query(sql, [values], function (error, result)
-            {
-                if (error) {
-                    throw error;
-                } else {
-                    res.status(200).send("Registration successful.");
-                }
-        
-            })
-            })
+            if (!hashedPassword) {
+                res.status(500).json({ error: "Password hashing failed. "});
+                return;
+            }
+
+            const insertNewUser = await Database.addNewUser(connection, username, firstname, hashedPassword); // adds new user to database
+
+            if(!insertNewUser) {
+                res.status(500).json({ error: "Database error. "});
+                return;
+            }
+
+            res.json({ message: 'Registration successful.', status: 200 });
+
         }
-    }) 
+
+    } catch (error) {
+
+        console.error(error);
+        res.status(500).json({ error: "Server error." });
+
+    }
     
 })
 /*

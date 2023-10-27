@@ -4,7 +4,6 @@ import axios from 'axios';
 
 class Register extends React.Component
 {
-    // create secure login page, create error page
 
     constructor(props) {
         super(props);
@@ -13,7 +12,7 @@ class Register extends React.Component
             id: 3,
             username: '',
             password: '',
-            fullname: ''
+            firstname: ''
         };
     }
 
@@ -25,7 +24,7 @@ class Register extends React.Component
     handleSubmit = (event) => {
         event.preventDefault();
 
-        console.log('First Name', this.state.fullname);
+        console.log('First Name', this.state.firstname);
         console.log('Username:', this.state.username);
         console.log('Password:', this.state.password);
 
@@ -64,12 +63,12 @@ class Register extends React.Component
                 <h1>Create An Account</h1>
                 <form onSubmit={this.handleSubmit}>
                         <div className="form-group">
-                            <label htmlFor="fullname">First Name:</label>
+                            <label htmlFor="firstname">First Name:</label>
                             <input
                                 type="text"
-                                id="fullname"
-                                name="fullname"
-                                value={this.state.fullname}
+                                id="firstname"
+                                name="firstname"
+                                value={this.state.firstname}
                                 onChange={this.handleInputChange}
                                 required
                                 />

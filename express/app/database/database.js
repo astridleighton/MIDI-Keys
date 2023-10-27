@@ -1,4 +1,4 @@
-
+const mysql = require('mysql');
 
 class Database {
 
@@ -100,7 +100,21 @@ class Database {
 
     async getAllSoundsFromUser(connection, username)
     {
-        // TODO: get all sounds from user in the database
+        return new Promise((resolve, reject) => {
+            try {
+                connection.query("SELECT sounds FROM users WHERE username = ?", [username], (error, results) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(results);
+                    }
+                })
+            } catch (error) {
+                reject(error);
+            }
+            
+        })
+
     }
 
 }

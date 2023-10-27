@@ -143,17 +143,18 @@ app.put('/remove-sound/:username', (req, res) => {
 
 app.get('/all-sounds/:username', async (req, res) => {
 
-    // TODO: get token from session
-
-    /*const username = req.params.username;
+    const username = req.params.username;
+    const token = req.body.token;
     
-    const validateToken = await Security.validateToken(token);*/
-    
-    // TODO: validate token against username
+    const validateToken = await Security.verifyToken(token);
 
-    // TODO: retrieve and parse all sounds
-
-    res.status(200).send("All sounds - Nothing set here yet.");
+    if(validateToken)
+    {
+        const allSounds = await Database.getAllSoundsFromUser(connection, username);
+        res.status(200).json(allSounds);
+    } else {
+        res.status(401).send("Invalid token.");
+    }
 
 })
 

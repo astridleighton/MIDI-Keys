@@ -10,6 +10,7 @@ class Play extends React.Component
 {
     // used for testing
     // needs to only know about selected device and the instrument needed -- all audio should come from here
+    // TODO: allow instrument to be changed -- default is keyboard
 
     constructor() {
         super();
@@ -33,20 +34,38 @@ class Play extends React.Component
       componentDidMount () {
         //alert(this.props.selectedDevice);
         //this.state.selectedDevice = this.props.selectedDevice;
+        this.initalizeKeyboard();
       }
 
       initalizeKeyboard () {
         const keyboard = new AudioKeys({
-            rows: 2,
+            polyphony: 10, // Adjust the polyphony as needed
         });
+
+        const keyToNote = {
+            65: 'C4', // A
+            83: 'D4', // S
+            68: 'E4', // D
+            70: 'F4', // F
+            71: 'G4', // G
+            72: 'A4', // H
+            73: 'B4', // J
+            74: 'C5', // K
+            // Add more keys and notes as needed
+          };
 
         keyboard.down((key) => {
 
-            const synth = new Tone.Synth().toDestination();
-            console.log(key);
-            // TODO: make sound! - remove dependency
-            //synth.triggerAttackRelease(key.frequency, "8n");
+            const note = keyToNote[key.keyCode];
+            if(note)
+            {
+                this.synth.triggerAttack(note);
+            }
         });
+
+        keyboard.up(() => {
+            this.synth.triggerRelease();
+        })
       }
 
       handleButtonClick = (instrument, e) => {
@@ -62,7 +81,7 @@ class Play extends React.Component
         } else if (instrument === 'monosynth')
         {
             this.amSynth.triggerAttack('C4', "8n");
-        } else if (instrument === 'keyboard')
+        } else if (instrument === 'qwerty')
         {
             console.log("no audio set up.");
         } else {

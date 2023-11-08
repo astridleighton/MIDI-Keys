@@ -8,13 +8,9 @@ import { useState } from 'react';
 
 class Play extends React.Component
 {
-    // used for testing
     // needs to only know about selected device and the instrument needed -- all audio should come from here
-    // TODO: allow instrument to be changed -- default is keyboard
-
-    constructor() {
-        super();
-        this.selectedInstrument = 'synth';
+    constructor(props) {
+        super(props);
         this.synth = new Tone.Synth().toDestination(); // Create a simple synth
         this.amSynth = new Tone.AMSynth().toDestination();
         this.monosynth = new Tone.MonoSynth({
@@ -26,14 +22,12 @@ class Play extends React.Component
             }
         }).toDestination();
         this.state = {
-            selectedDevice: '',
+            selectedSound: 'synth', // default device
         }
 
       }
 
       componentDidMount () {
-        //alert(this.props.selectedDevice);
-        //this.state.selectedDevice = this.props.selectedDevice;
         this.initalizeKeyboard();
       }
 
@@ -44,27 +38,41 @@ class Play extends React.Component
 
         const keyToNote = {
             65: 'C4', // A
+            87: 'Db4', // W
             83: 'D4', // S
+            69: 'Eb4', // E
             68: 'E4', // D
             70: 'F4', // F
+            84: 'Gb4', // T
             71: 'G4', // G
+            89: 'Ab4', // Y
             72: 'A4', // H
             73: 'B4', // J
             74: 'C5', // K
-            // Add more keys and notes as needed
+            79: 'Db5', // O
+            80: 'Ab4', // P
           };
 
-        keyboard.down((key) => {
+        keyboard.down((e) => {
 
-            const note = keyToNote[key.keyCode];
+            const note = keyToNote[e.keyCode];
+
             if(note)
             {
-                this.synth.triggerAttack(note);
+                if (this.state.selectedSound === 'synth') {
+                    this.synth.triggerAttack(note); // Use the 'note' argument
+                  } else if (this.state.selectedSound === 'amSynth') {
+                    this.amSynth.triggerAttack(note);
+                  } else if (this.state.selectedSound === 'monosynth') {
+                    this.monosynth.triggerAttack(note);
+                  }
             }
         });
 
         keyboard.up(() => {
             this.synth.triggerRelease();
+            this.amSynth.triggerRelease();
+            this.monosynth.triggerRelease();
         })
       }
 
@@ -74,16 +82,16 @@ class Play extends React.Component
 
         if(instrument === 'synth')
         {
-            this.synth.triggerAttack('C4', "8n");
+            this.state.selectedSound = 'synth';
         } else if (instrument === 'amsynth')
         {
-            this.amSynth.triggerAttack('C4', "8n");
+            this.state.selectedSound = 'amSynth';
         } else if (instrument === 'monosynth')
         {
-            this.amSynth.triggerAttack('C4', "8n");
+            this.state.selectedSound = 'monosynth';
         } else if (instrument === 'qwerty')
         {
-            console.log("no audio set up.");
+            //console.log("no audio set up.");
         } else {
             console.log("Uh oh, no instrument connected.");
         }
@@ -135,17 +143,15 @@ class Play extends React.Component
                         <button onClick={(e) => this.handleButtonClick('monosynth', e)}>Select</button>
                     </div>
                 </div>
-                <div class="card">
-                    <div class="card-body">
-                        Keyboard
-                        <button onClick={(e) => this.handleButtonClick('qwerty', e)}>Select</button>
-                    </div>
+                <div>
+                    Note: <p>{this.state.currentNote}</p>
                 </div>
                 {this.props.selectedDevice ? (
                     <p>Connected Device: {this.props.selectedDevice}</p>
                 ) : (
                     <p>No device connected.</p>
                 )}
+                <h3>Chord: ...</h3>
             </div>
             
         )

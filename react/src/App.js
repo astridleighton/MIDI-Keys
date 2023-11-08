@@ -22,15 +22,17 @@ MidiWebAPI !!
 class App extends React.Component
 {
 
-  constructor() {
+  constructor(props) {
     super();
+    this.currentNote = null;
     this.state = {
         fullName: "",
         selectedDevice: null,
         midi: null,
         currentNotes: [],
         token: null,
-        inputDeviceNames: []
+        inputDeviceNames: [],
+        //currentNote: null
     };
 }
 
@@ -155,17 +157,18 @@ onMIDISuccess(midiAccess)
 
                       // play note with Tone.JS
                       const synth = new Tone.Synth().toDestination();
-                      synth.triggerAttackRelease(Tone.Midi(note).toFrequency(), "8n");
-                      
+                      synth.triggerAttackRelease(Tone.Midi(note).toFrequency(), "4n");
+                      //this.currentNote = note;
                   }
                   else
                   {
                       console.log("Stopped playing " + note);
+                      //this.setState({ currentNote: note });
                       //this.noteOff(note);
                   }
                   break;
               case 128: // note off
-                  console.log("Stopped playing " + note);
+                  //console.log("Stopped playing " + note);
                   //this.noteOff();
                   break;
               default:
@@ -178,6 +181,8 @@ onMIDISuccess(midiAccess)
                   */
           }
       }
+
+      
 
       /*
       * Converts MIDI input (number value) to note value and octave

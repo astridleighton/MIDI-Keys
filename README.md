@@ -3,19 +3,18 @@
 This project will take the entire school year to complete. Here is what I have completed so far:
 
 - React front-end to display the visual elements of the website and allow site navigation
-- Express back-end to contain login, register, and add/remove sound endpoints
+- Express back-end to contain all login and registration functionality
 - SQL database to hold user information and saved sounds
-- Playback functionality from V49 MIDI device
-- Basic playback functionality with a few sounds from the Tone.JS library
-- JWT token authentication and session cookies
+- Playback functionality from V49 MIDI device and QWERTY keyboard using a few sound samples
+- JWT token authentication and session functionality
 
-# Future Goals
+# Next Semester Goals
 
-- Add more sound and synth packs
-- Allow user to select a device
+- Add more sound samples for a user to select from
+- Allow user to select between different device
 - Allow user to add/remove sounds from the favorites tab
 - Secure website using HTTPS and secured pages
-- Implement chord API: https://rapidapi.com/jsdisco/api/piano-chords
+- Implement chord display functionality
 
 # Out of Scope
 - Deploy to cloud

@@ -3,8 +3,6 @@ import { Route, Link, Routes, BrowserRouter } from 'react-router-dom';
 import './Navbar.css';
 import Cookies from 'js-cookie';
 
-// TODO: pass is authenticated to here to show logout button
-
 class Navbar extends React.Component
 {
     render()
@@ -12,25 +10,26 @@ class Navbar extends React.Component
         const isAuthenticated = !!Cookies.get('token');
 
         return(
-            <div className="navbar">
-                <ul>
-                    <li>
-                        <Link to="/">Play</Link>
+            <div className="navbar navbar-dark bg-dark">
+                <span class="navbar-brand mb-0 h1">MIDI Keys</span>
+                <ul class="mt-2 mt-lg-0 ml-auto">
+                    <li class="nav-item active">
+                        <Link to="/" class="nav-link">Play</Link>
                     </li>
-                    <li>
+                    <li class="nav-item">
                         <Link to="/connect" devices={this.props.midi}>Connect</Link>
                     </li>
-                    <li>
+                    <li class="nav-item">
                         <Link to="/about">About</Link>
                     </li>
-                    <li>
-                    {isAuthenticated ? (
+                </ul>
+                <span class="nav-item">
+                        {isAuthenticated ? (
                         <Link to="/logout">Log Out</Link>
                     ) : (
                         <Link to="/login">Login</Link>
                     )}
-                    </li>
-                </ul>
+                </span>
             </div>
         )
     }

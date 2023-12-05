@@ -15,6 +15,8 @@ class Login extends React.Component
         };
     }
 
+    // TODO: stop synth sounds
+
     handleInputChange = (event) => {
         const { name, value } = event.target;
         this.setState({ [name]: value });
@@ -67,36 +69,48 @@ class Login extends React.Component
 
         return (
             <div>
-                <h2>Login</h2>
-                <form onSubmit={this.handleSubmit}>
-                <div className="form-group">
-                    <label htmlFor="username">Username:</label>
-                    <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    value={this.state.username}
-                    onChange={this.handleInputChange}
-                    required
-                    />
+                <h2 class="fw-bold m-4 text-uppercase d-flex justify-content-center">Login</h2>
+                <div class="d-flex justify-content-center align-items-center h-100 m-3">
+                    <form onSubmit={this.handleSubmit}>
+                    <div className="form-group-row">
+                        <label htmlFor="username" class="col-sm-2 col-form-label">Username</label>
+                        <div class="col-sm-10">
+                            <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            class="form-control"
+                            placeholder="Enter Username"
+                            value={this.state.username}
+                            onChange={this.handleInputChange}
+                            required
+                            />
+                        </div>
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="password">Password</label>
+                        <div class="col-sm-10">
+                            <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="form-control"
+                            placeholder="Enter password"
+                            value={this.state.password}
+                            onChange={this.handleInputChange}
+                            required
+                            />
+                        </div>
+                    </div>
+                    <div class="form-group-row m-2">
+                        <p class="mb-0">Don't have an account? <Link to="/register" href="#!" class="text-black-50 fw-bold">Sign Up</Link></p>
+                    </div>
+                    <div class="text-center m-3">
+                        <button type="submit" class="btn btn-primary btn-block mb-4 text-center">Login</button>
+                    </div>
+                </form>
+            </div>
                 </div>
-                <div className="form-group">
-                    <label htmlFor="password">Password:</label>
-                    <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    value={this.state.password}
-                    onChange={this.handleInputChange}
-                    required
-                    />
-                </div>
-                <span>
-                    <Link to="/register">New? CREATE ACCOUNT</Link>
-                </span>
-              <button type="submit">Login</button>
-            </form>
-          </div>
         )
     }
 }

@@ -58,42 +58,58 @@ class Register extends React.Component
     {
         return(
             <div>
-                <h1>Create An Account</h1>
+                <h2 class="m-4 d-flex justify-content-center">Create An Account</h2>
+                <div className="d-flex justify-content-center align-items-center h-100 m-3">
                 <form onSubmit={this.handleSubmit}>
-                        <div className="form-group">
-                            <label htmlFor="firstname">First Name:</label>
+                    <div className="form-group-row">
+                        <label htmlFor="firstname" className="col-sm-5 col-form-label">First Name:</label>
+                        <div className="col-sm-10">
                             <input
                                 type="text"
                                 id="firstname"
                                 name="firstname"
+                                class="form-control"
+                                placeholder="Enter first name"
                                 value={this.state.firstname}
                                 onChange={this.handleInputChange}
                                 required
                                 />
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="username">Username:</label>
+                        </div>
+                        <div className="form-group-row">
+                            <label className="col-sm-2 col-form-label" htmlFor="username">Username:</label>
+                            <div className="col-sm-10">
                             <input
                                 type="text"
                                 id="username"
                                 name="username"
+                                class="form-control"
+                                placeholder="Enter username"
                                 value={this.state.username}
                                 onChange={this.handleInputChange}
                                 required
                                 />
+                            </div>
                         </div>
-                        <div>
-                            <label for="password">Password:</label>
+                        <div className="form-group-row">
+                            <label className="col-sm-2 col-form-label" for="password">Password:</label>
+                            <div className="col-sm-10">  
                             <input
                                 type="password"
                                 id="password"
                                 name="password"
+                                class="form-control"
+                                placeholder="Enter password"
                                 value={this.state.password}
                                 onChange={this.handleInputChange}
                                 />
+                            </div>
                         </div>
-                    <input type="submit" value="Register"/>
+                        <div class="text-center m-3">
+                            <input type="submit" value="Register" className="btn btn-primary btn-block mb-4 text-center"/>
+                        </div>
                 </form>
+                </div>
             </div>
         )
     }

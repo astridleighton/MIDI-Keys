@@ -69,7 +69,7 @@ class Login extends React.Component
 
         return (
             <div>
-                <h2 class="fw-bold m-4 text-uppercase d-flex justify-content-center">Login</h2>
+                <h2 class="m-4 d-flex justify-content-center">Login</h2>
                 <div class="d-flex justify-content-center align-items-center h-100 m-3">
                     <form onSubmit={this.handleSubmit}>
                     <div className="form-group-row">
@@ -80,7 +80,7 @@ class Login extends React.Component
                             id="username"
                             name="username"
                             class="form-control"
-                            placeholder="Enter Username"
+                            placeholder="Enter username"
                             value={this.state.username}
                             onChange={this.handleInputChange}
                             required

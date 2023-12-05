@@ -56,7 +56,6 @@ class Connect extends React.Component
         {
           // pass to app
           this.props.updateConnectedDevice(this.state.selectedDevice);
-          alert(this.state.selectedDevice);
         }
         else
         {
@@ -76,33 +75,34 @@ class Connect extends React.Component
     {
         return(
           <div className="container d-flex align-items-center flex-column">
-            <div className="text-center">
-            <h2>MIDI devices: </h2>
+            <div className="m-4 d-flex justify-content-center">
+              <h2>Connect MIDI Device</h2>
             </div>
             <div className="text-center">
-            <form>
-                  {this.state.midiDevices.map((device, index) => (
-                    <div key={index}>
-                      <input
-                        type="radio"
-                        id={device}
-                        name="midiDevice"
-                        value={device}
-                        checked={this.state.selectedDevice === device}
-                        onChange={this.handleDeviceChange}
-                      />
-                      <label htmlFor={device}>{device}</label>
+              <h5 className="m-2">Available Devices:</h5>
+              <form>
+                    {this.state.midiDevices.map((device, index) => (
+                      <div key={index} class="form-check">
+                        <input
+                          type="radio"
+                          id={device}
+                          name="midiDevice"
+                          value={device}
+                          class="form-check-input"
+                          checked={this.state.selectedDevice === device}
+                          onChange={this.handleDeviceChange}
+                        />
+                        <label class="form-check-label" htmlFor={device}>{device}</label>
+                      </div>
+                    ))}
+                  </form>
+            </div>
+            <div className="text-center m-2">
+              {this.state.selectedDevice && (
+                    <div>
+                      <button class="btn btn-primary btn-block mb-4 text-center" onClick={this.handleSelect}>Connect</button>
                     </div>
-                  ))}
-                </form>
-            </div>
-            <div className="text-center">
-            {this.state.selectedDevice && (
-                  <div>
-                    <button onClick={this.handleSelect}>Connect</button>
-                  </div>
-                )}
-                {!this.state.selectedDevice && <p>Please select a MIDI device.</p>}
+              )} 
             </div> 
           </div>
         )

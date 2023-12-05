@@ -4,13 +4,14 @@ import AudioKeys from 'audiokeys';
 import Cookies from 'js-cookie';
 import { useState } from 'react';
 
-// https://musicjoeyoung.medium.com/build-a-piano-with-tone-js-618e2403d9de
+// TODO: fix instances and timing issue
 
 class Play extends React.Component
 {
     // needs to only know about selected device and the instrument needed -- all audio should come from here
     constructor(props) {
         super(props);
+        //this.currentChord = [];
         this.synth = new Tone.Synth().toDestination(); // Create a simple synth
         this.amSynth = new Tone.AMSynth().toDestination();
         this.monosynth = new Tone.MonoSynth({
@@ -23,12 +24,14 @@ class Play extends React.Component
         }).toDestination();
         this.state = {
             selectedSound: 'synth', // default device
+            currentChord: [],
         }
 
       }
 
       componentDidMount () {
         this.initalizeKeyboard();
+        Tone.start();
       }
 
       initalizeKeyboard () {
@@ -53,28 +56,69 @@ class Play extends React.Component
             80: 'Ab4', // P
           };
 
-        keyboard.down((e) => {
+          // TODO: find out why note is being triggered twice
 
+        keyboard.down((e) => {
             const note = keyToNote[e.keyCode];
 
             if(note)
             {
+
+                // TODO: add note to array
+                this.setState(state => {
+                    const chord = [...state.currentChord, state.value];
+
+                    return {
+                        chord,
+                        value: '',
+                    }
+                })
+                
+
+                /*this.setState((prevState) => ({
+                    currentChord: [prevState, note],
+                }))*/
+
+                console.log(note);
+                //this.currentChord.push(e.keyCode);
+
+                //athis.getChord();
                 if (this.state.selectedSound === 'synth') {
-                    this.synth.triggerAttack(note); // Use the 'note' argument
+                    //this.synth.triggerAttack(note); // Use the 'note' argument
                   } else if (this.state.selectedSound === 'amSynth') {
-                    this.amSynth.triggerAttack(note);
+                    //this.amSynth.triggerAttack(note);
                   } else if (this.state.selectedSound === 'monosynth') {
-                    this.monosynth.triggerAttack(note);
+                    //this.monosynth.triggerAttack(note);
                   }
             }
         });
 
-        keyboard.up(() => {
-            this.synth.triggerRelease();
-            this.amSynth.triggerRelease();
-            this.monosynth.triggerRelease();
+        keyboard.up((e) => {
+            
+           /* const index = this.currentChord.indexOf(e);
+            if (index !== -1) {
+              this.chord.splice(index, 1);
+            }*/
+            console.log("up");
+            //this.synth.triggerRelease();
+            //this.amSynth.triggerRelease();
+            //this.monosynth.triggerRelease();
         })
-      }
+    }
+      
+
+      // TODO: add drums samples
+
+      /*const sampler = new Tone.Sampler({
+        urls: {
+            A1: "A1.mp3",
+            A2: "A2.mp3",
+        },
+        baseUrl: "https://tonejs.github.io/audio/casio/",
+        onload: () => {
+            sampler.triggerAttackRelease(["C1", "E1", "G1", "B1"], 0.5);
+        }
+    }).toDestination();*/
 
       handleButtonClick = (instrument, e) => {
         e.preventDefault();
@@ -97,6 +141,29 @@ class Play extends React.Component
         }
       }
 
+      getChord () {
+
+        // TODO: add additional intervals
+        
+        const root = this.currentChord[0];
+        const note2 = this.currentChord[1];
+        const note3 = this.currentChord[2];
+
+        console.log("Root: " + root);
+        console.log(this.currentChord);
+
+        const interval1 = note2 - root;
+        const interval2 = note3 - root;
+
+        if (interval1 === 4 && interval2 === 7) {
+            console.log("Major");
+        } else if (interval1 === 3 && interval2 === 7) {
+            console.log("Minor");
+        } else {
+            console.log("Other");
+        }
+      }
+
       handleLogout = () => {
         // TODO: ask user is they are sure they want to log out, add error handling
         Cookies.remove('token');
@@ -112,48 +179,47 @@ class Play extends React.Component
 
         return(
 
-            <div className="Play">
-                {isAuthenticated ? (
-                    <div>
-                        <h1>Welcome, {firstName}!</h1>
-                        <button onClick={(e) => this.handleLogout()}>Log Out</button>
-                    </div>
-                ) : (
-                    <div>
-                        <h1>MIDI Made Simple</h1>
-                    </div>
-                )}
-                
-                <h1>Sounds</h1>
-                <div class="card">
-                    <div class="card-body">
-                        Synth
-                        <button onClick={(e) => this.handleButtonClick('synth', e)}>Select</button>
-                    </div>
+            <div className="container d-flex flex-column align-items-center">
+                <div className="text-center m-4">
+                    {isAuthenticated ? (
+                        <div>
+                            <h1>Welcome, {firstName}!</h1>
+                            <button onClick={(e) => this.handleLogout()}>Log Out</button>
+                        </div>
+                    ) : (
+                        <div>
+                            <h1>MIDI Made Simple.</h1>
+                        </div>
+                    )}
                 </div>
-                <div class="card">
-                    <div class="card-body">
-                        AM Synth
-                        <button onClick={(e) => this.handleButtonClick('amsynth', e)}>Select</button>
+                <div className="text-center container w-50">
+                    <div className="pb-4">
+                        <h2>Sounds</h2>
                     </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        Mono Synth
-                        <button onClick={(e) => this.handleButtonClick('monosynth', e)}>Select</button>
-                    </div>
+                    <ul class="list-group">
+                        <li class="list-group-item list-group-item action flex-column align-items-start p-3">
+                            <p>Synth</p>
+                            <button onClick={(e) => this.handleButtonClick('synth', e)}>Select</button>
+                        </li>
+                        <li class="list-group-item list-group-item action flex-column align-items-start p-3">
+                            <p>AM Synth</p>
+                            <button onClick={(e) => this.handleButtonClick('amsynth', e)}>Select</button>
+                        </li>
+                        <li class="list-group-item list-group-item action flex-column align-items-start p-3">
+                            <p>Mono Synth</p>
+                            <button onClick={(e) => this.handleButtonClick('monosynth', e)}>Select</button>
+                        </li>
+                    </ul>
                 </div>
                 <div>
-                    Note: <p>{this.state.currentNote}</p>
+                    <ul>
+                    {this.state.currentChord.map((note) => (
+                        <li key={note}>{note}</li>
+                    ))}
+                    </ul>
                 </div>
-                {this.props.selectedDevice ? (
-                    <p>Connected Device: {this.props.selectedDevice}</p>
-                ) : (
-                    <p>No device connected.</p>
-                )}
                 <h3>Chord: ...</h3>
             </div>
-            
         )
     }
 }

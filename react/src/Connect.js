@@ -38,8 +38,9 @@ class Connect extends React.Component
       // TODO: replace with connected MIDI devices
       setDevice = () => {
         this.setState({
-          midiDevices: ["MIDI device1", "MIDI device2"],
+          midiDevices: ["Alesis V49"],
         })
+        //alert(this.state.midiDevices);
       }
 
       // connect to selected device
@@ -49,13 +50,13 @@ class Connect extends React.Component
 
       handleSelect = () => {
 
-        alert("test");
+        //alert("test");
 
         if (this.state.selectedDevice)
         {
           // pass to app
           this.props.updateConnectedDevice(this.state.selectedDevice);
-          alert(`You selected: ${this.state.selectedDevice}`);
+          alert(this.state.selectedDevice);
         }
         else
         {
@@ -71,30 +72,15 @@ class Connect extends React.Component
         this.setDevice();
       }
 
-      /*
-      * Checks if browser supports WebMidi API
-      * Returns true or false
-      */
-      /*checkBrowserSupport = async () =>
-      {
-        try {
-          const midiAccess = await navigator.requestMIDIAccess();
-          console.log("Browser supports midi access");
-          return true;
-        }
-        catch (error)
-        {
-          console.log("Browser does not support midi access.");
-          return false;
-        }
-      }*/
-
     render()
     {
         return(
-          <div>
-              <h2>MIDI devices: </h2>
-                <form>
+          <div className="container d-flex align-items-center flex-column">
+            <div className="text-center">
+            <h2>MIDI devices: </h2>
+            </div>
+            <div className="text-center">
+            <form>
                   {this.state.midiDevices.map((device, index) => (
                     <div key={index}>
                       <input
@@ -109,12 +95,15 @@ class Connect extends React.Component
                     </div>
                   ))}
                 </form>
-                {this.state.selectedDevice && (
+            </div>
+            <div className="text-center">
+            {this.state.selectedDevice && (
                   <div>
                     <button onClick={this.handleSelect}>Connect</button>
                   </div>
                 )}
                 {!this.state.selectedDevice && <p>Please select a MIDI device.</p>}
+            </div> 
           </div>
         )
     }

@@ -114,20 +114,31 @@ app.post('/register', async function(req, res, next) {
     
 })
 
-app.put('/add-sound/:soundID/:id', (req, res) => {
+app.post('/add-sound/:userID/:soundID', async function(req, res) {
 
-    const id = req.params.id;
-    const newSound = req.params.soundID;
+    // check if token is valid?
+    
+    const userID = req.params.userID;
+    const soundID = req.params.soundID;
 
     // TODO: use function in security class
+    try {
+
+        const addSound = await Database.addSound(connection, userID, soundID);
+
+        // TODO: add responses
+
+    } catch (error) {
+
+    }
 
     res.status(200).send("Add - Nothing set here yet.");
 
 })
 
-app.put('/remove-sound/:username', (req, res) => {
+app.delete('/remove-sound/:username', (req, res) => {
 
-    // TODO: get token from session
+    // check if token is valid?
 
     /*const username = req.params.username;
     

@@ -8,6 +8,7 @@ import * as Tone from 'tone';
 import About from './About';
 import Login from './Login';
 import Register from './Register';
+import Footer from './Footer';
 
 /*
 * Note: To begin application, navigate to midi-controller and type "npm start"
@@ -32,6 +33,7 @@ class App extends React.Component
         currentNotes: [],
         token: null,
         inputDeviceNames: [],
+        currentChord: []
         //currentNote: null
     };
 }
@@ -52,7 +54,7 @@ componentDidMount()
 
 onMIDISuccess(midiAccess)
   {
-      Tone.start();
+      //Tone.start();
       console.log("WebMIDI is supported in browser.");
       console.log(midiAccess);
       midiAccess.addEventListener('statechange', this.updateDevices);
@@ -77,6 +79,7 @@ onMIDISuccess(midiAccess)
               {
                   keyboard = input;
                   this.state.selectedDevice = input.name; // used for testing
+                  //alert(this.state.selectedDevice);
               }
               //input.onMIDIMessage = this.onMIDIMessage.bind(this);
           }
@@ -153,6 +156,7 @@ onMIDISuccess(midiAccess)
                   if(velocity > 0)
                   {
                       console.log("Playing " + note);
+
                       //this.noteOn(note, velocity);
 
                       // play note with Tone.JS
@@ -163,9 +167,14 @@ onMIDISuccess(midiAccess)
                   else
                   {
                       console.log("Stopped playing " + note);
+                      const index = this.chord.indexOf(note);
+                        if (index !== -1) {
+                        this.chord.splice(index, 1);
+                        }
                       //this.setState({ currentNote: note });
                       //this.noteOff(note);
                   }
+                  
                   break;
               case 128: // note off
                   //console.log("Stopped playing " + note);
@@ -209,7 +218,7 @@ onMIDISuccess(midiAccess)
   render()
   {
     return (
-      <div className="App">
+      <div className="app-container d-flex flex-column">
         <Router>
             <Navbar />
             <Routes>
@@ -220,6 +229,9 @@ onMIDISuccess(midiAccess)
                 <Route exact path="/register" element={<Register />} />
             </Routes>
         </Router>
+        <div class="fixed-bottom">
+            <Footer selectedDevice={this.state.selectedDevice}/>
+        </div>
       </div>
     );
   }

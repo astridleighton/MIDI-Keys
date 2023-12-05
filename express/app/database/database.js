@@ -117,6 +117,25 @@ class Database {
 
     }
 
+    async getAllSounds(connection)
+    {
+        /*
+        return new Promise((resolve, reject) => {
+            try {
+                connection.query("SELECT sounds FROM sounds WHERE username = ?", [username], (error, results) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(results);
+                    }
+                })
+            } catch (error) {
+                reject(error);
+            }
+            
+        })*/
+    }
+
 }
 
 module.exports = new Database();

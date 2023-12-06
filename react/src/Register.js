@@ -1,7 +1,9 @@
 import React from 'react';
-import { Redirect, Link } from 'react-router-dom';
 import axios from 'axios';
 
+/**
+ * Allows user to register for an account
+ */
 class Register extends React.Component
 {
 
@@ -16,11 +18,19 @@ class Register extends React.Component
         };
     }
 
+    /**
+     * Changes the state of the username and/or password
+     * @param {*} event 
+     */
     handleInputChange = (event) => {
         const { name, value } = event.target;
         this.setState({ [name]: value });
     }
 
+    /**
+     * Passes registration credentials to registration function
+     * @param {*} event 
+     */
     handleSubmit = (event) => {
         event.preventDefault();
 
@@ -32,6 +42,11 @@ class Register extends React.Component
 
     }
 
+    /**
+     * Sends registration credentials to back-end
+     * TODO: redirect to login page
+     * @param {*} registerCredentials 
+     */
     processRegister = async (registerCredentials) => {
 
         console.log("Details: " + JSON.stringify(registerCredentials));
@@ -50,10 +65,12 @@ class Register extends React.Component
             }
             
         }
-
-        // TODO: redirect to login page (protected)
     }
 
+    /**
+     * Displays registration form
+     * @returns 
+     */
     render()
     {
         return(

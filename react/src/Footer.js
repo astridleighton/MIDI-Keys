@@ -1,10 +1,10 @@
 import React from 'react';
 
+/**
+ * Displays connected device
+ */
 class Footer extends React.Component
 {
-    /*constructor (props) {
-        super(props);
-    }*/
 
     render()
     {

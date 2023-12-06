@@ -1,5 +1,8 @@
 import React from 'react';
 
+/*
+    Displays basic website information and future implementations
+*/
 class About extends React.Component
 {
     render()
@@ -19,9 +22,17 @@ class About extends React.Component
                         </p>
                         <p>
                             To begin, connect a MIDI device using a MIDI cable. Then, select the device from the <a href="/connect">connect</a> page.
-                        </p> 
+                        </p>
+                        <p>
+                            Right now, MIDI Keys is in its early stages of development, with new features being added next semester in April. Here is what will be implemented:
+                            <ul className="m-2">
+                                <li>Display current chord played</li>
+                                <li>Additional instrument samples</li>
+                                <li>Improved user interface (UI)</li>
+                                <li>Ability to save favorite sounds to user account</li>
+                            </ul>
+                        </p>
                         <span>
-                            <br></br>
                             <p>Developer: <a href="https://github.com/astridleighton" alt="link to developer's GitHub">Astrid Leighton</a></p>
                         </span>
                     </div>

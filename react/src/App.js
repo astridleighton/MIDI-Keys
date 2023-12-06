@@ -11,15 +11,9 @@ import Register from './Register';
 import Footer from './Footer';
 
 /*
-* Note: To begin application, navigate to midi-controller and type "npm start"
-*
-* Research: https://medium.com/swinginc/playing-with-midi-in-javascript-b6999f2913c3
-https://www.smashingmagazine.com/2018/03/web-midi-api/
-MidiWebAPI !!
-*
-* GitHub example: https://github.com/scott-ammon/web-midi-keyboard/blob/master/src/components/Keyboard.js
-*/
+    - Start-up: To begin application, navigate to the react folder and type "npm start"; make sure back-end is running as well by navigated to express and typing "index.js"
 
+*/
 class App extends React.Component
 {
 
@@ -33,18 +27,12 @@ class App extends React.Component
         currentNotes: [],
         token: null,
         inputDeviceNames: [],
-        currentChord: []
-        //currentNote: null
     };
 }
 
-// TODO: wait for selected device
-/*selectDevice = async (selectedDevice) => {
-    this.setState({ selectedDevice });
-    console.log("test");
-}*/
-
-// initializes midi access
+/**
+ * Initializes MIDI access
+ */
 componentDidMount()
 {
   navigator.requestMIDIAccess()
@@ -52,6 +40,10 @@ componentDidMount()
         (error) => this.onMIDIFailure(error));
 }
 
+/**
+ * If WebMIDI API connection is successful, get MIDI inputs
+ * @param {*} midiAccess 
+ */
 onMIDISuccess(midiAccess)
   {
       //Tone.start();
@@ -61,11 +53,7 @@ onMIDISuccess(midiAccess)
       this.midi = midiAccess;
 
       const midiIns = midiAccess.inputs;
-      //const midiOuts = midiAccess.outputs;
-
       const inputs = midiIns.values();
-      //const outputs = midiOuts.values();
-
       let keyboard = null;
 
       // list midi inputs to console
@@ -79,7 +67,6 @@ onMIDISuccess(midiAccess)
               {
                   keyboard = input;
                   this.state.selectedDevice = input.name; // used for testing
-                  //alert(this.state.selectedDevice);
               }
               //input.onMIDIMessage = this.onMIDIMessage.bind(this);
           }
@@ -88,15 +75,6 @@ onMIDISuccess(midiAccess)
       {
           console.log("No MIDI inputs detected.");
       }
-
-      // list midi outputs to console
-      /*if(outputs != null)
-      {
-          for(let output of outputs)
-          {
-              console.log(`Found MIDI output: ${output.name}, ID: ${output.id}`);
-          }
-      }*/
 
       if(keyboard != null)
       {
@@ -110,31 +88,12 @@ onMIDISuccess(midiAccess)
       console.log(`Name: ${e.port.name}, Brand: ${e.port.manufacturer}, State: ${e.port.state}, Type: ${e.port.type}`);
   }
 
+  /**
+   * If there is an issue connecting to WebMIDI API, log failure message
+   */
   onMIDIFailure()
   {
       console.log("Midi failure.");
-  }
-
-  onMIDIMessage = (event) =>
-  {
-      let message = `MIDI message received at timestamp ${event.timeStamp}[${event.data.length} bytes]: `;
-
-      for(const character of event.data)
-      {
-          message += `0x${character.toString(16)}`;
-      }
-
-      console.log(message);
-  }
-
-  noteOn(note, velocity)
-  {   
-      console.log(note, velocity);
-  }
-
-  noteOff(note)
-  {
-      console.log(note + " off")
   }
 
   // NOTES: 0-127
@@ -146,8 +105,6 @@ onMIDISuccess(midiAccess)
           const command = event.data[0];
           const noteInput = event.data[1];
           const velocity = event.data[2];
-          //const instrument = this.state.
-
           const note = midiToNote(noteInput);
 
           switch (command)
@@ -156,14 +113,10 @@ onMIDISuccess(midiAccess)
                   if(velocity > 0)
                   {
                       console.log("Playing " + note);
-                      updateChord(note); 
-
-                      //this.noteOn(note, velocity);
 
                       // play note with Tone.JS
                       const synth = new Tone.Synth().toDestination();
                       synth.triggerAttackRelease(Tone.Midi(note).toFrequency(), "4n");
-                      //this.currentNote = note;
                   }
                   else
                   {
@@ -206,11 +159,6 @@ onMIDISuccess(midiAccess)
 
         const noteName = noteNames[noteIndex];
         return noteName + octave;
-      }
-
-      function updateChord (note) {
-        alert("Test");
-        this.setState( { currentNote: note });
       }
 
   }

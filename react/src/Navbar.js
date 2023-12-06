@@ -3,8 +3,15 @@ import { Route, Link, Routes, BrowserRouter } from 'react-router-dom';
 import './Navbar.css';
 import Cookies from 'js-cookie';
 
+/**
+ * Displays navigation bar for site navigation
+ */
 class Navbar extends React.Component
 {
+    /**
+     * Shows navigation links and shows login/logout button depending on session cookie
+     * @returns 
+     */
     render()
     {
         const isAuthenticated = !!Cookies.get('token');

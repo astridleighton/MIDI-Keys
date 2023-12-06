@@ -1,30 +1,18 @@
 import React, {useContext} from 'react';
 import WebMidi from 'webmidi';
 
+/**
+ * Allows the user to connect to a selected device
+ * NOTE: Automatically connects to QWERTY keyboard
+ * TODO: implement 
+ */
 class Connect extends React.Component
 {
-
-  //var levelNotes = [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72];
-  //const { keyInfo, pitch, modulation } = useContext(MidiDataContext);
-
-    /*constructor(props) {
-        super(props);
-        this.state = {
-          inputs: []
-        };
-        WebMidi.enable(() => {
-          this.setState({
-            inputs: WebMidi.inputs
-          });
-        });
-      }*/
 
       constructor(props)
       {
         super(props);
         this.state = {
-          //const { inputDeviceNames } = props,
-          //midiDevices = props,
           midiDevices: [],
           selectedDevice: null,
 
@@ -40,7 +28,6 @@ class Connect extends React.Component
         this.setState({
           midiDevices: ["Alesis V49"],
         })
-        //alert(this.state.midiDevices);
       }
 
       // connect to selected device
@@ -49,8 +36,6 @@ class Connect extends React.Component
       };
 
       handleSelect = () => {
-
-        //alert("test");
 
         if (this.state.selectedDevice)
         {

@@ -2,17 +2,19 @@ import React from 'react';
 import * as Tone from 'tone';
 import AudioKeys from 'audiokeys';
 import Cookies from 'js-cookie';
-import { useState } from 'react';
 
-// TODO: fix instances and timing issue
-
+/*
+    - Contains the Tone.JS instruments and references online samples
+    - Allows user to select between instruments
+    - Displays notes played
+    - TODO: fix instances and timing issue
+*/
 class Play extends React.Component
 {
-    // needs to only know about selected device and the instrument needed -- all audio should come from here
+    // used to instantiate synthesizers from Tone.JS, selected sound, and notes/chords played
     constructor(props) {
         super(props);
-        //this.currentChord = [];
-        this.synth = new Tone.Synth().toDestination(); // Create a simple synth
+        this.synth = new Tone.Synth().toDestination(); 
         this.amSynth = new Tone.AMSynth().toDestination();
         this.monosynth = new Tone.MonoSynth({
             oscillator: {
@@ -22,18 +24,45 @@ class Play extends React.Component
                 attack: 0.1
             }
         }).toDestination();
+        this.sampler = new Tone.Sampler({
+        urls: {
+            A1: "A1.mp3",
+            A2: "A2.mp3",
+            B1: "B1.mp3",
+            B2: "B2.mp3",
+            C1: "C1.mp3",
+            C2: "C2.mp3",
+            D1: "D1.mp3",
+            D2: "D2.mp3",
+            E1: "E1.mp3",
+            E2: "E2.mp3",
+            F1: "F1.mp3",
+            F2: "F2.mp3",
+            G1: "G1.mp3",
+            G2: "G2.mp3"
+        },
+        baseUrl: "https://github.com/Tonejs/audio/blob/master/casio",
+    }).toDestination();
         this.state = {
             selectedSound: 'synth', // default device
             chordNotes: [],
         }
-
       }
 
+      /*
+        Starts Tone.JS and sets up keyboard
+      */
       componentDidMount () {
-        this.initalizeKeyboard();
         Tone.start();
+        this.initalizeKeyboard();
       }
 
+      /*
+        - Sets up keyboard using AudioKeys and allows QWERTY keyboard input
+        - Maps MIDI notes to music notes
+        - Triggers audio output with keydown event
+        - Stores current notes / chord being played
+      */
       initalizeKeyboard () {
         const keyboard = new AudioKeys({
             polyphony: 10, // Adjust the polyphony as needed
@@ -56,8 +85,9 @@ class Play extends React.Component
             80: 'Ab4', // P
           };
 
-          // TODO: find out why note is being triggered twice
-
+        /*
+          Triggers audio output, converts MIDI note to music note, and adds note to notes played
+        */
         keyboard.down((e) => {
             const note = keyToNote[e.keyCode];
 
@@ -66,9 +96,6 @@ class Play extends React.Component
 
                 this.addNote(note);
 
-                //athis.currentChord.push(e.keyCode);
-
-                //athis.getChord();
                 if (this.state.selectedSound === 'synth') {
                     //this.synth.triggerAttack(note); // Use the 'note' argument
                   } else if (this.state.selectedSound === 'amSynth') {
@@ -79,6 +106,9 @@ class Play extends React.Component
             }
         });
 
+        /*
+            Stops audio output and removes note from notes played
+        */
         keyboard.up((e) => {
 
             const note = keyToNote[e.keyCode];
@@ -91,9 +121,11 @@ class Play extends React.Component
 
         
     }
+
+    /*
+        Adds note to chordNotes state to be displayed
+    */
     addNote = (newNote) => {
-        /*this.setState((prevState) => ({ chordNotes:
-        [...prevState.chordNotes, newNote ]}));*/
 
         this.setState((prevState) => {
             if(!prevState.chordNotes.includes(newNote)) {
@@ -107,84 +139,82 @@ class Play extends React.Component
 
     }
 
+    /*
+        Removes note from chordNotes state
+    */
     removeNote = (oldNote) => {
         this.setState((prevState) => ({ chordNotes:
             [...prevState.chordNotes.filter((note) => note !== oldNote), ]}));
     }
-      
 
-      // TODO: add drums samples
+    /*
+        Selects instrument type based on user option
+    */
+    handleButtonClick = (instrument, e) => {
+    e.preventDefault();
+    console.log("Selected: " + instrument);
 
-      /*const sampler = new Tone.Sampler({
-        urls: {
-            A1: "A1.mp3",
-            A2: "A2.mp3",
-        },
-        baseUrl: "https://tonejs.github.io/audio/casio/",
-        onload: () => {
-            sampler.triggerAttackRelease(["C1", "E1", "G1", "B1"], 0.5);
-        }
-    }).toDestination();*/
+    if(instrument === 'synth') {
+        this.state.selectedSound = 'synth';
+    } else if (instrument === 'amsynth') {
+        this.state.selectedSound = 'amSynth';
+    } else if (instrument === 'monosynth') {
+        this.state.selectedSound = 'monosynth';
+    } else if (instrument === 'sampler') {
+        this.state.selectedSound = 'sampler';
+    } else if (instrument === 'qwerty')
+    {
+        //console.log("no audio set up.");
+    } else {
+        console.log("Uh oh, no instrument connected.");
+    }
+    }
 
-      handleButtonClick = (instrument, e) => {
-        e.preventDefault();
-        console.log("Selected: " + instrument);
+    /*
+        - Starter code to display the chord being played (not used yet)
+        - TODO: implement additional instruments, samples, and intervals
+    */
+    getChord () {
+    
+    const root = this.currentChord[0];
+    const note2 = this.currentChord[1];
+    const note3 = this.currentChord[2];
 
-        if(instrument === 'synth')
-        {
-            this.state.selectedSound = 'synth';
-        } else if (instrument === 'amsynth')
-        {
-            this.state.selectedSound = 'amSynth';
-        } else if (instrument === 'monosynth')
-        {
-            this.state.selectedSound = 'monosynth';
-        } else if (instrument === 'qwerty')
-        {
-            //console.log("no audio set up.");
-        } else {
-            console.log("Uh oh, no instrument connected.");
-        }
-      }
+    console.log("Root: " + root);
+    console.log(this.currentChord);
 
-      getChord () {
+    const interval1 = note2 - root;
+    const interval2 = note3 - root;
 
-        // TODO: add additional intervals
-        
-        const root = this.currentChord[0];
-        const note2 = this.currentChord[1];
-        const note3 = this.currentChord[2];
+    if (interval1 === 4 && interval2 === 7) {
+        console.log("Major");
+    } else if (interval1 === 3 && interval2 === 7) {
+        console.log("Minor");
+    } else {
+        console.log("Other");
+    }
+    }
 
-        console.log("Root: " + root);
-        console.log(this.currentChord);
-
-        const interval1 = note2 - root;
-        const interval2 = note3 - root;
-
-        if (interval1 === 4 && interval2 === 7) {
-            console.log("Major");
-        } else if (interval1 === 3 && interval2 === 7) {
-            console.log("Minor");
-        } else {
-            console.log("Other");
-        }
-      }
-
-      handleLogout = () => {
-        // TODO: ask user is they are sure they want to log out, add error handling
+    /*
+        Removes session cookie from user session and logs user out
+        - TODO: ask user if they are sure they want to log out, add error handling
+    */
+    handleLogout = () => {
         Cookies.remove('token');
         Cookies.remove('name');
         window.location.reload();
-      }
+    }
 
-    // TODO: look into samples, organize better
+    /*
+        Renders user session and displays available sounds and notes played
+    */
     render()
     {
+        // get user session cookie if applicable
         const isAuthenticated = !!Cookies.get('token');
         const firstName = Cookies.get('name');
 
         return(
-
             <div className="container d-flex flex-column align-items-center">
                 <div className="text-center m-4">
                     {isAuthenticated ? (
@@ -215,14 +245,17 @@ class Play extends React.Component
                             <p>Mono Synth</p>
                             <button onClick={(e) => this.handleButtonClick('monosynth', e)}>Select</button>
                         </li>
+                        <li className="list-group-item list-group-item action flex-column align-items-start p-3">
+                            <p>Sampler</p>
+                            <button onClick={(e) => this.handleButtonClick('sampler', e)}>Select</button>
+                        </li>
                     </ul>
                 </div>
-                <div>
-                    <h3 className="ml-2">Chord:
-                        <span >{this.state.chordNotes.map((note) => (
-                        <p className="d-inline" key={note}>{note} </p>
+                <div className="m-3">
+                    <h3 className="ml-2 w-100">Notes:</h3>
+                        <span className="h2">{this.state.chordNotes.map((note) => (
+                        <p className="d-inline" key={note}> {note} </p>
                     ))}</span>
-                    </h3>
                 </div>
             </div>
         )

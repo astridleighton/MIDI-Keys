@@ -3,9 +3,16 @@ import { Redirect, Link, useHistory } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
+/**
+ * Allows user to log in to account
+ * TODO: stop synth sounds on this page
+ */
 class Login extends React.Component
 {
-    
+    /**
+     * Stores username and password
+     * @param {*} props 
+     */
     constructor(props)
     {
         super(props);
@@ -15,21 +22,30 @@ class Login extends React.Component
         };
     }
 
-    // TODO: stop synth sounds
-
+    /**
+     * Changes state of username and/or password
+     * @param {*} event 
+     */
     handleInputChange = (event) => {
         const { name, value } = event.target;
         this.setState({ [name]: value });
     }
 
+    /**
+     * Passes login credentials to login function
+     * TODO: redirect to Play page 
+     * @param {*} event 
+     */
     handleSubmit = (event) => {
         event.preventDefault();
-
         this.processLogin(this.state);
-
-        // TODO: redirect to login
     }
 
+    /**
+     * Sends login credentials to the back-end
+     * Sets sessions cookies
+     * @param {*} loginCredentials 
+     */
     processLogin = async (loginCredentials) => {
 
         console.log("Details: " + JSON.stringify(loginCredentials));
@@ -44,7 +60,7 @@ class Login extends React.Component
                 if (token && name) {
                     Cookies.set('token', token, { expires: 1 });
                     Cookies.set('name', name, {expires: 1 });
-                    this.state.firstname = name; // pass state to play
+                    this.state.firstname = name;
                     alert("Login successful.");
                 } else {
                     alert("Did not receive token and/or name from database. Please try again.");
@@ -64,6 +80,10 @@ class Login extends React.Component
         }
     }
 
+    /**
+     * Displays login form and registration link
+     * @returns 
+     */
     render() {
         const {username, password} = this.state;
 

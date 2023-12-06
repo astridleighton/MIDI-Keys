@@ -11,19 +11,19 @@ class Navbar extends React.Component
 
         return(
             <div className="navbar navbar-dark bg-dark">
-                <span class="navbar-brand mb-0 h1">MIDI Keys</span>
-                <ul class="mt-2 mt-lg-0 ml-auto">
-                    <li class="nav-item active">
-                        <Link to="/" class="nav-link">Play</Link>
+                <span className="navbar-brand mb-0 h1">MIDI Keys</span>
+                <ul className="mt-2 mt-lg-0 ml-auto">
+                    <li className="nav-item active">
+                        <Link to="/" className="nav-link">Play</Link>
                     </li>
-                    <li class="nav-item">
+                    <li className="nav-item">
                         <Link to="/connect" devices={this.props.midi}>Connect</Link>
                     </li>
-                    <li class="nav-item">
+                    <li className="nav-item">
                         <Link to="/about">About</Link>
                     </li>
                 </ul>
-                <span class="nav-item">
+                <span className="nav-item">
                         {isAuthenticated ? (
                         <Link to="/logout">Log Out</Link>
                     ) : (

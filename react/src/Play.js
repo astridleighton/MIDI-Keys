@@ -24,7 +24,7 @@ class Play extends React.Component
         }).toDestination();
         this.state = {
             selectedSound: 'synth', // default device
-            currentChord: [],
+            chordNotes: [],
         }
 
       }
@@ -64,23 +64,9 @@ class Play extends React.Component
             if(note)
             {
 
-                // TODO: add note to array
-                this.setState(state => {
-                    const chord = [...state.currentChord, state.value];
+                this.addNote(note);
 
-                    return {
-                        chord,
-                        value: '',
-                    }
-                })
-                
-
-                /*this.setState((prevState) => ({
-                    currentChord: [prevState, note],
-                }))*/
-
-                console.log(note);
-                //this.currentChord.push(e.keyCode);
+                //athis.currentChord.push(e.keyCode);
 
                 //athis.getChord();
                 if (this.state.selectedSound === 'synth') {
@@ -94,16 +80,36 @@ class Play extends React.Component
         });
 
         keyboard.up((e) => {
-            
-           /* const index = this.currentChord.indexOf(e);
-            if (index !== -1) {
-              this.chord.splice(index, 1);
-            }*/
-            console.log("up");
+
+            const note = keyToNote[e.keyCode];
+
+            this.removeNote(note);
             //this.synth.triggerRelease();
             //this.amSynth.triggerRelease();
             //this.monosynth.triggerRelease();
         })
+
+        
+    }
+    addNote = (newNote) => {
+        /*this.setState((prevState) => ({ chordNotes:
+        [...prevState.chordNotes, newNote ]}));*/
+
+        this.setState((prevState) => {
+            if(!prevState.chordNotes.includes(newNote)) {
+                return {
+                    chordNotes: [...prevState.chordNotes, newNote],
+                }
+            }
+            return prevState;
+
+        })
+
+    }
+
+    removeNote = (oldNote) => {
+        this.setState((prevState) => ({ chordNotes:
+            [...prevState.chordNotes.filter((note) => note !== oldNote), ]}));
     }
       
 
@@ -196,29 +202,28 @@ class Play extends React.Component
                     <div className="pb-4">
                         <h2>Sounds</h2>
                     </div>
-                    <ul class="list-group">
-                        <li class="list-group-item list-group-item action flex-column align-items-start p-3">
+                    <ul className="list-group">
+                        <li className="list-group-item list-group-item action flex-column align-items-start p-3">
                             <p>Synth</p>
                             <button onClick={(e) => this.handleButtonClick('synth', e)}>Select</button>
                         </li>
-                        <li class="list-group-item list-group-item action flex-column align-items-start p-3">
+                        <li className="list-group-item list-group-item action flex-column align-items-start p-3">
                             <p>AM Synth</p>
                             <button onClick={(e) => this.handleButtonClick('amsynth', e)}>Select</button>
                         </li>
-                        <li class="list-group-item list-group-item action flex-column align-items-start p-3">
+                        <li className="list-group-item list-group-item action flex-column align-items-start p-3">
                             <p>Mono Synth</p>
                             <button onClick={(e) => this.handleButtonClick('monosynth', e)}>Select</button>
                         </li>
                     </ul>
                 </div>
                 <div>
-                    <ul>
-                    {this.state.currentChord.map((note) => (
-                        <li key={note}>{note}</li>
-                    ))}
-                    </ul>
+                    <h3 className="ml-2">Chord:
+                        <span >{this.state.chordNotes.map((note) => (
+                        <p className="d-inline" key={note}>{note} </p>
+                    ))}</span>
+                    </h3>
                 </div>
-                <h3>Chord: ...</h3>
             </div>
         )
     }

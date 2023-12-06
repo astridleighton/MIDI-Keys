@@ -138,7 +138,7 @@ onMIDISuccess(midiAccess)
   }
 
   // NOTES: 0-127
-  useKeyboard(keyboard)
+  useKeyboard = (keyboard) =>
   {
     
       keyboard.onmidimessage = function (event)
@@ -156,6 +156,7 @@ onMIDISuccess(midiAccess)
                   if(velocity > 0)
                   {
                       console.log("Playing " + note);
+                      updateChord(note); 
 
                       //this.noteOn(note, velocity);
 
@@ -207,13 +208,18 @@ onMIDISuccess(midiAccess)
         return noteName + octave;
       }
 
-      // TODO: bind to connected device
+      function updateChord (note) {
+        alert("Test");
+        this.setState( { currentNote: note });
+      }
 
   }
 
   updateConnectedDevice = (value) => {
     this.setState( { selectedDevice: value });
   }
+
+  
 
   render()
   {
@@ -229,7 +235,7 @@ onMIDISuccess(midiAccess)
                 <Route exact path="/register" element={<Register />} />
             </Routes>
         </Router>
-        <div class="fixed-bottom">
+        <div className="fixed-bottom">
             <Footer selectedDevice={this.state.selectedDevice}/>
         </div>
       </div>

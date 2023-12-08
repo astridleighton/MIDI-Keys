@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import * as Tone from 'tone';
 
 /**
  * Allows user to register for an account
@@ -16,6 +17,10 @@ class Register extends React.Component
             password: '',
             firstname: ''
         };
+    }
+
+    componentDidMount () {
+        Tone.Transport.pause();
     }
 
     /**

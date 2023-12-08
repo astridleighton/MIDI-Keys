@@ -1,5 +1,6 @@
 import React, {useContext} from 'react';
 import WebMidi from 'webmidi';
+import * as Tone from 'tone';
 
 /**
  * Allows the user to connect to a selected device
@@ -15,13 +16,16 @@ class Connect extends React.Component
         this.state = {
           midiDevices: [],
           selectedDevice: null,
-
         }
       }
 
       state = {
         support: ".",
       }
+
+      componentDidMount () {
+        Tone.Transport.pause();
+    }
 
       // TODO: replace with connected MIDI devices
       setDevice = () => {

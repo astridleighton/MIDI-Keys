@@ -7,16 +7,43 @@ import Cookies from 'js-cookie';
     - Contains the Tone.JS instruments and references online samples
     - Allows user to select between instruments
     - Displays notes played
-    - TODO: fix instances and timing issue
+    - TODO: maybe pass play option between components?
 */
 class Play extends React.Component
 {
     // used to instantiate synthesizers from Tone.JS, selected sound, and notes/chords played
     constructor(props) {
         super(props);
-        this.synth = new Tone.Synth().toDestination(); 
-        this.amSynth = new Tone.AMSynth().toDestination();
-        this.monosynth = new Tone.MonoSynth({
+        this.synths = {};
+        this.amSynths = {};
+        this.monoSynths = {};
+
+        this.casio = new Tone.Sampler({
+            urls: {
+            A1: "A1.mp3",
+            A2: "A2.mp3",
+        },
+	        baseUrl: "https://tonejs.github.io/audio/casio/",
+        }).toDestination();
+
+        this.state = {
+            selectedSound: 'synth', // default device
+            chordNotes: [],
+        }
+      }
+
+      createSynth = () => {
+        const synth = new Tone.Synth().toDestination();
+        return synth;
+      }
+
+      createAMSynth = () => {
+        const amSynth = new Tone.AMSynth().toDestination();
+        return amSynth;
+      }
+
+      createMonoSynth = () => {
+        const monoSynth = new Tone.MonoSynth({
             oscillator: {
                 type: "square"
             },
@@ -24,30 +51,9 @@ class Play extends React.Component
                 attack: 0.1
             }
         }).toDestination();
-        this.sampler = new Tone.Sampler({
-        urls: {
-            A1: "A1.mp3",
-            A2: "A2.mp3",
-            B1: "B1.mp3",
-            B2: "B2.mp3",
-            C1: "C1.mp3",
-            C2: "C2.mp3",
-            D1: "D1.mp3",
-            D2: "D2.mp3",
-            E1: "E1.mp3",
-            E2: "E2.mp3",
-            F1: "F1.mp3",
-            F2: "F2.mp3",
-            G1: "G1.mp3",
-            G2: "G2.mp3"
-        },
-        baseUrl: "https://github.com/Tonejs/audio/blob/master/casio",
-    }).toDestination();
-        this.state = {
-            selectedSound: 'synth', // default device
-            chordNotes: [],
-        }
+        return monoSynth;
       }
+
 
       /*
         Starts Tone.JS and sets up keyboard
@@ -97,11 +103,16 @@ class Play extends React.Component
                 this.addNote(note);
 
                 if (this.state.selectedSound === 'synth') {
-                    //this.synth.triggerAttack(note); // Use the 'note' argument
+                    const synth = this.createSynth();
+                    synth.triggerAttackRelease(note, "4n");
                   } else if (this.state.selectedSound === 'amSynth') {
-                    //this.amSynth.triggerAttack(note);
+                    const amSynth = this.createAMSynth();
+                    amSynth.triggerAttackRelease(note, "4n");
                   } else if (this.state.selectedSound === 'monosynth') {
-                    //this.monosynth.triggerAttack(note);
+                    const monoSynth = this.createMonoSynth();
+                    monoSynth.triggerAttackRelease(note, "4n");
+                  } else if (this.state.selectedSound === 'sampler') {
+                    this.sampler.triggerAttackRelease(note, "4an");
                   }
             }
         });
@@ -114,9 +125,10 @@ class Play extends React.Component
             const note = keyToNote[e.keyCode];
 
             this.removeNote(note);
-            //this.synth.triggerRelease();
-            //this.amSynth.triggerRelease();
-            //this.monosynth.triggerRelease();
+            /*this.synth.triggerRelease();
+            this.amSynth.triggerRelease();
+            this.monosynth.triggerRelease();
+            //this.sampler.triggerRelease();*/
         })
 
         
@@ -160,8 +172,8 @@ class Play extends React.Component
         this.state.selectedSound = 'amSynth';
     } else if (instrument === 'monosynth') {
         this.state.selectedSound = 'monosynth';
-    } else if (instrument === 'sampler') {
-        this.state.selectedSound = 'sampler';
+    } else if (instrument === 'casio') {
+        this.state.selectedSound = 'casio';
     } else if (instrument === 'qwerty')
     {
         //console.log("no audio set up.");
@@ -193,16 +205,6 @@ class Play extends React.Component
     } else {
         console.log("Other");
     }
-    }
-
-    /*
-        Removes session cookie from user session and logs user out
-        - TODO: ask user if they are sure they want to log out, add error handling
-    */
-    handleLogout = () => {
-        Cookies.remove('token');
-        Cookies.remove('name');
-        window.location.reload();
     }
 
     /*
@@ -246,7 +248,7 @@ class Play extends React.Component
                             <button onClick={(e) => this.handleButtonClick('monosynth', e)}>Select</button>
                         </li>
                         <li className="list-group-item list-group-item action flex-column align-items-start p-3">
-                            <p>Sampler</p>
+                            <p>Casio Keyboard</p>
                             <button onClick={(e) => this.handleButtonClick('sampler', e)}>Select</button>
                         </li>
                     </ul>

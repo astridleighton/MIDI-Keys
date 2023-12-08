@@ -9,6 +9,7 @@ import About from './About';
 import Login from './Login';
 import Register from './Register';
 import Footer from './Footer';
+import Cookies from 'js-cookie';
 
 /*
     - Start-up: To begin application, navigate to the react folder and type "npm start"; make sure back-end is running as well by navigated to express and typing "index.js"
@@ -38,6 +39,7 @@ componentDidMount()
   navigator.requestMIDIAccess()
   .then((midiAccess) => this.onMIDISuccess(midiAccess), 
         (error) => this.onMIDIFailure(error));
+    Tone.start();
 }
 
 /**
@@ -166,6 +168,16 @@ onMIDISuccess(midiAccess)
   updateConnectedDevice = (value) => {
     this.setState( { selectedDevice: value });
   }
+
+    /*
+    Removes session cookie from user session and logs user out
+    - TODO: ask user if they are sure they want to log out, add error handling
+*/
+    handleLogout = () => {
+        Cookies.remove('token');
+        Cookies.remove('name');
+        window.location.reload();
+    }
 
   
 

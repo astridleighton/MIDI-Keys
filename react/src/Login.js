@@ -1,7 +1,8 @@
 import React from 'react';
-import { Redirect, Link, useHistory } from 'react-router-dom';
+import { Redirect, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import * as Tone from 'tone';
 
 /**
  * Allows user to log in to account
@@ -15,11 +16,16 @@ class Login extends React.Component
      */
     constructor(props)
     {
+
         super(props);
         this.state = {
             username: '',
             password: '',
         };
+    }
+
+    componentDidMount() {
+        Tone.Transport.pause();
     }
 
     /**
@@ -44,6 +50,7 @@ class Login extends React.Component
     /**
      * Sends login credentials to the back-end
      * Sets sessions cookies
+     * TODO: redirect to home page
      * @param {*} loginCredentials 
      */
     processLogin = async (loginCredentials) => {
@@ -62,6 +69,8 @@ class Login extends React.Component
                     Cookies.set('name', name, {expires: 1 });
                     this.state.firstname = name;
                     alert("Login successful.");
+
+                    //this.redirectToPlayPage();
                 } else {
                     alert("Did not receive token and/or name from database. Please try again.");
                 }
@@ -79,6 +88,11 @@ class Login extends React.Component
             }
         }
     }
+
+    /*redirectToPlayPage = () => {
+        const navigate = useNavigate();
+        navigate("/");
+    }*/
 
     /**
      * Displays login form and registration link

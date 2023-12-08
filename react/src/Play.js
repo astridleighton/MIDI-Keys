@@ -26,6 +26,19 @@ class Play extends React.Component
 	        baseUrl: "https://tonejs.github.io/audio/casio/",
         }).toDestination();
 
+        // TODO: implement
+        /*this.drumSampler = new Tone.Sampler({
+            urls: {
+            kick: "kick.mp3",
+            snare: "snare.mp3",
+            tom1: "tom1.mp3",
+            tom2: "tom2.mp3",
+            hihat: "hihat.mp3"
+            
+        },
+	        baseUrl: "https://tonejs.github.io/audio/drum-samples/4OP-FM/",
+        }).toDestination();*/
+
         this.state = {
             selectedSound: 'synth', // default device
             chordNotes: [],
@@ -52,6 +65,10 @@ class Play extends React.Component
             }
         }).toDestination();
         return monoSynth;
+      }
+
+      createDrumSample = () => {
+
       }
 
 

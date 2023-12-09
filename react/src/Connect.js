@@ -5,7 +5,6 @@ import * as Tone from 'tone';
 /**
  * Allows the user to connect to a selected device
  * NOTE: Automatically connects to QWERTY keyboard
- * TODO: implement 
  */
 class Connect extends React.Component
 {

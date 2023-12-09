@@ -26,23 +26,20 @@ class Play extends React.Component
 	        baseUrl: "https://tonejs.github.io/audio/casio/",
         }).toDestination();
 
-        // TODO: implement
-        /*this.drumSampler = new Tone.Sampler({
-            urls: {
-            kick: "kick.mp3",
-            snare: "snare.mp3",
-            tom1: "tom1.mp3",
-            tom2: "tom2.mp3",
-            hihat: "hihat.mp3"
-            
-        },
-	        baseUrl: "https://tonejs.github.io/audio/drum-samples/4OP-FM/",
-        }).toDestination();*/
+        this.kickPlayer = new Tone.Player("https://tonejs.github.io/audio/drum-samples/4OP-FM/kick.mp3").toDestination();
+        this.snarePlayer = new Tone.Player("https://tonejs.github.io/audio/drum-samples/4OP-FM/snare.mp3").toDestination();
+        this.tom1Player = new Tone.Player("https://tonejs.github.io/audio/drum-samples/4OP-FM/tom1.mp3").toDestination();
+        this.tom2Player = new Tone.Player("https://tonejs.github.io/audio/drum-samples/4OP-FM/tom2.mp3").toDestination();
+        this.tom3Player = new Tone.Player("https://tonejs.github.io/audio/drum-samples/4OP-FM/tom3.mp3").toDestination();
+        this.hiHatPlayer = new Tone.Player("https://tonejs.github.io/audio/drum-samples/4OP-FM/hihat.mp3").toDestination();
+        this.bongoSnarePlayer = new Tone.Player("https://tonejs.github.io/audio/drum-samples/Bongos/snare.mp3").toDestination();
+        this.bongoTomPlayer = new Tone.Player("https://tonejs.github.io/audio/drum-samples/Bongos/tom1.mp3").toDestination();
 
         this.state = {
             selectedSound: 'synth', // default device
             chordNotes: [],
         }
+
       }
 
       createSynth = () => {
@@ -67,18 +64,137 @@ class Play extends React.Component
         return monoSynth;
       }
 
-      createDrumSample = () => {
-
-      }
-
 
       /*
         Starts Tone.JS and sets up keyboard
       */
       componentDidMount () {
+        navigator.requestMIDIAccess()
+            .then((midiAccess) => this.onMIDISuccess(midiAccess), 
+        (error) => this.onMIDIFailure(error));
         Tone.start();
+        Tone.setContext(new AudioContext({ sampleRate: 44100 }));
+        Tone.Master.volume.value = -6;
         this.initalizeKeyboard();
+        this.state.selectedSound = 'synth';
       }
+
+      /**
+ * If WebMIDI API connection is successful, get MIDI inputs
+ * @param {*} midiAccess 
+ */
+onMIDISuccess(midiAccess)
+{
+    //Tone.start();
+    console.log("WebMIDI is supported in browser.");
+    console.log(midiAccess);
+    midiAccess.addEventListener('statechange', this.updateDevices);
+    this.midi = midiAccess;
+
+    const midiIns = midiAccess.inputs;
+    const inputs = midiIns.values();
+    let keyboard = null;
+
+    // list midi inputs to console
+    if (inputs != null)
+    {
+        for(let input of inputs)
+        {
+
+            console.log(`Found MIDI input: ${input.name}, ID: ${input.id}`);
+            if(input.name === "V49")
+            {
+                keyboard = input;
+                this.state.selectedDevice = input.name; // used for testing
+            }
+            //input.onMIDIMessage = this.onMIDIMessage.bind(this);
+        }
+    }
+    else
+    {
+        console.log("No MIDI inputs detected.");
+    }
+
+    if(keyboard != null)
+    {
+        this.useKeyboard(keyboard);
+    }
+    
+}
+
+
+
+      useKeyboard = (midiKeyboard) =>
+        {
+    
+                midiKeyboard.onmidimessage =  (event) =>
+                {
+                    const command = event.data[0];
+                    const noteInput = event.data[1];
+                    const velocity = event.data[2];
+                    const note = this.midiToNote(noteInput);
+
+                    switch (command)
+                    {
+                        
+                        case 144: // note on
+                            if(velocity > 0)
+                            {
+                                this.addNote(note);
+
+                                if (this.state.selectedSound === 'synth') {
+                                    const synth = this.createSynth();
+                                    synth.triggerAttackRelease(Tone.Midi(noteInput).toFrequency(), "4n");
+                                    } else if (this.state.selectedSound === 'amSynth') {
+                                    const amSynth = this.createAMSynth();
+                                    amSynth.triggerAttackRelease(note, "4n");
+                                    } else if (this.state.selectedSound === 'monosynth') {
+                                    const monoSynth = this.createMonoSynth();
+                                    monoSynth.triggerAttackRelease(note, "4n");
+                                    } else if (this.state.selectedSound === 'casio') {
+                                    this.sampler.triggerAttackRelease(note, "4n"); // TODO: fix
+                                    }
+                            
+                            }
+                            
+                            break;
+                        case 128: // note off
+                            this.removeNote(note);
+                            break;
+                        case 153: // drum pads
+                        // TODO: add separate instances
+                            if (noteInput === 49) {
+                                this.kickPlayer.start(0.5);
+                            } else if (noteInput === 41) {
+                                this.snarePlayer.start(0.5);
+                            } else if (noteInput === 42) {
+                                this.tom1Player.start(0.5);
+                            } else if (noteInput === 46) {
+                                this.tom2Player.start(0.5);
+                            } else if (noteInput === 36) {
+                                this.tom3Player.start(0.5);
+                            } else if (noteInput === 37) {
+                                this.hiHatPlayer.start(0.5);
+                            } else if (noteInput === 38) {
+                                this.bongoSnarePlayer.start(0.5);
+                            } else if (noteInput === 39) {
+                                this.bongoTomPlayer.start(0.5);
+                            }
+                            break;
+                        default:
+                            break;
+
+                            /* COMMANDS:
+                            * command 224 = pitch wheel, 176 = mod wheel
+                            * 153/137 - pads
+                            * 176 - buttons 
+                            * drums: 49 - 41 - 42 - 46
+                            * drums: 36 - 37 - 38 - 39
+                            */
+                        }
+                };
+        
+            }
 
       /*
         - Sets up keyboard using AudioKeys and allows QWERTY keyboard input
@@ -87,6 +203,15 @@ class Play extends React.Component
         - Stores current notes / chord being played
       */
       initalizeKeyboard () {
+
+        // set up connected keyboard - will add other devices
+        let midiKeyboard = null;
+
+        if(midiKeyboard != null)
+        {
+          this.useKeyboard(midiKeyboard);
+        }
+
         const keyboard = new AudioKeys({
             polyphony: 10, // Adjust the polyphony as needed
         });
@@ -147,9 +272,23 @@ class Play extends React.Component
             this.monosynth.triggerRelease();
             //this.sampler.triggerRelease();*/
         })
+        
+        }
 
         
-    }
+        /*
+        * Converts MIDI input (number value) to note value and octave
+        * Example: #28 -> E1
+        */
+        midiToNote = (midiInput) =>
+        {
+        const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+        const octave = Math.floor(midiInput / 12) -1;
+        const noteIndex = midiInput % 12;
+
+        const noteName = noteNames[noteIndex];
+        return noteName + octave;
+        }
 
     /*
         Adds note to chordNotes state to be displayed
@@ -180,23 +319,23 @@ class Play extends React.Component
         Selects instrument type based on user option
     */
     handleButtonClick = (instrument, e) => {
-    e.preventDefault();
-    console.log("Selected: " + instrument);
+        e.preventDefault();
+        console.log("Selected: " + instrument);
 
-    if(instrument === 'synth') {
-        this.state.selectedSound = 'synth';
-    } else if (instrument === 'amsynth') {
-        this.state.selectedSound = 'amSynth';
-    } else if (instrument === 'monosynth') {
-        this.state.selectedSound = 'monosynth';
-    } else if (instrument === 'casio') {
-        this.state.selectedSound = 'casio';
-    } else if (instrument === 'qwerty')
-    {
-        //console.log("no audio set up.");
-    } else {
-        console.log("Uh oh, no instrument connected.");
-    }
+        if(instrument === 'synth') {
+            this.state.selectedSound = 'synth';
+        } else if (instrument === 'amsynth') {
+            this.state.selectedSound = 'amSynth';
+        } else if (instrument === 'monosynth') {
+            this.state.selectedSound = 'monosynth';
+        } else if (instrument === 'casio') {
+            this.state.selectedSound = 'casio';
+        } else if (instrument === 'qwerty')
+        {
+            //console.log("no audio set up.");
+        } else {
+            console.log("Uh oh, no instrument connected.");
+        }
     }
 
     /*
@@ -205,24 +344,24 @@ class Play extends React.Component
     */
     getChord () {
     
-    const root = this.currentChord[0];
-    const note2 = this.currentChord[1];
-    const note3 = this.currentChord[2];
+        const root = this.currentChord[0];
+        const note2 = this.currentChord[1];
+        const note3 = this.currentChord[2];
 
-    console.log("Root: " + root);
-    console.log(this.currentChord);
+        console.log("Root: " + root);
+        console.log(this.currentChord);
 
-    const interval1 = note2 - root;
-    const interval2 = note3 - root;
+        const interval1 = note2 - root;
+        const interval2 = note3 - root;
 
-    if (interval1 === 4 && interval2 === 7) {
-        console.log("Major");
-    } else if (interval1 === 3 && interval2 === 7) {
-        console.log("Minor");
-    } else {
-        console.log("Other");
-    }
-    }
+        if (interval1 === 4 && interval2 === 7) {
+            console.log("Major");
+        } else if (interval1 === 3 && interval2 === 7) {
+            console.log("Minor");
+        } else {
+            console.log("Other");
+        }
+    }   
 
     /*
         Renders user session and displays available sounds and notes played
@@ -266,7 +405,7 @@ class Play extends React.Component
                         </li>
                         <li className="list-group-item list-group-item action flex-column align-items-start p-3">
                             <p>Casio Keyboard</p>
-                            <button onClick={(e) => this.handleButtonClick('sampler', e)}>Select</button>
+                            <button onClick={(e) => this.handleButtonClick('casio', e)}>Select</button>
                         </li>
                     </ul>
                 </div>

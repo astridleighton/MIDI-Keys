@@ -25,11 +25,6 @@ class Play extends React.Component
             "kick": "https://tonejs.github.io/audio/drum-samples/4OP-FM/snare.mp3",
         }).toDestination();*/
 
-        this.kickPlayer = new Tone.Player("https://tonejs.github.io/audio/drum-samples/4OP-FM/kick.mp3").toDestination();
-        this.snarePlayer = new Tone.Player("https://tonejs.github.io/audio/drum-samples/4OP-FM/snare.mp3").toDestination();
-        this.tom1Player = new Tone.Player("https://tonejs.github.io/audio/drum-samples/4OP-FM/tom1.mp3").toDestination();
-        this.tom2Player = new Tone.Player("https://tonejs.github.io/audio/drum-samples/4OP-FM/tom2.mp3").toDestination();
-        this.tom3Player = new Tone.Player("https://tonejs.github.io/audio/drum-samples/4OP-FM/tom3.mp3").toDestination();
         this.hiHatPlayer = new Tone.Player("https://tonejs.github.io/audio/drum-samples/4OP-FM/hihat.mp3").toDestination();
         this.bongoSnarePlayer = new Tone.Player("https://tonejs.github.io/audio/drum-samples/Bongos/snare.mp3").toDestination();
         this.bongoTomPlayer = new Tone.Player("https://tonejs.github.io/audio/drum-samples/Bongos/tom1.mp3").toDestination();
@@ -72,6 +67,7 @@ class Play extends React.Component
                 attack: 0.1
             }
         }).toDestination();
+        monoSynth.volume.value = -5;
         return monoSynth;
       }
 
@@ -97,6 +93,77 @@ class Play extends React.Component
                 casio.triggerAttackRelease(note, 0.5);
             }
         }).toDestination();
+      }
+
+      createKickPlayer = () => {
+
+        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/kick.mp3", function(){
+            const kickPlayer = new Tone.Player(buffer.get()).toDestination();
+            kickPlayer.start(0.5);
+
+        });
+      }
+
+      createSnarePlayer = () => {
+
+        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/snare.mp3", function(){
+            const snarePlayer = new Tone.Player(buffer.get()).toDestination();
+            snarePlayer.start(0.5);
+
+        });
+      }
+
+      createTom1Player = () => {
+
+        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/tom1.mp3", function(){
+            const tom1Player = new Tone.Player(buffer.get()).toDestination();
+            tom1Player.start(0.5);
+
+        });
+      }
+
+      createTom2Player = () => {
+
+        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/tom2.mp3", function(){
+            const tom2Player = new Tone.Player(buffer.get()).toDestination();
+            tom2Player.start(0.5);
+
+        });
+      }
+
+      createTom3Player = () => {
+
+        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/tom3.mp3", function(){
+            const tom3Player = new Tone.Player(buffer.get()).toDestination();
+            tom3Player.start(0.5);
+
+        });
+      }
+
+      createHiHatPlayer = () => {
+
+        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/hihat.mp3", function(){
+            const hiHatPlayer = new Tone.Player(buffer.get()).toDestination();
+            hiHatPlayer.start(0.5);
+
+        });
+      }
+
+      createBongo1Player = () => {
+
+        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/Bongos/snare.mp3", function(){
+            const hiHatPlayer = new Tone.Player(buffer.get()).toDestination();
+            hiHatPlayer.start(0.5);
+
+        });
+      }
+
+      createBongo2Player = () => {
+
+        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/Bongos/tom1.mp3", function(){
+            const bongo2Player = new Tone.Player(buffer.get()).toDestination();
+            bongo2Player.start(0.5);
+        });
       }
 
       /*
@@ -176,11 +243,9 @@ class Play extends React.Component
                         if (this.state.selectedSound === 'synth') {
                             const synth = this.createSynth();
                             synth.triggerAttackRelease(Tone.Midi(noteInput).toFrequency(), "4n");
-                            if (Tone.context.state !== 'closed') {
+                            /*if (Tone.context.state !== 'closed') {
                                 Tone.context.close();
-                                console.log("test");
-                            }
-                            
+                            }*/
                         } else if (this.state.selectedSound === 'amSynth') {
                             const amSynth = this.createAMSynth();
                             amSynth.triggerAttackRelease(note, "4n");
@@ -198,22 +263,21 @@ class Play extends React.Component
                     break;
                 case 153: // drum pads
                     if (noteInput === 49) {
-                        console.log("test");
-                        this.kickPlayer.start(0.5);
+                        this.createKickPlayer();
                     } else if (noteInput === 41) {
-                        this.snarePlayer.start(0.5);
+                        this.createSnarePlayer();
                     } else if (noteInput === 42) {
-                        this.tom1Player.start(0.5);
+                        this.createTom1Player();
                     } else if (noteInput === 46) {
-                        this.tom2Player.start(0.5);
+                        this.createTom2Player();
                     } else if (noteInput === 36) {
-                        this.tom3Player.start(0.5);
+                        this.createTom3Player();
                     } else if (noteInput === 37) {
-                        this.hiHatPlayer.start(0.5);
+                        this.createHiHatPlayer();
                     } else if (noteInput === 38) {
-                        this.bongoSnarePlayer.start(0.5);
+                        this.createBongo1Player();
                     } else if (noteInput === 39) {
-                        this.bongoTomPlayer.start(0.5);
+                        this.createBongo2Player();
                     }
                     break;
                 default:

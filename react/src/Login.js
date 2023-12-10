@@ -111,7 +111,7 @@ class Login extends React.Component
                 <div className="d-flex justify-content-center align-items-center h-100 m-3">
                     <form onSubmit={this.handleSubmit}>
                     <div className="form-group-row">
-                        <label htmlFor="username" class="col-sm-2 col-form-label">Username</label>
+                        <label htmlFor="username" className="col-sm-2 col-form-label">Username</label>
                         <div className="col-sm-10">
                             <input
                             type="text"

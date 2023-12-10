@@ -90,7 +90,7 @@ class Register extends React.Component
                                 type="text"
                                 id="firstname"
                                 name="firstname"
-                                class="form-control"
+                                className="form-control"
                                 placeholder="Enter first name"
                                 value={this.state.firstname}
                                 onChange={this.handleInputChange}
@@ -105,7 +105,7 @@ class Register extends React.Component
                                 type="text"
                                 id="username"
                                 name="username"
-                                class="form-control"
+                                className="form-control"
                                 placeholder="Enter username"
                                 value={this.state.username}
                                 onChange={this.handleInputChange}
@@ -120,7 +120,7 @@ class Register extends React.Component
                                 type="password"
                                 id="password"
                                 name="password"
-                                class="form-control"
+                                className="form-control"
                                 placeholder="Enter password"
                                 value={this.state.password}
                                 onChange={this.handleInputChange}

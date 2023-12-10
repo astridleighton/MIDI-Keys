@@ -8,6 +8,13 @@ import Cookies from 'js-cookie';
  */
 class Navbar extends React.Component
 {
+
+    handleLogout = () => {
+        Cookies.remove('token');
+        Cookies.remove('name');
+        window.location.reload();
+    }
+    
     /**
      * Shows navigation links and shows login/logout button depending on session cookie
      * @returns 
@@ -32,7 +39,7 @@ class Navbar extends React.Component
                 </ul>
                 <span className="nav-item">
                         {isAuthenticated ? (
-                        <Link to="/logout">Log Out</Link>
+                        <Link><span onClick={this.handleLogout}>Log Out</span></Link>
                     ) : (
                         <Link to="/login">Login</Link>
                     )}

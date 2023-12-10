@@ -56,18 +56,6 @@ componentDidMount()
     this.setState( { selectedDevice: value });
   }
 
-    /*
-    Removes session cookie from user session and logs user out
-    - TODO: ask user if they are sure they want to log out, add error handling
-*/
-    handleLogout = () => {
-        Cookies.remove('token');
-        Cookies.remove('name');
-        window.location.reload();
-    }
-
-  
-
   render()
   {
     return (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Redirect, Link, useNavigate } from 'react-router-dom';
+import { withRouter, Link, useNavigate, Redirect } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import * as Tone from 'tone';
@@ -17,10 +17,13 @@ class Login extends React.Component
     constructor(props)
     {
 
+        //const navigate = useNavigate();
+
         super(props);
         this.state = {
             username: '',
             password: '',
+            loginSuccess: false
         };
     }
 
@@ -45,6 +48,9 @@ class Login extends React.Component
     handleSubmit = (event) => {
         event.preventDefault();
         this.processLogin(this.state);
+        if (this.loginSuccess) {
+
+        }
     }
 
     /**
@@ -68,9 +74,7 @@ class Login extends React.Component
                     Cookies.set('token', token, { expires: 1 });
                     Cookies.set('name', name, {expires: 1 });
                     this.state.firstname = name;
-                    alert("Login successful.");
-
-                    //this.redirectToPlayPage();
+                    this.setState( { loginSuccess: true });
                 } else {
                     alert("Did not receive token and/or name from database. Please try again.");
                 }
@@ -103,12 +107,12 @@ class Login extends React.Component
 
         return (
             <div>
-                <h2 class="m-4 d-flex justify-content-center">Login</h2>
-                <div class="d-flex justify-content-center align-items-center h-100 m-3">
+                <h2 className="m-4 d-flex justify-content-center">Login</h2>
+                <div className="d-flex justify-content-center align-items-center h-100 m-3">
                     <form onSubmit={this.handleSubmit}>
                     <div className="form-group-row">
                         <label htmlFor="username" class="col-sm-2 col-form-label">Username</label>
-                        <div class="col-sm-10">
+                        <div className="col-sm-10">
                             <input
                             type="text"
                             id="username"
@@ -123,7 +127,7 @@ class Login extends React.Component
                     </div>
                     <div className="form-group">
                         <label htmlFor="password">Password</label>
-                        <div class="col-sm-10">
+                        <div className="col-sm-10">
                             <input
                             type="password"
                             id="password"
@@ -136,11 +140,11 @@ class Login extends React.Component
                             />
                         </div>
                     </div>
-                    <div class="form-group-row m-2">
-                        <p class="mb-0">Don't have an account? <Link to="/register" href="#!" class="text-black-50 fw-bold">Sign Up</Link></p>
+                    <div className="form-group-row m-2">
+                        <p className="mb-0">Don't have an account? <Link to="/register" href="#!" class="text-black-50 fw-bold">Sign Up</Link></p>
                     </div>
-                    <div class="text-center m-3">
-                        <button type="submit" class="btn btn-primary btn-block mb-4 text-center">Login</button>
+                    <div className="text-center m-3">
+                        <button type="submit" className="btn btn-primary btn-block mb-4 text-center">Login</button>
                     </div>
                 </form>
             </div>

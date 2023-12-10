@@ -1,25 +1,10 @@
 import React from 'react';
-import * as Tone from 'tone';
-import AudioKeys from 'audiokeys';
 
 /*
     Displays basic website information and future implementations
 */
 class About extends React.Component
 {
-
-    componentDidMount () {
-        Tone.Transport.pause();
-
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-        // Stop all currently playing audio
-        if (audioContext.state === 'running') {
-        audioContext.suspend().then(() => {
-            console.log('AudioContext suspended. All audio stopped.');
-        });
-        }
-    }
 
     render()
     {

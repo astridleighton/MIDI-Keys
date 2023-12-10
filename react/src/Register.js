@@ -80,7 +80,7 @@ class Register extends React.Component
     {
         return(
             <div>
-                <h2 class="m-4 d-flex justify-content-center">Create An Account</h2>
+                <h2 className="m-4 d-flex justify-content-center">Create An Account</h2>
                 <div className="d-flex justify-content-center align-items-center h-100 m-3">
                 <form onSubmit={this.handleSubmit}>
                     <div className="form-group-row">

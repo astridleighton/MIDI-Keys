@@ -24,6 +24,7 @@ class Connect extends React.Component
 
       componentDidMount () {
         Tone.Transport.pause();
+        this.setDevice();
     }
 
       // TODO: replace with connected MIDI devices
@@ -51,14 +52,6 @@ class Connect extends React.Component
         }
       }
 
-      /*
-      * Checks browser support when component mounts
-      */
-      componentDidMount()
-      {
-        this.setDevice();
-      }
-
     render()
     {
         return(
@@ -70,7 +63,7 @@ class Connect extends React.Component
               <h5 className="m-2">Available Devices:</h5>
               <form>
                     {this.state.midiDevices.map((device, index) => (
-                      <div key={index} class="form-check">
+                      <div key={index} className="form-check">
                         <input
                           type="radio"
                           id={device}
@@ -80,7 +73,7 @@ class Connect extends React.Component
                           checked={this.state.selectedDevice === device}
                           onChange={this.handleDeviceChange}
                         />
-                        <label class="form-check-label" htmlFor={device}>{device}</label>
+                        <label className="form-check-label" htmlFor={device}>{device}</label>
                       </div>
                     ))}
                   </form>
@@ -88,7 +81,7 @@ class Connect extends React.Component
             <div className="text-center m-2">
               {this.state.selectedDevice && (
                     <div>
-                      <button class="btn btn-primary btn-block mb-4 text-center" onClick={this.handleSelect}>Connect</button>
+                      <button className="btn btn-primary btn-block mb-4 text-center" onClick={this.handleSelect}>Connect</button>
                     </div>
               )} 
             </div> 
@@ -96,6 +89,5 @@ class Connect extends React.Component
         )
     }
 }
-
 
 export default Connect;

@@ -10,15 +10,6 @@ import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
-/* TODO: add for authentication, change to true when using https
-<AuthProvider
-      authType={"cookie"}
-      authName={"_auth"}
-      cookieDomain={window.location.hostname}
-      cookieSecure={false}
-    >
-*/
-
 root.render(
   <React.StrictMode>
     <App />

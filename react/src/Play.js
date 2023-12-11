@@ -90,7 +90,7 @@ class Play extends React.Component
         },
 	        baseUrl: "https://tonejs.github.io/audio/casio/",
             onload: () => {
-                casio.triggerAttackRelease(note, 0.5);
+                casio.triggerAttackRelease(note, 0.8);
             }
         }).toDestination();
       }
@@ -174,10 +174,10 @@ class Play extends React.Component
             .then((midiAccess) => this.onMIDISuccess(midiAccess), 
         (error) => this.onMIDIFailure(error));
         Tone.start();
-        Tone.setContext(new AudioContext({ sampleRate: 44100 }));
+        Tone.setContext(new AudioContext({ sampleRate: 48000 }));
         Tone.Master.volume.value = -6;
         this.initalizeKeyboard();
-        this.setState( { selectedSound: 'synth' });
+        //this.setState( { selectedSound: 'synth' });
       }
 
       /**
@@ -308,7 +308,7 @@ class Play extends React.Component
 
         if(midiKeyboard != null)
         {
-        this.useKeyboard(midiKeyboard);
+            this.useKeyboard(midiKeyboard);
         }
 
         const keyboard = this.createQwerty();
@@ -362,30 +362,29 @@ class Play extends React.Component
             } else {
                 // TODO: pass variable to other components
             }  
-    });
+        });
 
-            /*
-                Stops audio output and removes note from notes played
-            */
-            keyboard.up((e) => {
+    /*
+        Stops audio output and removes note from notes played
+    */
+        keyboard.up((e) => {
 
-                if(this.state.selectedSound === "qwerty") {
-                    const note = keyToNote[e.keyCode];
+            if(this.state.selectedSound === "qwerty") {
+                const note = keyToNote[e.keyCode];
 
-                this.removeNote(note);
+            this.removeNote(note);
 
-                // will add longer note duration in future implentations
-                /*this.synth.triggerRelease();
-                this.amSynth.triggerRelease();
-                this.monosynth.triggerRelease();
-                //this.sampler.triggerRelease();*/
-                }
+            // will add longer note duration in future implentations
+            /*this.synth.triggerRelease();
+            this.amSynth.triggerRelease();
+            this.monosynth.triggerRelease();
+            //this.sampler.triggerRelease();*/
+            }
 
-                
-            })
-    }
+            
+        })
+        }
 
-        
     /*
     * Converts MIDI input (number value) to note value and octave
     * Example: #28 -> E1
@@ -499,31 +498,76 @@ class Play extends React.Component
                     <div className="pb-4">
                         <h2>Sounds</h2>
                     </div>
+                    <div className="d-flex justify-content-center">
                     <ul className="list-group">
-                        <li className="list-group-item list-group-item action flex-column align-items-start p-3">
-                            <p>Synth (Default)</p>
-                            <button onClick={(e) => this.handleButtonClick('synth', e)}>Select</button>
+                        <li className="list-group-item list-group-item action d-flex justify-content-between flex-column align-items-start p-3 w-100" style={{ backgroundColor: 'black', padding: '5px', borderRadius: '5px' }}>
+                            <div className="form-check">
+                                <input 
+                                    type="radio"
+                                    className="form-check-input"
+                                    name="soundSelection"
+                                    style={{ backgroundColor: 'grey', marginRight: '5px' }}
+                                    onChange={(e) => this.handleButtonClick('synth', e)}
+                                />
+                                <label className="form-check-label text-white">Synth</label>
+                            </div>
                         </li>
-                        <li className="list-group-item list-group-item action flex-column align-items-start p-3">
-                            <p>AM Synth</p>
-                            <button onClick={(e) => this.handleButtonClick('amsynth', e)}>Select</button>
+                        <li className="list-group-item list-group-item action d-flex justify-content-between flex-column align-items-start p-3 w-100" style={{ backgroundColor: 'black', padding: '5px', borderRadius: '5px' }}>
+                            <div className="form-check">
+                                <input 
+                                    type="radio"
+                                    className="form-check-input"
+                                    name="soundSelection"
+                                    style={{ backgroundColor: 'grey', marginRight: '5px' }}
+                                    onChange={(e) => this.handleButtonClick('amsynth', e)}
+                                />
+                                <label className="form-check-label text-white">AM Synth</label>
+                            </div>
                         </li>
-                        <li className="list-group-item list-group-item action flex-column align-items-start p-3">
-                            <p>Mono Synth</p>
-                            <button onClick={(e) => this.handleButtonClick('monosynth', e)}>Select</button>
+                        <li className="list-group-item list-group-item action d-flex justify-content-between flex-column align-items-start p-3 w-100" style={{ backgroundColor: 'black', padding: '5px', borderRadius: '5px' }}>
+                            <div className="form-check">
+                                <input 
+                                    type="radio"
+                                    className="form-check-input"
+                                    name="soundSelection"
+                                    style={{ backgroundColor: 'grey', marginRight: '5px' }}
+                                    onChange={(e) => this.handleButtonClick('monosynth', e)}
+                                />
+                                <label className="form-check-label text-white">Mono Synth</label>
+                            </div>
                         </li>
-                        <li className="list-group-item list-group-item action flex-column align-items-start p-3">
-                            <p>Casio Keyboard</p>
-                            <button onClick={(e) => this.handleButtonClick('casio', e)}>Select</button>
+                        <li className="list-group-item list-group-item action d-flex justify-content-between flex-column align-items-start p-3 w-100" style={{ backgroundColor: 'black', padding: '5px', borderRadius: '5px' }}>
+                            <div className="form-check">
+                                <input 
+                                    type="radio"
+                                    className="form-check-input"
+                                    name="soundSelection"
+                                    style={{ backgroundColor: 'grey', marginRight: '5px' }}
+                                    onChange={(e) => this.handleButtonClick('casio', e)}
+                                />
+                                <label className="form-check-label text-white">Casio Piano (Sample)</label>
+                            </div>
                         </li>
-                        <li className="list-group-item list-group-item action flex-column align-items-start p-3">
-                            <p>QWERTY Keyboard</p>
-                            <button onClick={(e) => this.handleButtonClick('qwerty', e)}>Select</button>
+                        <li className="list-group-item list-group-item action d-flex justify-content-between flex-column align-items-start p-3 w-100" style={{ backgroundColor: 'black', padding: '5px', borderRadius: '5px' }}>
+                            <div className="form-check">
+                                <input 
+                                    type="radio"
+                                    className="form-check-input"
+                                    name="soundSelection"
+                                    style={{ backgroundColor: 'grey', marginRight: '5px' }}
+                                    onChange={(e) => this.handleButtonClick('qwerty', e)}
+                                />
+                                <label className="form-check-label text-white">QWERTY Keyboard</label>
+                            </div>
                         </li>
                     </ul>
+                    </div>
+                    
                 </div>
                 <div className="m-3">
                     <h3 className="ml-2 w-100">Notes:</h3>
+                </div>
+                <div>
                         <span className="h2">{this.state.chordNotes.map((note) => (
                         <p className="d-inline" key={note}> {note} </p>
                     ))}</span>

@@ -45,13 +45,11 @@ class Login extends React.Component
      * TODO: redirect to Play page 
      * @param {*} event 
      */
-    handleSubmit = (event) => {
+    handleSubmit = async (event) => {
         event.preventDefault();
-        this.processLogin(this.state);
-        if (this.loginSuccess) {
-
-        }
-    }
+        await this.processLogin(this.state);
+        window.location.reload(); // TODO: remove once redirect is added
+      };
 
     /**
      * Sends login credentials to the back-end
@@ -75,6 +73,7 @@ class Login extends React.Component
                     Cookies.set('name', name, {expires: 1 });
                     this.state.firstname = name;
                     this.setState( { loginSuccess: true });
+                    alert("Login successful. Please navigate to the Play page to start creating music.");
                 } else {
                     alert("Did not receive token and/or name from database. Please try again.");
                 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import * as Tone from 'tone';
+import { withRouter, Link, useNavigate, Redirect } from 'react-router-dom';
 
 /**
  * Allows user to register for an account
@@ -58,6 +59,7 @@ class Register extends React.Component
         try {
             const result = await axios.post(`http://localhost:3000/register`, registerCredentials);
             console.log(result);
+            alert("Account created. Please navigate to the login page.");
         }
             catch (error)
         {
@@ -127,6 +129,9 @@ class Register extends React.Component
                                 />
                             </div>
                         </div>
+                        <div className="form-group-row m-2">
+                        <p className="mb-0">Already have an account? <Link to="/login" href="#!" class="text-black-50 fw-bold">Login</Link></p>
+                    </div>
                         <div class="text-center m-3">
                             <input type="submit" value="Register" className="btn btn-primary btn-block mb-4 text-center"/>
                         </div>

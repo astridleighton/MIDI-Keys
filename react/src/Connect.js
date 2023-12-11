@@ -81,7 +81,7 @@ class Connect extends React.Component
             <div className="text-center m-2">
               {this.state.selectedDevice && (
                     <div>
-                      <button className="btn btn-primary btn-block mb-4 text-center" onClick={this.handleSelect}>Connect</button>
+                      <button className="btn btn-primary btn-block mb-4 bg-black text-center" onClick={this.handleSelect}>Connect</button>
                     </div>
               )} 
             </div> 

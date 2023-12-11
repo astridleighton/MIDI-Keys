@@ -56,10 +56,14 @@ componentDidMount()
     this.setState( { selectedDevice: value });
   }
 
+  removeConnectedDevice = () => {
+    this.setState( { selectedDevice: null });
+  }
+
   render()
   {
     return (
-      <div className="app-container d-flex flex-column">
+      <div className="app-container d-flex flex-column" style={{ backgroundColor: '#f8f8f8' }}>
         <Router>
             <Navbar />
             <Routes>
@@ -71,7 +75,7 @@ componentDidMount()
             </Routes>
         </Router>
         <div className="fixed-bottom">
-            <Footer selectedDevice={this.state.selectedDevice}/>
+            <Footer selectedDevice={this.state.selectedDevice} removeConnectedDevice={this.removeConnectedDevice}/>
         </div>
       </div>
     );

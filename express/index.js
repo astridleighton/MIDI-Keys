@@ -10,6 +10,7 @@ app.use(express.json());
 
 const mysql = require('mysql');
 
+// sets up database configuration
 const dbConfig = {
     host: 'localhost',
     user: 'root',
@@ -19,7 +20,9 @@ const dbConfig = {
 
 const connection = mysql.createConnection(dbConfig);
 
-// Connect to the database
+/*
+* Connects to the database at the specified database credentials
+*/
 connection.connect((err) => {
     if (err) {
       console.error('Error connecting to the database:', err);
@@ -28,10 +31,16 @@ connection.connect((err) => {
     }
   });
 
+/*
+* Testing message at index page to ensure application is running
+*/
 app.get('/', (req, res) => {
     res.send("Testing express app");
 })
 
+/*
+* Allows user to log in by validating password and token
+*/
 app.post('/login', async function(req, res, next) {
     const username = req.body.username;
     const password = req.body.password;
@@ -73,6 +82,9 @@ app.post('/login', async function(req, res, next) {
 
 });
 
+/*
+* Allows user to create an account by registering
+*/
 app.post('/register', async function(req, res, next) {
 
     const firstname = req.body.firstname;
@@ -114,44 +126,66 @@ app.post('/register', async function(req, res, next) {
     
 })
 
-app.post('/add-sound/:userID/:soundID', async function(req, res) {
+/*
+* Allows user to add sound to his favorites tab
+*/
+app.post('/add-favorite', async function(req, res) {
 
-    // check if token is valid?
+    const username = req.body.username;
+    const sound = req.body.sound;
     
-    const userID = req.params.userID;
-    const soundID = req.params.soundID;
-
-    // TODO: use function in security class
     try {
 
-        const addSound = await Database.addSound(connection, userID, soundID);
+        // TODO: check if token is valid?
 
-        // TODO: add responses
+        const userIDObject = await Database.getIDFromUser(connection, username);
+
+        const soundIDObject = await Database.getIDFromSound(connection, sound);
+
+        // TODO: convert values to numbers
+
+        /*const addFavorite = await Database.addFavorite(connection, userID, soundID);
+
+        /*if (addFavorite) 
+            res.status(200).send("Added favorite successfully.");
+        } else {*/
+            res.status(401).json({ message: 'Add favorite failed.', status: 401 });
+        //}
 
     } catch (error) {
-
+        console.error(error);
+        res.status(500).json({ message: 'An error occurred while checking the username.' });
     }
-
-    res.status(200).send("Add - Nothing set here yet.");
 
 })
 
-app.delete('/remove-sound/:username', (req, res) => {
+/*
+* Allows user to remove sound from his favorites tab (INCOMPLETE)
+*/
+app.delete('/remove-favorite', async (req, res) => {
 
-    // check if token is valid?
+    const userID = req.body.username;
+    const soundID = req.body.sound;
 
-    /*const username = req.params.username;
+    // TODO: check if token is valid?
     
-    const validateToken = await Security.validateToken(token);*/
-    
-    // TODO: validate token against username
+    //const validateToken = await Security.validateToken(token);
 
-    // TODO: retrieve and parse all sounds
+    // TODO: get user ID
+
+    // TODO: get sound ID
+
+    // TODO: fix SQL error
+
+    //const removeFavorite = await Database.deleteFavorite(connection, userID, soundID);
 
     res.status(200).send("Remove sound - Nothing set here yet.");
 
 })
 
+/*
+* Gets all sounds from the user to add to the favorites tab (INCOMPLETE)
+*/
 app.get('/all-sounds/:username', async (req, res) => {
 
     const username = req.params.username;
@@ -169,6 +203,9 @@ app.get('/all-sounds/:username', async (req, res) => {
 
 })
 
+/*
+* Testing message when express app runs
+*/
 app.listen(3000, () => {
     console.log("Server started on port 3000");
 })

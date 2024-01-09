@@ -70,10 +70,10 @@ class Database {
      * @param {*} username 
      * @param {*} sound 
      */
-    async deleteFavorite(connection, userID, soundID)
+    async removeFavorite(connection, userID, soundID)
     {
         return new Promise((resolve, reject) => {
-            connection.query("DELETE FROM favorites WHERE userID = ? AND soundID = ? VALUES (?, ?)", [userID, soundID], (error, results) => {
+            connection.query("DELETE FROM favorites WHERE userID = ? AND soundID = ?", [userID, soundID], (error, results) => {
                 if (error) {
                     reject(error);
                 } else {
@@ -143,8 +143,8 @@ class Database {
                 if (error) {
                     reject(error);
                 } else {
-                    console.log(results);
-                    resolve(results);
+                    const userID = results[0].ID.toString();
+                    resolve(userID);
                 }
             })
         })
@@ -163,13 +163,12 @@ class Database {
                 if (error) {
                     reject(error);
                 } else {
-                    resolve(results);
+                    const soundID = results[0].id.toString();
+                    resolve(soundID);
                 }
             })
         })
     }
-
-
 
 }
 

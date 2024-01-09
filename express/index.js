@@ -138,19 +138,16 @@ app.post('/add-favorite', async function(req, res) {
 
         // TODO: check if token is valid?
 
-        const userIDObject = await Database.getIDFromUser(connection, username);
+        const userID = await Database.getIDFromUser(connection, username);
+        const soundID = await Database.getIDFromSound(connection, sound);
 
-        const soundIDObject = await Database.getIDFromSound(connection, sound);
+        const addFavorite = await Database.addFavorite(connection, userID, soundID);
 
-        // TODO: convert values to numbers
-
-        /*const addFavorite = await Database.addFavorite(connection, userID, soundID);
-
-        /*if (addFavorite) 
+        if (addFavorite) {
             res.status(200).send("Added favorite successfully.");
-        } else {*/
+        } else {
             res.status(401).json({ message: 'Add favorite failed.', status: 401 });
-        //}
+        }
 
     } catch (error) {
         console.error(error);
@@ -164,22 +161,30 @@ app.post('/add-favorite', async function(req, res) {
 */
 app.delete('/remove-favorite', async (req, res) => {
 
-    const userID = req.body.username;
-    const soundID = req.body.sound;
+    const username = req.body.username;
+    const sound = req.body.sound;
 
     // TODO: check if token is valid?
     
     //const validateToken = await Security.validateToken(token);
 
-    // TODO: get user ID
+    try {
 
-    // TODO: get sound ID
+        const userID = await Database.getIDFromUser(connection, username);
+    
+        const soundID = await Database.getIDFromSound(connection, sound);
 
-    // TODO: fix SQL error
+        const removeFavorite = await Database.removeFavorite(connection, userID, soundID);
 
-    //const removeFavorite = await Database.deleteFavorite(connection, userID, soundID);
+        if (removeFavorite) {
+            res.status(200).send("Removed favorite successfully.");
+        } else {
+            res.status(401).json({ message: 'Add favorite failed.', status: 401 });
+        }
 
-    res.status(200).send("Remove sound - Nothing set here yet.");
+    } catch (error) {
+
+    }
 
 })
 

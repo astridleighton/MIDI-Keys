@@ -130,6 +130,31 @@ class Database {
 
     }
 
+     /**
+     * Gets all sounds from the user at specified username
+     * @param {*} connection 
+     * @param {*} username 
+     * @returns all sounds from user on success, error message on failure
+     */
+     async getAllSounds(connection)
+     {
+         return new Promise((resolve, reject) => {
+             try {
+                 connection.query("SELECT * FROM sounds", (error, results) => {
+                     if (error) {
+                         reject(error);
+                     } else {
+                         resolve(results);
+                     }
+                 })
+             } catch (error) {
+                 reject(error);
+             }
+             
+         })
+ 
+     }
+
     /**
      * Gets all rows with matching username
      * @param {*} connection 

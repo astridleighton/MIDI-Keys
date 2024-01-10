@@ -189,21 +189,15 @@ app.delete('/remove-favorite', async (req, res) => {
 })
 
 /*
-* Gets all sounds from the user to add to the favorites tab (INCOMPLETE)
+* Gets all sounds
 */
-app.get('/all-sounds/:username', async (req, res) => {
+app.get('/all-sounds', async (req, res) => {
 
-    const username = req.params.username;
-    const token = req.body.token;
-    
-    const validateToken = await Security.verifyToken(token);
-
-    if(validateToken)
-    {
-        const allSounds = await Database.getAllSoundsFromUser(connection, username);
+    try {
+        const allSounds = await Database.getAllSounds(connection);
         res.status(200).json(allSounds);
-    } else {
-        res.status(401).send("Invalid token.");
+    } catch (error) {
+        res.status(500).send("Unable to retrieve sounds from database.");
     }
 
 })

@@ -2,12 +2,13 @@ import React from 'react';
 import * as Tone from 'tone';
 import AudioKeys from 'audiokeys';
 import Cookies from 'js-cookie';
+import axios from 'axios';
 
-/*
-    - Contains the Tone.JS instruments and references online samples
-    - Allows user to select between instruments
-    - Displays notes played
-*/
+/**
+ *   Contains the Tone.JS instruments and references online samples
+ *   Allows user to select between instruments
+ *   Displays notes played
+ */
 class Play extends React.Component
 {
     // used to instantiate synthesizers from Tone.JS, selected sound, and notes/chords played
@@ -37,8 +38,8 @@ class Play extends React.Component
       }
 
       /**
-       * Creates an isntance of the synth
-       * @returns 
+       * Creates an instance of the synth
+       * @returns instance
        */
       createSynth = () => {
         const synth = new Tone.Synth().toDestination();
@@ -47,7 +48,7 @@ class Play extends React.Component
 
       /**
        * Creates an instance of the AM Synth
-       * @returns 
+       * @returns instance
        */
       createAMSynth = () => {
         const amSynth = new Tone.AMSynth().toDestination();
@@ -56,7 +57,7 @@ class Play extends React.Component
 
       /**
        * Creates an instance of the mono synth
-       * @returns 
+       * @returns instance
        */
       createMonoSynth = () => {
         const monoSynth = new Tone.MonoSynth({
@@ -71,6 +72,10 @@ class Play extends React.Component
         return monoSynth;
       }
 
+      /**
+       * Creates an instance of the QWERTY keyboard
+       * @returns instance
+       */
       createQwerty = () => {
         const keyboard = new AudioKeys({
             polyphony: 10, // Adjust the polyphony as needed
@@ -95,6 +100,9 @@ class Play extends React.Component
         }).toDestination();
       }
 
+      /**
+       * Creates an instance of the kick
+       */
       createKickPlayer = () => {
 
         var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/kick.mp3", function(){
@@ -104,6 +112,9 @@ class Play extends React.Component
         });
       }
 
+      /**
+       * Creates an instance of the snare
+       */
       createSnarePlayer = () => {
 
         var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/snare.mp3", function(){
@@ -113,6 +124,9 @@ class Play extends React.Component
         });
       }
 
+      /**
+       * Creates an instance of tom1
+       */
       createTom1Player = () => {
 
         var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/tom1.mp3", function(){
@@ -122,6 +136,9 @@ class Play extends React.Component
         });
       }
 
+      /**
+       * Creates an instance of tom2
+       */
       createTom2Player = () => {
 
         var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/tom2.mp3", function(){
@@ -131,6 +148,9 @@ class Play extends React.Component
         });
       }
 
+      /**
+       * Creates an instance of tom3 (floor tom)
+       */
       createTom3Player = () => {
 
         var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/tom3.mp3", function(){
@@ -140,6 +160,9 @@ class Play extends React.Component
         });
       }
 
+      /**
+       * Creates an instance of the hi-hat
+       */
       createHiHatPlayer = () => {
 
         var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/hihat.mp3", function(){
@@ -149,6 +172,9 @@ class Play extends React.Component
         });
       }
 
+      /**
+       * Creates an instance of a bongo sound
+       */
       createBongo1Player = () => {
 
         var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/Bongos/snare.mp3", function(){
@@ -158,6 +184,9 @@ class Play extends React.Component
         });
       }
 
+      /**
+       * Creates an instance of another bongo sound
+       */
       createBongo2Player = () => {
 
         var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/Bongos/tom1.mp3", function(){
@@ -166,9 +195,27 @@ class Play extends React.Component
         });
       }
 
-      /*
-        Starts Tone.JS and sets up keyboard
-      */
+      getAllSounds = async () => {
+        try {
+            const result = await axios.get('http://localhost:3000/all-sounds');
+
+            if (result.status === 200) {
+                console.log("200");
+                // TODO: convert JSON to objects
+                // TODO: add sound class
+            } else {
+                console.log("Error");
+            }
+
+
+        } catch (error) {
+
+        }
+      }
+
+      /**
+       * Starts tone.JS and sets up sounds
+       */
       componentDidMount () {
         navigator.requestMIDIAccess()
             .then((midiAccess) => this.onMIDISuccess(midiAccess), 
@@ -177,10 +224,11 @@ class Play extends React.Component
         Tone.setContext(new AudioContext({ sampleRate: 48000 }));
         Tone.Master.volume.value = -6;
         this.initalizeKeyboard();
+        this.getAllSounds();
         //this.setState( { selectedSound: 'synth' });
       }
 
-      /**
+/**
  * If WebMIDI API connection is successful, get MIDI inputs
  * @param {*} midiAccess 
  */
@@ -222,6 +270,10 @@ class Play extends React.Component
         
     }
 
+    /**
+     * Used to set up MIDI keyboard with note mappings, sounds, and MIDI events
+     * @param {*} midiKeyboard 
+     */
     useKeyboard = (midiKeyboard) =>
     {
     
@@ -453,23 +505,52 @@ class Play extends React.Component
     */
     getChord ()
     {
-        const root = this.currentChord[0];
-        const note2 = this.currentChord[1];
-        const note3 = this.currentChord[2];
+        // only works for three note chords
+        if (this.currentChord.length === 3) {
+            const root = this.currentChord[0];
+            const note2 = this.currentChord[1];
+            const note3 = this.currentChord[2];
 
-        console.log("Root: " + root);
-        console.log(this.currentChord);
+            console.log("Root: " + root);
+            console.log(this.currentChord);
 
-        const interval1 = note2 - root;
-        const interval2 = note3 - root;
+            const interval1 = note2 - root;
+            const interval2 = note3 - root;
 
-        if (interval1 === 4 && interval2 === 7) {
-            console.log("Major");
-        } else if (interval1 === 3 && interval2 === 7) {
-            console.log("Minor");
-        } else {
-            console.log("Other");
+            if (interval1 === 4 && interval2 === 3) { // MAJOR
+                console.log("Major");
+            } else if (interval1 === 3 && interval2 === 4) { // MINOR
+                console.log("Minor");
+            } else if (interval1 === 4 && interval2 === 3 && note3 - note2 === 4) { // MAJ 7
+                console.log("Major 7th");
+            } else if (interval1 === 3 && interval2 === 4 && note3 - note2 === 3) { // MIN 7
+                console.log("Minor 7th");
+            } else if (interval1 === 4 && interval2 === 2) {
+                console.log("Major 6th");
+            } else if (interval1 === 3 && interval2 === 3) {
+                console.log("Minor 6th");
+            } else if (interval1 === 5 && interval2 === 2) {
+                console.log("Sus4");
+            } else if (interval1 === 2 && interval2 === 3) {
+                console.log("sus2");
+            } else if (interval1 === 4 && interval2 === 4) {
+                console.log("augmented");
+            } else if (interval1 === 3 && interval2 === 3) {
+                console.log("Diminished");
+            } else if (interval1 === 4 && interval2 === 3 && note3 - note2 === 6) {
+                console.log("Dominant 7th");
+            } else if (interval1 === 4 && interval2 === 3 && note3 - note2 === 8) {
+                console.log("Augmented 7th");
+            } else if (interval1 === 3 && interval2 === 3 && note3 - note2 === 6) {
+                console.log("Half-Diminished 7th");
+            } else if (interval1 === 3 && interval2 === 3 && note3 - note2 === 9) {
+                console.log("Diminished 7th");
+            } else {
+                console.log("Other");
+            }
         }
+
+        
     }   
 
     /*

@@ -6,8 +6,16 @@ const saltRounds = 10;
 const jwt = require('jsonwebtoken');
 const secretKey = "astrid";
 
+/**
+ * Used to perform all security operations in user login/registration
+ */
 class Security {
 
+    /**
+     * Generates token using JWT and sets expiration for 1 hour
+     * @param {*} payload 
+     * @returns token if successful, error message if rejection
+     */
     static async generateToken(payload)
     {
         return new Promise((resolve, reject) => {
@@ -22,6 +30,12 @@ class Security {
         })
     }
 
+    /**
+     * Checks if hashed and plaintext password match in the database
+     * @param {*} plainPassword 
+     * @param {*} hashedPassword 
+     * @returns success message if they match, error on failure to find match
+     */
     static async comparePasswords(plainPassword, hashedPassword) {
         return new Promise((resolve, reject) => {
             bcrypt.compare(plainPassword, hashedPassword, (error, result) => {
@@ -29,7 +43,6 @@ class Security {
                 {
                     console.error(error);
                     reject(error);
-                    console.log("test");
                 } else {
                     resolve(result);
                 }
@@ -37,6 +50,11 @@ class Security {
         })
     }
 
+    /**
+     * Hashes password using bcrypt hash function, set to 10 salt rounds
+     * @param {*} plainPassword 
+     * @returns hashed password if successful, error message if failure
+     */
     static async hashPassword(plainPassword) {
 
         try {
@@ -49,10 +67,14 @@ class Security {
 
     }
 
+    /**
+     * Verifies token matches with secret key
+     * @param {*} token 
+     * @returns decoded token on success, error message and null on failure
+     */
     static async verifyToken(token) {
         try {
             const decoded = jwt.verify(token, secretKey);
-
             return decoded;
         } catch (error) {
             console.error('Token verification error.', error);

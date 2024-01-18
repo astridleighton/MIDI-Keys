@@ -6,10 +6,18 @@ import React from 'react';
 class Footer extends React.Component
 {
 
+    /**
+     * removes connected device from properties
+     * @param {*} e 
+     */
     removeConnectedDevice = (e) => {
         this.props.removeConnectedDevice();
     }
 
+    /**
+     * Displays footer element
+     * @returns view
+     */
     render()
     {
         return(

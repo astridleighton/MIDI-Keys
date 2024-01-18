@@ -1,11 +1,15 @@
 import React from 'react';
 
-/*
-    Displays basic website information and future implementations
-*/
+/**
+ * Displays basic website information
+ */
 class About extends React.Component
 {
 
+    /**
+     * Shows website information and helps users understand the purpose of the site
+     * @returns view
+     */
     render()
     {
         return(

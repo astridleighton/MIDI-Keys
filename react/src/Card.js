@@ -1,8 +1,9 @@
 import React from 'react';
 import { Card } from 'react-bootstrap';
 
-// TODO: fix bootstrap
-
+/**
+ * Not set up yet
+ */
 class SoundCard extends React.Component
 {
     render()

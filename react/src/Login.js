@@ -6,7 +6,6 @@ import * as Tone from 'tone';
 
 /**
  * Allows user to log in to account
- * TODO: stop synth sounds on this page
  */
 class Login extends React.Component
 {
@@ -82,9 +81,9 @@ class Login extends React.Component
             }
         }
         catch (error) {
-            if (error.response.status === 401) {
+            if (error.response && error.response.status === 401) {
                 alert("Invalid login credentials. Please try again.");
-            } else if (error.response.status === 500) {
+            } else if (error.response && error.response.status === 500) {
                 alert("A server error occurred during login. Please try again!");
             } else {
                 alert("An error occurred. Please try again.");

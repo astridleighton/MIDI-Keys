@@ -20,6 +20,10 @@ class Register extends React.Component
         };
     }
 
+    /**
+     * Stops sound when on this page
+     * TODO: ensure this is the proper way to do this
+     */
     componentDidMount () {
         Tone.Transport.pause();
     }
@@ -76,7 +80,7 @@ class Register extends React.Component
 
     /**
      * Displays registration form
-     * @returns 
+     * @returns view
      */
     render()
     {

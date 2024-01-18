@@ -3,6 +3,7 @@ import * as Tone from 'tone';
 import AudioKeys from 'audiokeys';
 import Cookies from 'js-cookie';
 import axios from 'axios';
+import Sound from './Sound';
 
 /**
  *   Contains the Tone.JS instruments and references online samples
@@ -201,15 +202,17 @@ class Play extends React.Component
 
             if (result.status === 200) {
                 console.log("200");
-                // TODO: convert JSON to objects
-                // TODO: add sound class
+
+                const soundObjects = result.data.map(sound => new Sound(sound.id, sound.name, sound.location));
+
+                console.log(soundObjects);
             } else {
                 console.log("Error");
             }
 
 
         } catch (error) {
-
+            console.log("Database error.");
         }
       }
 

@@ -11,10 +11,10 @@ import Register from './Register';
 import Footer from './Footer';
 import Cookies from 'js-cookie';
 
-/*
-    - Start-up: To begin application, navigate to the react folder and type "npm start"; make sure back-end is running as well by navigated to express and typing "index.js"
-
-*/
+/**
+ * Start-up: To begin application, navigate to the react folder and type "npm start"; make sure back-end is running as well by navigated to express and typing "index.js"
+ * Parent component used to handle state
+ */
 class App extends React.Component
 {
 
@@ -31,14 +31,6 @@ class App extends React.Component
     };
 }
 
-/**
- * Initializes MIDI access
- */
-componentDidMount()
-{
-  
-}
-
   /*updateDevices(e)
   {
       console.log(`Name: ${e.port.name}, Brand: ${e.port.manufacturer}, State: ${e.port.state}, Type: ${e.port.type}`);
@@ -52,14 +44,25 @@ componentDidMount()
       console.log("Midi failure.");
   }*/
 
+  /**
+   * Updates state of connected device
+   * @param {*} value 
+   */
   updateConnectedDevice = (value) => {
     this.setState( { selectedDevice: value });
   }
 
+  /**
+   * Changes connected device state to null
+   */
   removeConnectedDevice = () => {
     this.setState( { selectedDevice: null });
   }
 
+  /**
+   * Sets all routes, displays navbar, footer
+   * @returns view
+   */
   render()
   {
     return (

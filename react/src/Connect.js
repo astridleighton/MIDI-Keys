@@ -4,11 +4,15 @@ import * as Tone from 'tone';
 
 /**
  * Allows the user to connect to a selected device
- * NOTE: Automatically connects to QWERTY keyboard
+ * NOTE: Automatically connects to QWERTY keyboard?
  */
 class Connect extends React.Component
 {
 
+      /**
+       * Shows midi devices and select device
+       * @param {*} props 
+       */
       constructor(props)
       {
         super(props);
@@ -22,23 +26,35 @@ class Connect extends React.Component
         support: ".",
       }
 
+      /**
+       * Sets device and pauses audio output
+       */
       componentDidMount () {
         Tone.Transport.pause();
         this.setDevice();
     }
 
-      // TODO: replace with connected MIDI devices
+      /**
+       * Sets selected MIDI device
+       * TODO: allow user to choose from connected devices
+       */
       setDevice = () => {
         this.setState({
           midiDevices: ["Alesis V49"],
         })
       }
 
-      // connect to selected device
+      /**
+       * Connects to selected device
+       * @param {*} event 
+       */
       handleDeviceChange = (event) => {
         this.setState({ selectedDevice: event.target.value });
       };
 
+      /**
+       * Passes selected device
+       */
       handleSelect = () => {
 
         if (this.state.selectedDevice)
@@ -52,6 +68,10 @@ class Connect extends React.Component
         }
       }
 
+    /**
+     * Shows device options
+     * @returns view
+     */
     render()
     {
         return(

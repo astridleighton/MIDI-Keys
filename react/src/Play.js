@@ -569,6 +569,9 @@ class Play extends React.Component
         };
 
         const favoriteSound = JSON.stringify(soundInfo);
+        console.log(favoriteSound);
+
+        // TODO: fix the way this is sent - creating SQL error
 
         try {
             const result = await axios.post('http://localhost:3000/add-favorite', favoriteSound);
@@ -577,6 +580,17 @@ class Play extends React.Component
         } catch (error) {
             console.log("Database error.");
         }
+    }
+
+    handleAddFavorite = (sound, e) => {
+        e.preventDefault();
+        //await this.addFavorite(sound);
+        alert("Testing add favorite");
+    }
+
+    handleRemoveFavorite = (sound, e) => {
+        e.preventDefault();
+        alert("Testing remove favorite");
     }
 
     /*
@@ -600,7 +614,8 @@ class Play extends React.Component
                     {isAuthenticated ? (
                         <div>
                             <h1>Welcome, {firstName}!</h1>
-                            <button onClick={this.addFavorite("synth")}>Add Favorite</button>
+                            <button onClick={(e) => this.handleAddFavorite("synth", e)}>Add Favorite</button>
+                            <button onClick={(e) => this.handleRemoveFavorite("synth", e)}>Remove Favorite</button>
                         </div>
                     ) : (
                         <div>

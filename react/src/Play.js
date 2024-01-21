@@ -2,8 +2,8 @@ import React from 'react';
 import * as Tone from 'tone';
 import AudioKeys from 'audiokeys';
 import Cookies from 'js-cookie';
-import axios from 'axios';
 import Sound from './Sound';
+import axios from 'axios';
 
 /**
  *   Contains the Tone.JS instruments and references online samples
@@ -34,6 +34,8 @@ class Play extends React.Component
         this.state = {
             selectedSound: '', // default device
             chordNotes: [],
+            soundObjects: [],
+            isLoading: true,
         }
 
       }
@@ -196,39 +198,19 @@ class Play extends React.Component
         });
       }
 
-      getAllSounds = async () => {
-        try {
-            const result = await axios.get('http://localhost:3000/all-sounds');
-
-            if (result.status === 200) {
-                console.log("200");
-
-                const soundObjects = result.data.map(sound => new Sound(sound.id, sound.name, sound.location));
-
-                console.log(soundObjects);
-            } else {
-                console.log("Error");
-            }
-
-
-        } catch (error) {
-            console.log("Database error.");
-        }
-      }
-
       /**
        * Starts tone.JS and sets up sounds
        */
       componentDidMount () {
-        navigator.requestMIDIAccess()
+            navigator.requestMIDIAccess()
             .then((midiAccess) => this.onMIDISuccess(midiAccess), 
-        (error) => this.onMIDIFailure(error));
-        Tone.start();
-        Tone.setContext(new AudioContext({ sampleRate: 48000 }));
-        Tone.Master.volume.value = -6;
-        this.initalizeKeyboard();
-        this.getAllSounds();
-        //this.setState( { selectedSound: 'synth' });
+            (error) => this.onMIDIFailure(error));
+            Tone.start();
+            Tone.setContext(new AudioContext({ sampleRate: 48000 }));
+            Tone.Master.volume.value = -6;
+            this.initalizeKeyboard();
+            this.getAllSounds();
+            //this.setState( { selectedSound: 'synth' });
       }
 
 /**
@@ -554,7 +536,48 @@ class Play extends React.Component
         }
 
         
-    }   
+    }  
+    
+    // TODO: fix so sounds are rendered
+    getAllSounds = async () => {
+        try {
+            const result = await axios.get('http://localhost:3000/all-sounds');
+
+            if (result.status === 200) {
+                console.log("200");
+
+                const sounds = result.data.map(sound => new Sound(sound.id, sound.name, sound.location));
+                console.log(sounds);
+
+                this.setState({ soundObjects: sounds, isLoading: false });
+            } else {
+                console.log("Error");
+            }
+
+
+        } catch (error) {
+            console.log("Database error.");
+        }
+    }
+
+    // TODO: only call if user is logged in
+    addFavorite = async (soundName) => {
+
+        const soundInfo = {
+            username: "aleighton1", // TODO: get from cookies
+            sound: soundName
+        };
+
+        const favoriteSound = JSON.stringify(soundInfo);
+
+        try {
+            const result = await axios.post('http://localhost:3000/add-favorite', favoriteSound);
+            console.log(result);
+
+        } catch (error) {
+            console.log("Database error.");
+        }
+    }
 
     /*
         Renders user session and displays available sounds and notes played
@@ -564,13 +587,20 @@ class Play extends React.Component
         // get user session cookie if applicable
         const isAuthenticated = !!Cookies.get('token');
         const firstName = Cookies.get('name');
+        const { soundObjects, isLoading } = this.state;
+
+        if(isLoading) {
+            return <p>Loading sounds...</p>;
+        }
 
         return(
+            
             <div className="container d-flex flex-column align-items-center">
                 <div className="text-center m-4">
                     {isAuthenticated ? (
                         <div>
                             <h1>Welcome, {firstName}!</h1>
+                            <button onClick={this.addFavorite("synth")}>Add Favorite</button>
                         </div>
                     ) : (
                         <div>
@@ -581,6 +611,15 @@ class Play extends React.Component
                 <div className="text-center container w-50">
                     <div className="pb-4">
                         <h2>Sounds</h2>
+                        <ul>
+                            <li>Test</li>
+                            {soundObjects.map(sound => {
+                                    <li key={sound.id}>
+                                    ID: {sound.id}: {sound.name}, Location: {sound.location}
+                                </li> 
+                            })}
+                        </ul>
+                         
                     </div>
                     <div className="d-flex justify-content-center">
                     <ul className="list-group">

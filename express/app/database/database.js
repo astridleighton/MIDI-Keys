@@ -162,7 +162,7 @@ class Database {
      * @returns SQL results on success, error message on fail
      */
     async getIDFromUser(connection, username)
-    {
+    {        
         return new Promise((resolve, reject) => {
             connection.query("SELECT ID FROM users WHERE username = ?", [username], (error, results) => {
                 if (error) {

@@ -560,37 +560,51 @@ class Play extends React.Component
         }
     }
 
-    // TODO: only call if user is logged in
-    addFavorite = async (soundName) => {
+    addFavorite = (soundName) => {
 
-        const soundInfo = {
-            username: "aleighton1", // TODO: get from cookies
+        // TODO: only call if user is logged in
+        // TODO: do not hard-code username, get from cookies?
+
+        axios.post('http://localhost:3000/add-favorite', {
+            username: 'aleighton1',
             sound: soundName
-        };
-
-        const favoriteSound = JSON.stringify(soundInfo);
-        console.log(favoriteSound);
-
-        // TODO: fix the way this is sent - creating SQL error
-
-        try {
-            const result = await axios.post('http://localhost:3000/add-favorite', favoriteSound);
-            console.log(result);
-
-        } catch (error) {
-            console.log("Database error.");
-        }
+          })
+          .then(function (response) {
+            console.log(response);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
     }
 
-    handleAddFavorite = (sound, e) => {
-        e.preventDefault();
-        //await this.addFavorite(sound);
-        alert("Testing add favorite");
+    removeFavorite = (soundName) => {
+
+        // TODO: only call if user is logged in
+        // TODO: do not hard-code username, get from cookies?
+
+        // TODO: fix so parameters are being sent correctly
+
+        axios.delete('http://localhost:3000/remove-favorite', { 
+            params: {
+                username: 'aleighton1',
+                sound: soundName
+            } })
+          .then(function (response) {
+            console.log(response);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
     }
 
-    handleRemoveFavorite = (sound, e) => {
+    handleAddFavorite = async (sound, e) => {
         e.preventDefault();
-        alert("Testing remove favorite");
+        await this.addFavorite(sound);
+    }
+
+    handleRemoveFavorite = async (sound, e) => {
+        e.preventDefault();
+        await this.removeFavorite(sound);
     }
 
     /*

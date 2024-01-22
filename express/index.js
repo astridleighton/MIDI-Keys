@@ -137,7 +137,7 @@ app.post('/add-favorite', async function(req, res) {
     try {
 
         // TODO: check if token is valid?
-
+        
         const userID = await Database.getIDFromUser(connection, username);
         const soundID = await Database.getIDFromSound(connection, sound);
 
@@ -159,10 +159,12 @@ app.post('/add-favorite', async function(req, res) {
 /*
 * Allows user to remove sound from his favorites tab (INCOMPLETE)
 */
-app.delete('/remove-favorite', async (req, res) => {
+app.delete('/remove-favorite/:username/:sound', async (req, res) => {
 
-    const username = req.body.username;
-    const sound = req.body.sound;
+    const username = req.params.username;
+    const sound = req.params.sound;
+
+    console.log("username: " + username);
 
     // TODO: check if token is valid?
     
@@ -199,6 +201,18 @@ app.get('/all-sounds', async (req, res) => {
     } catch (error) {
         res.status(500).send("Unable to retrieve sounds from database.");
     }
+
+})
+
+/*
+* Get all favorites
+*/
+app.get('/all-favorites/:username', async (req, res) => {
+
+    const username = req.params.username;
+
+    // TODO: get userID from username
+    // TODO: find SQL to join tables to get all favorites from specific user
 
 })
 

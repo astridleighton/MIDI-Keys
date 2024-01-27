@@ -141,12 +141,21 @@ app.post('/add-favorite', async function(req, res) {
         const userID = await Database.getIDFromUser(connection, username);
         const soundID = await Database.getIDFromSound(connection, sound);
 
-        const addFavorite = await Database.addFavorite(connection, userID, soundID);
+        const favoriteExists = await Database.findFavoriteByUserAndSound(connection, userID, soundID);
 
-        if (addFavorite) {
-            res.status(200).send("Added favorite successfully.");
-        } else {
-            res.status(401).json({ message: 'Add favorite failed.', status: 401 });
+        if(favoriteExists.length === 0) {
+
+            const addFavorite = await Database.addFavorite(connection, userID, soundID);
+
+            if (addFavorite) {
+                res.status(200).send("Added favorite successfully.");
+            } else {
+                res.status(401).json({ message: 'Add favorite failed.', status: 401 });
+            }
+        } else { // favorite already exists in database
+            
+            res.status(403).json({ message: 'Favorite already exists.', status: 403 });
+
         }
 
     } catch (error) {
@@ -161,8 +170,8 @@ app.post('/add-favorite', async function(req, res) {
 */
 app.delete('/remove-favorite/:username/:sound', async (req, res) => {
 
-    const username = req.params.username;
-    const sound = req.params.sound;
+    const username1 = req.params.username;
+    const sound1 = req.params.sound;
 
     console.log("username: " + username);
 
@@ -211,8 +220,26 @@ app.get('/all-favorites/:username', async (req, res) => {
 
     const username = req.params.username;
 
-    // TODO: get userID from username
-    // TODO: find SQL to join tables to get all favorites from specific user
+    const usernameCheck = await Database.findByUsername(connection, username); // checks if username exists
+
+    if (usernameCheck.length === 0) {
+        res.status(403).send("Username not found.");
+    } else {
+        try {
+            const userID = await Database.getIDFromUser(connection, username);
+    
+            const allFavorites = await Database.getAllFavoritesFromUser(connection, userID);
+
+            if(allFavorites.length === 0) {
+                res.status(404).send("No favorites found for user.");
+            } else {
+                res.status(200).json(allFavorites);
+            }
+    
+        } catch (error) {
+            res.status(500).send("Unable to retrieve sounds from database.");
+        }
+    }
 
 })
 

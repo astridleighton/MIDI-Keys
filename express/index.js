@@ -137,16 +137,25 @@ app.post('/add-favorite', async function(req, res) {
     try {
 
         // TODO: check if token is valid?
-
+        
         const userID = await Database.getIDFromUser(connection, username);
         const soundID = await Database.getIDFromSound(connection, sound);
 
-        const addFavorite = await Database.addFavorite(connection, userID, soundID);
+        const favoriteExists = await Database.findFavoriteByUserAndSound(connection, userID, soundID);
 
-        if (addFavorite) {
-            res.status(200).send("Added favorite successfully.");
-        } else {
-            res.status(401).json({ message: 'Add favorite failed.', status: 401 });
+        if(favoriteExists.length === 0) {
+
+            const addFavorite = await Database.addFavorite(connection, userID, soundID);
+
+            if (addFavorite) {
+                res.status(200).send("Added favorite successfully.");
+            } else {
+                res.status(401).json({ message: 'Add favorite failed.', status: 401 });
+            }
+        } else { // favorite already exists in database
+            
+            res.status(403).json({ message: 'Favorite already exists.', status: 403 });
+
         }
 
     } catch (error) {
@@ -159,13 +168,12 @@ app.post('/add-favorite', async function(req, res) {
 /*
 * Allows user to remove sound from his favorites tab (INCOMPLETE)
 */
-app.delete('/remove-favorite', async (req, res) => {
+app.delete('/remove-favorite/:username/:sound', async (req, res) => {
 
-    const username = req.body.username;
-    const sound = req.body.sound;
+    const username = req.params.username;
+    const sound = req.params.sound;
 
     // TODO: check if token is valid?
-    
     //const validateToken = await Security.validateToken(token);
 
     try {
@@ -198,6 +206,36 @@ app.get('/all-sounds', async (req, res) => {
         res.status(200).json(allSounds);
     } catch (error) {
         res.status(500).send("Unable to retrieve sounds from database.");
+    }
+
+})
+
+/*
+* Get all favorites
+*/
+app.get('/all-favorites/:username', async (req, res) => {
+
+    const username = req.params.username;
+
+    const usernameCheck = await Database.findByUsername(connection, username); // checks if username exists
+
+    if (usernameCheck.length === 0) {
+        res.status(403).send("Username not found.");
+    } else {
+        try {
+            const userID = await Database.getIDFromUser(connection, username);
+    
+            const allFavorites = await Database.getAllFavoritesFromUser(connection, userID);
+
+            if(allFavorites.length === 0) {
+                res.status(404).send("No favorites found for user.");
+            } else {
+                res.status(200).json(allFavorites);
+            }
+    
+        } catch (error) {
+            res.status(500).send("Unable to retrieve sounds from database.");
+        }
     }
 
 })

@@ -2,8 +2,9 @@ import React from 'react';
 import * as Tone from 'tone';
 import AudioKeys from 'audiokeys';
 import Cookies from 'js-cookie';
-import axios from 'axios';
+import SoundCard from './SoundCard';
 import Sound from './Sound';
+import axios from 'axios';
 
 /**
  *   Contains the Tone.JS instruments and references online samples
@@ -34,6 +35,9 @@ class Play extends React.Component
         this.state = {
             selectedSound: '', // default device
             chordNotes: [],
+            soundObjects: [],
+            isLoading: true,
+            favoriteSoundObjects: []
         }
 
       }
@@ -95,6 +99,19 @@ class Play extends React.Component
             A2: "A2.mp3",
         },
 	        baseUrl: "https://tonejs.github.io/audio/casio/",
+            onload: () => {
+                casio.triggerAttackRelease(note, 0.8);
+            }
+        }).toDestination();
+      }
+
+      createOnlineSampler = (note, url) => {
+        const casio = new Tone.Sampler({
+            urls: {
+            A1: "A1.mp3",
+            A2: "A2.mp3",
+        },
+	        baseUrl: url,
             onload: () => {
                 casio.triggerAttackRelease(note, 0.8);
             }
@@ -196,39 +213,19 @@ class Play extends React.Component
         });
       }
 
-      getAllSounds = async () => {
-        try {
-            const result = await axios.get('http://localhost:3000/all-sounds');
-
-            if (result.status === 200) {
-                console.log("200");
-
-                const soundObjects = result.data.map(sound => new Sound(sound.id, sound.name, sound.location));
-
-                console.log(soundObjects);
-            } else {
-                console.log("Error");
-            }
-
-
-        } catch (error) {
-            console.log("Database error.");
-        }
-      }
-
       /**
        * Starts tone.JS and sets up sounds
        */
       componentDidMount () {
-        navigator.requestMIDIAccess()
+            navigator.requestMIDIAccess()
             .then((midiAccess) => this.onMIDISuccess(midiAccess), 
-        (error) => this.onMIDIFailure(error));
-        Tone.start();
-        Tone.setContext(new AudioContext({ sampleRate: 48000 }));
-        Tone.Master.volume.value = -6;
-        this.initalizeKeyboard();
-        this.getAllSounds();
-        //this.setState( { selectedSound: 'synth' });
+            (error) => this.onMIDIFailure(error));
+            Tone.start();
+            Tone.setContext(new AudioContext({ sampleRate: 48000 }));
+            Tone.Master.volume.value = -6;
+            this.initalizeKeyboard();
+            this.getAllSounds();
+            this.getAllFavorites();
       }
 
 /**
@@ -554,7 +551,102 @@ class Play extends React.Component
         }
 
         
-    }   
+    }  
+    
+    getAllSounds = async () => {
+        try {
+            const result = await axios.get('http://localhost:3000/all-sounds');
+
+            if (result.status === 200) {
+                console.log("200");
+
+                const sounds = result.data.map(sound => new Sound(sound.id, sound.name, sound.location));
+                //console.log(sounds);
+
+                this.setState({ soundObjects: sounds, isLoading: false });
+            } else {
+                console.log("Error");
+            }
+
+
+        } catch (error) {
+            console.log("Database error.");
+        }
+    }
+
+    getAllFavorites = async () => {
+
+        // TODO: get username from token?
+
+        const username = "aleighton1";
+
+        try {
+            const result = await axios.get(`http://localhost:3000/all-favorites/${username}`);
+
+            if (result.status === 200) {
+                console.log("200");
+
+                const favorites = result.data.map(sound => new Sound(sound.id, sound.name, sound.location));
+                //console.log(sounds);
+
+                this.setState({ favoriteSoundObjects: favorites, isLoading: false });
+            } else {
+                console.log("Error");
+            }
+
+
+        } catch (error) {
+            console.log("Database error.");
+        }
+    }
+
+    addFavorite = (soundName) => {
+
+        // TODO: only call if user is logged in
+        // TODO: do not hard-code username, get from cookies?
+
+        axios.post('http://localhost:3000/add-favorite', {
+            username: 'aleighton1',
+            sound: soundName
+          })
+          .then(function (response) {
+            console.log(response);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+    }
+
+    removeFavorite = (soundName) => {
+
+        // TODO: only call if user is logged in
+        // TODO: do not hard-code username, get from cookies?
+
+        const username = 'aleighton1';
+
+        axios.delete(`http://localhost:3000/remove-favorite/${username}/${soundName}`)
+          .then(function (response) {
+            console.log(response);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+    }
+
+    handleAddFavorite = async (sound, e) => {
+        e.preventDefault();
+        await this.addFavorite(sound);
+    }
+
+    handleRemoveFavorite = async (sound, e) => {
+        e.preventDefault();
+        await this.removeFavorite(sound);
+    }
+
+    /*
+        Idea: get all sounds and then have a favorited state on the sound in the sound.js file
+            - can either remove this from soundlist or set as a different color somehow, maybe user master soundlist
+    */
 
     /*
         Renders user session and displays available sounds and notes played
@@ -564,13 +656,21 @@ class Play extends React.Component
         // get user session cookie if applicable
         const isAuthenticated = !!Cookies.get('token');
         const firstName = Cookies.get('name');
+        const { soundObjects, isLoading } = this.state;
+
+        if(isLoading) {
+            return <p>Loading sounds...</p>;
+        }
 
         return(
+            
             <div className="container d-flex flex-column align-items-center">
                 <div className="text-center m-4">
                     {isAuthenticated ? (
                         <div>
                             <h1>Welcome, {firstName}!</h1>
+                            <button onClick={(e) => this.handleAddFavorite("synth", e)}>Add Favorite</button>
+                            <button onClick={(e) => this.handleRemoveFavorite("synth", e)}>Remove Favorite</button>
                         </div>
                     ) : (
                         <div>
@@ -579,82 +679,105 @@ class Play extends React.Component
                     )}
                 </div>
                 <div className="text-center container w-50">
-                    <div className="pb-4">
-                        <h2>Sounds</h2>
+                    <div className="row">
+                        <div className="col-md-6">
+                            <div className="pb-4">
+                                <h2>Samples</h2>
+                                    <ul>
+                                        {this.state.soundObjects.map(sound => (
+                                        <SoundCard key={sound.id} sound={sound} />
+                                        ))}
+                                    </ul>
+                            </div>
+                        </div>
+                        <div className="col-md-6">
+                            <h2>Built-In</h2>
+                            <div className="d-flex justify-content-center">
+                                <ul className="list-group">
+                                    <li className="list-group-item list-group-item action d-flex justify-content-between flex-column align-items-start p-3 w-100" style={{ backgroundColor: 'black', padding: '5px', borderRadius: '5px' }}>
+                                        <div className="form-check">
+                                            <input 
+                                                type="radio"
+                                                className="form-check-input"
+                                                name="soundSelection"
+                                                style={{ backgroundColor: 'grey', marginRight: '5px' }}
+                                                onChange={(e) => this.handleButtonClick('synth', e)}
+                                            />
+                                            <label className="form-check-label text-white">Synth</label>
+                                        </div>
+                                    </li>
+                                    <li className="list-group-item list-group-item action d-flex justify-content-between flex-column align-items-start p-3 w-100" style={{ backgroundColor: 'black', padding: '5px', borderRadius: '5px' }}>
+                                        <div className="form-check">
+                                            <input 
+                                                type="radio"
+                                                className="form-check-input"
+                                                name="soundSelection"
+                                                style={{ backgroundColor: 'grey', marginRight: '5px' }}
+                                                onChange={(e) => this.handleButtonClick('amsynth', e)}
+                                            />
+                                            <label className="form-check-label text-white">AM Synth</label>
+                                        </div>
+                                    </li>
+                                    <li className="list-group-item list-group-item action d-flex justify-content-between flex-column align-items-start p-3 w-100" style={{ backgroundColor: 'black', padding: '5px', borderRadius: '5px' }}>
+                                        <div className="form-check">
+                                            <input 
+                                                type="radio"
+                                                className="form-check-input"
+                                                name="soundSelection"
+                                                style={{ backgroundColor: 'grey', marginRight: '5px' }}
+                                                onChange={(e) => this.handleButtonClick('monosynth', e)}
+                                            />
+                                            <label className="form-check-label text-white">Mono Synth</label>
+                                        </div>
+                                    </li>
+                                    <li className="list-group-item list-group-item action d-flex justify-content-between flex-column align-items-start p-3 w-100" style={{ backgroundColor: 'black', padding: '5px', borderRadius: '5px' }}>
+                                        <div className="form-check">
+                                            <input 
+                                                type="radio"
+                                                className="form-check-input"
+                                                name="soundSelection"
+                                                style={{ backgroundColor: 'grey', marginRight: '5px' }}
+                                                onChange={(e) => this.handleButtonClick('casio', e)}
+                                            />
+                                            <label className="form-check-label text-white">Casio Piano (Sample)</label>
+                                        </div>
+                                    </li>
+                                    <li className="list-group-item list-group-item action d-flex justify-content-between flex-column align-items-start p-3 w-100" style={{ backgroundColor: 'black', padding: '5px', borderRadius: '5px' }}>
+                                        <div className="form-check">
+                                            <input 
+                                                type="radio"
+                                                className="form-check-input"
+                                                name="soundSelection"
+                                                style={{ backgroundColor: 'grey', marginRight: '5px' }}
+                                                onChange={(e) => this.handleButtonClick('qwerty', e)}
+                                            />
+                                            <label className="form-check-label text-white">QWERTY Keyboard</label>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
-                    <div className="d-flex justify-content-center">
-                    <ul className="list-group">
-                        <li className="list-group-item list-group-item action d-flex justify-content-between flex-column align-items-start p-3 w-100" style={{ backgroundColor: 'black', padding: '5px', borderRadius: '5px' }}>
-                            <div className="form-check">
-                                <input 
-                                    type="radio"
-                                    className="form-check-input"
-                                    name="soundSelection"
-                                    style={{ backgroundColor: 'grey', marginRight: '5px' }}
-                                    onChange={(e) => this.handleButtonClick('synth', e)}
-                                />
-                                <label className="form-check-label text-white">Synth</label>
-                            </div>
-                        </li>
-                        <li className="list-group-item list-group-item action d-flex justify-content-between flex-column align-items-start p-3 w-100" style={{ backgroundColor: 'black', padding: '5px', borderRadius: '5px' }}>
-                            <div className="form-check">
-                                <input 
-                                    type="radio"
-                                    className="form-check-input"
-                                    name="soundSelection"
-                                    style={{ backgroundColor: 'grey', marginRight: '5px' }}
-                                    onChange={(e) => this.handleButtonClick('amsynth', e)}
-                                />
-                                <label className="form-check-label text-white">AM Synth</label>
-                            </div>
-                        </li>
-                        <li className="list-group-item list-group-item action d-flex justify-content-between flex-column align-items-start p-3 w-100" style={{ backgroundColor: 'black', padding: '5px', borderRadius: '5px' }}>
-                            <div className="form-check">
-                                <input 
-                                    type="radio"
-                                    className="form-check-input"
-                                    name="soundSelection"
-                                    style={{ backgroundColor: 'grey', marginRight: '5px' }}
-                                    onChange={(e) => this.handleButtonClick('monosynth', e)}
-                                />
-                                <label className="form-check-label text-white">Mono Synth</label>
-                            </div>
-                        </li>
-                        <li className="list-group-item list-group-item action d-flex justify-content-between flex-column align-items-start p-3 w-100" style={{ backgroundColor: 'black', padding: '5px', borderRadius: '5px' }}>
-                            <div className="form-check">
-                                <input 
-                                    type="radio"
-                                    className="form-check-input"
-                                    name="soundSelection"
-                                    style={{ backgroundColor: 'grey', marginRight: '5px' }}
-                                    onChange={(e) => this.handleButtonClick('casio', e)}
-                                />
-                                <label className="form-check-label text-white">Casio Piano (Sample)</label>
-                            </div>
-                        </li>
-                        <li className="list-group-item list-group-item action d-flex justify-content-between flex-column align-items-start p-3 w-100" style={{ backgroundColor: 'black', padding: '5px', borderRadius: '5px' }}>
-                            <div className="form-check">
-                                <input 
-                                    type="radio"
-                                    className="form-check-input"
-                                    name="soundSelection"
-                                    style={{ backgroundColor: 'grey', marginRight: '5px' }}
-                                    onChange={(e) => this.handleButtonClick('qwerty', e)}
-                                />
-                                <label className="form-check-label text-white">QWERTY Keyboard</label>
-                            </div>
-                        </li>
-                    </ul>
+                    <div className="col-md-6">
+                        <h2>Favorites</h2>
+                            <ul>
+                                {/* Displays favorites for user - TODO: return list of sounds, or correlate ID to sample list */}
+                                {this.state.favoriteSoundObjects.map(sound => (
+                                <SoundCard key={sound.id} sound={sound} />
+                                ))}
+                            </ul>
                     </div>
-                    
                 </div>
                 <div className="m-3">
                     <h3 className="ml-2 w-100">Notes:</h3>
                 </div>
                 <div>
-                        <span className="h2">{this.state.chordNotes.map((note) => (
-                        <p className="d-inline" key={note}> {note} </p>
-                    ))}</span>
+                    {/* Displays current chord for user */}
+                    <span className="h2">
+                        {this.state.chordNotes.map((note) => (
+                            <p className="d-inline" key={note}> {note}</p>
+                        ))}
+                    </span>
                 </div>
             </div>
         )

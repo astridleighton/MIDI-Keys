@@ -106,16 +106,38 @@ class Database {
     }
 
     /**
+     * Adds a sound to a user's favorites
+     * @param {*} connection 
+     * @param {*} username 
+     * @param {*} sound 
+     */
+    async findFavoriteByUserAndSound(connection, userID, soundID)
+    {
+        return new Promise((resolve, reject) => {
+
+            connection.query("SELECT * FROM favorites WHERE userID = ? AND soundID = ?", [userID, soundID], (error, results) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(results);
+                }
+            })
+
+        })
+    
+    }
+
+    /**
      * Gets all sounds from the user at specified username
      * @param {*} connection 
      * @param {*} username 
      * @returns all sounds from user on success, error message on failure
      */
-    async getAllSoundsFromUser(connection, username)
+    async getAllFavoritesFromUser(connection, username)
     {
         return new Promise((resolve, reject) => {
             try {
-                connection.query("SELECT sounds FROM favorites WHERE userID = ?", [username], (error, results) => {
+                connection.query("SELECT * FROM favorites WHERE userID = ?", [username], (error, results) => {
                     if (error) {
                         reject(error);
                     } else {
@@ -162,7 +184,7 @@ class Database {
      * @returns SQL results on success, error message on fail
      */
     async getIDFromUser(connection, username)
-    {
+    {        
         return new Promise((resolve, reject) => {
             connection.query("SELECT ID FROM users WHERE username = ?", [username], (error, results) => {
                 if (error) {

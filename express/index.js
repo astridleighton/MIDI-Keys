@@ -170,13 +170,10 @@ app.post('/add-favorite', async function(req, res) {
 */
 app.delete('/remove-favorite/:username/:sound', async (req, res) => {
 
-    const username1 = req.params.username;
-    const sound1 = req.params.sound;
-
-    console.log("username: " + username);
+    const username = req.params.username;
+    const sound = req.params.sound;
 
     // TODO: check if token is valid?
-    
     //const validateToken = await Security.validateToken(token);
 
     try {

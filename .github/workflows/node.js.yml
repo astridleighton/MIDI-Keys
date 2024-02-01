@@ -13,7 +13,9 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+             working-directory: ./react/
     strategy:
       matrix:
         node-version: [14.x ] # 16.x, 18.x]
@@ -21,8 +23,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Change directory to /react
-      run: cd react
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:

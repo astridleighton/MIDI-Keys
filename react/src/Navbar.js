@@ -2,7 +2,8 @@ import React from 'react';
 import { Route, Link, Routes, BrowserRouter } from 'react-router-dom';
 import './Navbar.css';
 import Cookies from 'js-cookie';
-
+import { AppBar, Button, TextField, Typography, Container, CssBaseline, Avatar, Grid, Toolbar } from '@mui/material';
+//import PianoIcon from '@mui/icons-material/Piano';
 /**
  * Displays navigation bar for site navigation
  */
@@ -24,27 +25,43 @@ class Navbar extends React.Component
         const isAuthenticated = !!Cookies.get('token');
 
         return(
-            <div className="navbar navbar-dark bg-dark">
-                <span className="navbar-brand mb-0 h1">MIDI Keys</span>
-                <ul className="mt-2 mt-lg-0 ml-auto">
-                    <li className="nav-item active">
-                        <Link to="/" className="nav-link">Play</Link>
-                    </li>
-                    <li className="nav-item">
-                        <Link to="/connect" devices={this.props.midi}>Connect</Link>
-                    </li>
-                    <li className="nav-item">
-                        <Link to="/about">About</Link>
-                    </li>
-                </ul>
-                <span className="nav-item">
-                        {isAuthenticated ? (
-                        <Link><span onClick={this.handleLogout}>Log Out</span></Link>
-                    ) : (
-                        <Link to="/login">Login</Link>
-                    )}
-                </span>
+            <div>
+                <AppBar position="static" color="primary" sx={{ backgroundColor: '#000000' }}>
+                    <Toolbar>
+                        <Typography variant="h6" sx={{ my: 2 }}>
+                            MIDI Keys
+                        </Typography>
+                        <Button
+                            variant="outline"
+                        >
+                            <a href="/" style={{ textDecoration: 'none', color: 'inherit'}}>Play</a>
+                        </Button>
+                        <Button
+                            variant="outline"
+                        >
+                            <a href="/about" style={{ textDecoration: 'none', color: 'inherit'}}>About</a>
+                        </Button>
+                        <span style={{ marginLeft: 'auto' }}>
+                            {isAuthenticated ? (
+                                    <Button
+                                        variant="outlined"
+                                        onClick={this.handleLogout}
+                                        >
+                                            Log Out
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        variant="outlined"
+                                        sx={{ marginLeft: 'auto' }}
+                                    >
+                                        <a href="/login" style={{ textDecoration: 'none', color: 'white'}}>Login</a>
+                                    </Button>
+                                )}
+                        </span>
+                    </Toolbar>
+                </AppBar>
             </div>
+            
         )
     }
 }

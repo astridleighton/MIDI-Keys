@@ -5,6 +5,10 @@ import Cookies from 'js-cookie';
 import SoundCard from './SoundCard';
 import Sound from './Sound';
 import axios from 'axios';
+import { ListItem, List, FormControl, FormLabel, RadioGroup, FromControlLabel, ListItemButton, ListItemText, ListItemIcon, Radio, Box, FormControlLabel } from '@mui/material';
+import StarIcon from '@mui/icons-material/Star';
+import IconButton from '@mui/material/IconButton';
+
 
 /**
  *   Contains the Tone.JS instruments and references online samples
@@ -466,6 +470,10 @@ class Play extends React.Component
 
         })
 
+        console.log(this.state.chordNotes);
+
+        // TODO: fix why note is not showing up, connect to chord function
+
     }
 
     /*
@@ -480,8 +488,31 @@ class Play extends React.Component
         Selects instrument type based on user option
     */
     handleButtonClick = (instrument, e) => {
-        e.preventDefault();
+        //e.preventDefault();
         console.log("Selected: " + instrument);
+
+        if(instrument === 'synth') {
+            this.state.selectedSound = 'synth';
+        } else if (instrument === 'amsynth') {
+            this.state.selectedSound = 'amSynth';
+        } else if (instrument === 'monosynth') {
+            this.state.selectedSound = 'monosynth';
+        } else if (instrument === 'casio') {
+            this.state.selectedSound = 'casio';
+        } else if (instrument === 'qwerty')
+        {
+            this.setState( { selectedSound: 'qwerty' });
+        } else {
+            console.log("Uh oh, no instrument connected.");
+        }
+    }
+
+    // TODO: get rid of other function
+
+    handleButtonClick1 = (value) => {
+        //e.preventDefault();
+        const instrument = value;
+        alert("Selected: " + instrument);
 
         if(instrument === 'synth') {
             this.state.selectedSound = 'synth';
@@ -503,16 +534,16 @@ class Play extends React.Component
         - Starter code to display the chord being played (not used yet)
         - TODO: implement additional instruments, samples, and intervals
     */
-    getChord ()
+    getChord (chord)
     {
         // only works for three note chords
-        if (this.currentChord.length === 3) {
+        if (chord.length === 3) {
             const root = this.currentChord[0];
             const note2 = this.currentChord[1];
             const note3 = this.currentChord[2];
 
             console.log("Root: " + root);
-            console.log(this.currentChord);
+            //console.log(this.currentChord);
 
             const interval1 = note2 - root;
             const interval2 = note3 - root;
@@ -576,7 +607,10 @@ class Play extends React.Component
 
     getAllFavorites = async () => {
 
-        // TODO: get username from token?
+        const token = Cookies.get('token');
+        const userFirstName = Cookies.get('name');
+
+        // TODO: if token is valid, get all favorites from user
 
         const username = "aleighton1";
 
@@ -643,6 +677,10 @@ class Play extends React.Component
         await this.removeFavorite(sound);
     }
 
+    handleStarClick = async (e) => {
+        alert("you clicked the star");
+    }
+
     /*
         Idea: get all sounds and then have a favorited state on the sound in the sound.js file
             - can either remove this from soundlist or set as a different color somehow, maybe user master soundlist
@@ -657,10 +695,6 @@ class Play extends React.Component
         const isAuthenticated = !!Cookies.get('token');
         const firstName = Cookies.get('name');
         const { soundObjects, isLoading } = this.state;
-
-        if(isLoading) {
-            return <p>Loading sounds...</p>;
-        }
 
         return(
             
@@ -683,89 +717,109 @@ class Play extends React.Component
                         <div className="col-md-6">
                             <div className="pb-4">
                                 <h2>Samples</h2>
+                                {isLoading ? (
+                                    <p>Loading sounds from database...</p>
+                                ) : (
                                     <ul>
                                         {this.state.soundObjects.map(sound => (
                                         <SoundCard key={sound.id} sound={sound} />
                                         ))}
                                     </ul>
+                                )}
                             </div>
                         </div>
-                        <div className="col-md-6">
-                            <h2>Built-In</h2>
-                            <div className="d-flex justify-content-center">
-                                <ul className="list-group">
-                                    <li className="list-group-item list-group-item action d-flex justify-content-between flex-column align-items-start p-3 w-100" style={{ backgroundColor: 'black', padding: '5px', borderRadius: '5px' }}>
-                                        <div className="form-check">
-                                            <input 
-                                                type="radio"
-                                                className="form-check-input"
-                                                name="soundSelection"
-                                                style={{ backgroundColor: 'grey', marginRight: '5px' }}
-                                                onChange={(e) => this.handleButtonClick('synth', e)}
+                        <div>
+                            <Box sx={{ width: '100%', maxWidth: 260, bgColor: 'background.paper' }}>
+                            <FormControl>
+                                <FormLabel>Built In</FormLabel>
+                                <RadioGroup
+                                    aria-label="sounds"
+                                    name="build-in-sounds"
+                                    defaultValue="synth"
+                                    onChange={(e) => this.handleButtonClick1(e.target.value)}
+                                    >
+                                        <List
+                                            sx = {{
+                                                '& .MuiListItem-root': {
+                                                    borderRadius: '8px',
+                                                    backgroundColor: 'black',
+                                                    marginBottom: '8px',
+                                                    color: 'white'
+                                                  },
+                                                  '& .MuiRadio-root': {
+                                                    color: 'white', // Radio button color
+                                                  },
+                                                  '& .MuiSvgIcon-root': {
+                                                    stroke: 'white', // Star icon outline color
+                                                  },
+                                            }}
+                                            >
+                                        <ListItem>
+                                            <FormControlLabel
+                                            value="synth"
+                                            control={<Radio />}
+                                            label="Synth"
                                             />
-                                            <label className="form-check-label text-white">Synth</label>
-                                        </div>
-                                    </li>
-                                    <li className="list-group-item list-group-item action d-flex justify-content-between flex-column align-items-start p-3 w-100" style={{ backgroundColor: 'black', padding: '5px', borderRadius: '5px' }}>
-                                        <div className="form-check">
-                                            <input 
-                                                type="radio"
-                                                className="form-check-input"
-                                                name="soundSelection"
-                                                style={{ backgroundColor: 'grey', marginRight: '5px' }}
-                                                onChange={(e) => this.handleButtonClick('amsynth', e)}
+                                            <ListItemIcon>
+                                                <IconButton
+                                                    color="white"
+                                                    onClick={() => this.handleStarClick('test')}>
+                                                        <StarIcon />
+                                                    </IconButton>
+                                                
+                                            </ListItemIcon>
+                                        </ListItem>
+                                        <ListItem>
+                                            <FormControlLabel
+                                            value="amsynth"
+                                            control={<Radio />}
+                                            label="AM Synth"
                                             />
-                                            <label className="form-check-label text-white">AM Synth</label>
-                                        </div>
-                                    </li>
-                                    <li className="list-group-item list-group-item action d-flex justify-content-between flex-column align-items-start p-3 w-100" style={{ backgroundColor: 'black', padding: '5px', borderRadius: '5px' }}>
-                                        <div className="form-check">
-                                            <input 
-                                                type="radio"
-                                                className="form-check-input"
-                                                name="soundSelection"
-                                                style={{ backgroundColor: 'grey', marginRight: '5px' }}
-                                                onChange={(e) => this.handleButtonClick('monosynth', e)}
+                                        </ListItem>
+                                        <ListItem>
+                                            <FormControlLabel
+                                            value="monosynth"
+                                            control={<Radio />}
+                                            label="Mono Synth"
                                             />
-                                            <label className="form-check-label text-white">Mono Synth</label>
-                                        </div>
-                                    </li>
-                                    <li className="list-group-item list-group-item action d-flex justify-content-between flex-column align-items-start p-3 w-100" style={{ backgroundColor: 'black', padding: '5px', borderRadius: '5px' }}>
-                                        <div className="form-check">
-                                            <input 
-                                                type="radio"
-                                                className="form-check-input"
-                                                name="soundSelection"
-                                                style={{ backgroundColor: 'grey', marginRight: '5px' }}
-                                                onChange={(e) => this.handleButtonClick('casio', e)}
+                                        </ListItem>
+                                        <ListItem>
+                                            <FormControlLabel
+                                            value="casio"
+                                            control={<Radio />}
+                                            label="Casio Piano (Sample)"
                                             />
-                                            <label className="form-check-label text-white">Casio Piano (Sample)</label>
-                                        </div>
-                                    </li>
-                                    <li className="list-group-item list-group-item action d-flex justify-content-between flex-column align-items-start p-3 w-100" style={{ backgroundColor: 'black', padding: '5px', borderRadius: '5px' }}>
-                                        <div className="form-check">
-                                            <input 
-                                                type="radio"
-                                                className="form-check-input"
-                                                name="soundSelection"
-                                                style={{ backgroundColor: 'grey', marginRight: '5px' }}
-                                                onChange={(e) => this.handleButtonClick('qwerty', e)}
+                                        </ListItem>
+                                        <ListItem>
+                                            <FormControlLabel
+                                            value="qwerty"
+                                            control={<Radio />}
+                                            label="Qwerty"
                                             />
-                                            <label className="form-check-label text-white">QWERTY Keyboard</label>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
+                                        </ListItem>
+                                        </List>
+                                    </RadioGroup>
+                            </FormControl>
+                            </Box>
                         </div>
                     </div>
                     <div className="col-md-6">
-                        <h2>Favorites</h2>
-                            <ul>
-                                {/* Displays favorites for user - TODO: return list of sounds, or correlate ID to sample list */}
-                                {this.state.favoriteSoundObjects.map(sound => (
-                                <SoundCard key={sound.id} sound={sound} />
-                                ))}
-                            </ul>
+                        <div>
+                            {isAuthenticated ? (
+                                <div>
+                                    <h2>Favorites</h2>
+                                    <ul>
+                                        {/* Displays favorites for user - TODO: return list of sounds, or correlate ID to sample list */}
+                                        {this.state.favoriteSoundObjects.map(sound => (
+                                        <SoundCard key={sound.id} sound={sound} />
+                                        ))}
+                                    </ul>
+                                </div>
+                            ) : (
+                               <p>{/* Does nothing */}</p> 
+                            )}
+                        </div>
+                        
                     </div>
                 </div>
                 <div className="m-3">

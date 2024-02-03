@@ -696,6 +696,7 @@ class Play extends React.Component
         const firstName = Cookies.get('name');
         const { soundObjects, isLoading } = this.state;
 
+        {/* TODO: combine lists so it is one comprehensive list? or categorize better */}
         return(
             
             <div className="container d-flex flex-column align-items-center">
@@ -720,11 +721,37 @@ class Play extends React.Component
                                 {isLoading ? (
                                     <p>Loading sounds from database...</p>
                                 ) : (
-                                    <ul>
+                                    <Box sx={{ width: '100%', maxWidth: 260, bgColor: 'background.paper' }}>
+                                        <FormControl>
+                                            <RadioGroup
+                                                aria-label="sounds"
+                                                name="build-in-sounds"
+                                                defaultValue="synth"
+                                                /*onChange={(e) => this.handleButtonClick1(e.target.value)}*/
+                                                >
+                                                  <List
+                                            sx = {{
+                                                '& .MuiListItem-root': {
+                                                    borderRadius: '8px',
+                                                    backgroundColor: 'black',
+                                                    marginBottom: '8px',
+                                                    color: 'white'
+                                                  },
+                                                  '& .MuiRadio-root': {
+                                                    color: 'white', // Radio button color
+                                                  },
+                                                  '& .MuiSvgIcon-root': {
+                                                    stroke: 'white', // Star icon outline color
+                                                  },
+                                            }}
+                                            >
                                         {this.state.soundObjects.map(sound => (
-                                        <SoundCard key={sound.id} sound={sound} />
+                                            <SoundCard key={sound.id} id={sound.id} name={sound.name} />
                                         ))}
-                                    </ul>
+                                        </List> 
+                                            </RadioGroup>
+                                        </FormControl>
+                                    </Box>
                                 )}
                             </div>
                         </div>
@@ -754,6 +781,11 @@ class Play extends React.Component
                                                   },
                                             }}
                                             >
+                                        <SoundCard
+                                            name="synth (test)"
+                                            onSelect={this.handleButtonClick1}
+                                            onFavorite={this.handleAddFavorite}
+                                            />
                                         <ListItem>
                                             <FormControlLabel
                                             value="synth"

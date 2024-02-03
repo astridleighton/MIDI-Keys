@@ -5,6 +5,7 @@ class Sound {
         this.id = id;
         this.name = name;
         this.location = location;
+        this.isFavorited = false;
     }
 }
 

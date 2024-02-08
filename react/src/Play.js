@@ -560,13 +560,15 @@ class Play extends React.Component
             if (result.status === 200) {
                 console.log("200");
 
-                const sounds = result.data.map(sound => new Sound(sound.id, sound.name, sound.location));
-                //console.log(sounds);
+                const sounds = result.data.map(sound => new Sound(sound.id, sound.name, sound.source));
+                console.log(sounds);
 
                 this.setState({ soundObjects: sounds, isLoading: false });
             } else {
                 console.log("Error");
             }
+
+            console.log("Test1");
 
 
         } catch (error) {
@@ -576,27 +578,58 @@ class Play extends React.Component
 
     getAllFavorites = async () => {
 
-        // TODO: get username from token?
-
-        const username = "aleighton1";
+        const token = Cookies.get('token');
+        console.log(token);
 
         try {
-            const result = await axios.get(`http://localhost:3000/all-favorites/${username}`);
+            const result = await axios.post('http://localhost:3000/all-favorites', { token: token });
 
             if (result.status === 200) {
-                console.log("200");
 
-                const favorites = result.data.map(sound => new Sound(sound.id, sound.name, sound.location));
-                //console.log(sounds);
+                // TODO: add results if there are NO favorites in the database
 
-                this.setState({ favoriteSoundObjects: favorites, isLoading: false });
+                if(result.data.length > 0) {
+
+                    const favorites = result.data.map(sound => new Sound(sound.id, sound.name, sound.source));
+                    console.log(favorites);
+                    console.log("test2");
+                    //console.log("sounds" + this.state.soundObjects);
+
+                    // TODO: make sure favorites sync with sound objects
+
+                    for(let i = 0; i < favorites.length; i++) {
+
+                        for(let j = 0; j < this.state.soundObjects.length; j++) {
+
+                            if(favorites[i].id === this.state.soundObjects[j].id) {
+
+                                const updatedSoundObjects = [...this.state.soundObjects];
+
+                                updatedSoundObjects[j].isFavorite = true;
+                                this.setState({ soundObjects : updatedSoundObjects });
+                                break;
+
+                            }
+
+                        }
+                    }
+
+                    console.log(this.state.soundObjects);
+
+                } else {
+                    console.log("No favorites to show.");
+                }
+
+                
+            } else if (result.status === 404) {
+                console.log("No favorites to show for user");
             } else {
                 console.log("Error");
             }
 
 
         } catch (error) {
-            console.log("Database error.");
+            console.log("Caught - Database error.");
         }
     }
 

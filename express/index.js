@@ -227,11 +227,15 @@ app.get('/all-sounds', async (req, res) => {
 /*
 * Get all favorites
 */
-app.get('/all-favorites', async (req, res) => {
+app.post('/all-favorites', async (req, res) => {
 
     const token = req.body.token;
 
+    console.log("Token: " + token);
+
     const username = await Security.getUserNameFromToken(token); // get username from token
+
+    console.log("Username: " + username);
 
     const usernameCheck = await Database.findByUsername(connection, username); // checks if username exists
 
@@ -240,11 +244,11 @@ app.get('/all-favorites', async (req, res) => {
     } else {
         try {
             const userID = await Database.getIDFromUser(connection, username);
-    
+
             const allFavorites = await Database.getAllFavoritesFromUser(connection, userID);
 
             if(allFavorites.length === 0) {
-                res.status(404).send("No favorites found for user.");
+                return res.status(404).json({ error: 'No favorites found for the user.' });
             } else {
                 res.status(200).json(allFavorites);
             }

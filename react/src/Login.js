@@ -1,8 +1,9 @@
 import React from 'react';
-import { withRouter, Link, useNavigate, Redirect } from 'react-router-dom';
+import { withRouter, Link, useNavigate, Redirect, useOutletContext, createContext } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import * as Tone from 'tone';
+import { Button, Box, TextField, Typography, Container, CssBaseline, Avatar, Grid } from '@mui/material';
 
 /**
  * Allows user to log in to account
@@ -105,48 +106,92 @@ class Login extends React.Component
 
         return (
             <div>
-                <h2 className="m-4 d-flex justify-content-center">Login</h2>
-                <div className="d-flex justify-content-center align-items-center h-100 m-3">
-                    <form onSubmit={this.handleSubmit}>
-                    <div className="form-group-row">
-                        <label htmlFor="username" className="col-sm-2 col-form-label">Username</label>
-                        <div className="col-sm-10">
-                            <input
-                            type="text"
-                            id="username"
-                            name="username"
-                            class="form-control"
-                            placeholder="Enter username"
-                            value={this.state.username}
-                            onChange={this.handleInputChange}
-                            required
-                            />
-                        </div>
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="password">Password</label>
-                        <div className="col-sm-10">
-                            <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            class="form-control"
-                            placeholder="Enter password"
-                            value={this.state.password}
-                            onChange={this.handleInputChange}
-                            required
-                            />
-                        </div>
-                    </div>
-                    <div className="form-group-row m-2">
-                        <p className="mb-0">Don't have an account? <Link to="/register" href="#!" class="text-black-50 fw-bold">Sign Up</Link></p>
-                    </div>
-                    <div className="text-center m-3">
-                        <button type="submit" className="btn btn-primary btn-block mb-4 text-center">Login</button>
-                    </div>
-                </form>
+                    
+                    <Container maxWidth="xs">
+                        <Container
+                            sx={{
+                                mt: '50px',
+                                mb: '-30px'
+                            }}>
+                        <Typography
+                        component="h1"
+                        variant="h5"
+                        sx={{
+                            textAlign: 'center',
+                        }}
+                    >
+                        Log In
+                    </Typography>
+                        </Container>
+                    <Box
+                        component="form"
+                        onSubmit={this.handleSubmit}
+                        noValidate
+                        sx={{
+                            marginTop: 8,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                          }}
+                    >
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="username"
+                        label="Username"
+                        name="username"
+                        value={this.state.username}
+                        onChange={this.handleInputChange}
+                        autoComplete="username"
+                        autoFocus
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        name="password"
+                        label="Password"
+                        type="password"
+                        id="password"
+                        value={this.state.password}
+                        onChange={this.handleInputChange}
+                        autoComplete="current-password"
+                    />
+                    <Container
+                        sx={{
+                            margin: '20px'
+                        }}>
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        onClick={this.handleSubmit}
+                        sx={{
+                            backgroundColor: 'black',
+                            color: 'white',
+                            padding: '10px'
+                        }}
+
+                    >
+                        Log In
+                    </Button>
+                    </Container>
+                        <Typography>
+                            Don't have an account?
+                            <a
+                                href="/register"
+                                style={{
+                                    textDecoration: 'none',
+                                    color: 'inherit',
+                                    fontWeight: 'bold',
+                                    padding: '5px'
+                                    }}>Sign Up</a>
+                        </Typography>
+                    </Box>
+                    </Container>
+                    
             </div>
-                </div>
         )
     }
 }

@@ -8,13 +8,14 @@ This project will take the entire school year to complete. Here is what I have c
 - Playback functionality from V49 MIDI device and QWERTY keyboard using a few sound samples
 - JWT token authentication and session functionality
 
-# Next Semester Goals
+# In Progress
 
 - Add more sound samples for a user to select from
 - Allow user to select between different device
 - Allow user to add/remove sounds from the favorites tab
 - Secure website using HTTPS and secured pages
 - Implement chord display functionality
+- Improved user interface using Material UI
 
 # Out of Scope
 - Deploy to cloud

@@ -665,12 +665,9 @@ class Play extends React.Component
     }
 
     addFavorite = (soundName) => {
-
-        // TODO: only call if user is logged in
-        // TODO: do not hard-code username, get from cookies?
-
+        
         axios.post('http://localhost:3000/add-favorite', {
-            username: 'aleighton1',
+            token: Cookies.get('token'),
             sound: soundName
           })
           .then(function (response) {
@@ -683,12 +680,9 @@ class Play extends React.Component
 
     removeFavorite = (soundName) => {
 
-        // TODO: only call if user is logged in
-        // TODO: do not hard-code username, get from cookies?
-
-        const username = 'aleighton1';
-
-        axios.delete(`http://localhost:3000/remove-favorite/${username}/${soundName}`)
+        axios.delete(`http://localhost:3000/remove-favorite/${soundName}`, {
+            token: Cookies.get('token')
+        })
           .then(function (response) {
             console.log(response);
           })

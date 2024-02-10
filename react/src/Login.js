@@ -28,6 +28,9 @@ class Login extends React.Component
         };
     }
 
+    /**
+     * Stops tone.js and audio
+     */
     componentDidMount() {
         Tone.Transport.pause();
     }
@@ -123,88 +126,84 @@ class Login extends React.Component
                             mt: '50px',
                             mb: '-30px'
                         }}>
-                    <Typography
-                    component="h1"
-                    variant="h5"
-                    sx={{
-                        textAlign: 'center',
-                    }}
-                >
-                    Log In
-                </Typography>
+                            <Typography
+                            component="h1"
+                            variant="h5"
+                            sx={{ textAlign: 'center' }} >
+                                Log In
+                            </Typography>
                     </Container>
-                <Box
-                    component="form"
-                    onSubmit={this.handleSubmit}
-                    noValidate
-                    sx={{
-                        marginTop: 8,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        }}
-                >
-                <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    id="username"
-                    label="Username"
-                    name="username"
-                    error={this.state.submitted && !this.state.username} // check if empty
-                    helperText={this.state.submitted && !this.state.username ? 'Username is required ' : ''}
-                    value={this.state.username}
-                    onChange={this.handleInputChange}
-                    autoComplete="username"
-                    autoFocus
-                />
-                <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    name="password"
-                    label="Password"
-                    type="password"
-                    id="password"
-                    error={this.state.submitted && !this.state.password} // check if empty
-                    helperText={this.state.submitted && !this.state.password ? 'Password is required ' : ''}
-                    value={this.state.password}
-                    onChange={this.handleInputChange}
-                    autoComplete="current-password"
-                />
-                <Container
-                    sx={{
-                        margin: '20px'
-                    }}>
-                <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    onClick={this.handleSubmit}
-                    sx={{
-                        backgroundColor: 'black',
-                        color: 'white',
-                        padding: '10px'
-                    }}
+                    <Box
+                        component="form"
+                        onSubmit={this.handleSubmit}
+                        noValidate
+                        sx={{
+                            marginTop: 8,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            }}
+                    >
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="username"
+                            label="Username"
+                            name="username"
+                            error={this.state.submitted && !this.state.username} // check if empty
+                            helperText={this.state.submitted && !this.state.username ? 'Username is required ' : ''}
+                            value={this.state.username}
+                            onChange={this.handleInputChange}
+                            autoComplete="username"
+                            autoFocus
+                        />
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            name="password"
+                            label="Password"
+                            type="password"
+                            id="password"
+                            error={this.state.submitted && !this.state.password} // check if empty
+                            helperText={this.state.submitted && !this.state.password ? 'Password is required ' : ''}
+                            value={this.state.password}
+                            onChange={this.handleInputChange}
+                            autoComplete="current-password"
+                        />
+                        <Container
+                            sx={{
+                                margin: '20px'
+                            }}>
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                onClick={this.handleSubmit}
+                                sx={{
+                                    backgroundColor: 'black',
+                                    color: 'white',
+                                    padding: '10px'
+                                }}
 
-                >
-                    Log In
-                </Button>
-                </Container>
-                    <Typography>
-                        Don't have an account?
-                        <a
-                            href="/register"
-                            style={{
-                                textDecoration: 'none',
-                                color: 'inherit',
-                                fontWeight: 'bold',
-                                padding: '5px'
-                                }}>Sign Up</a>
-                    </Typography>
-                </Box>
-                </Container>
-                    
+                            >
+                                Log In
+                            </Button>
+                        </Container>
+                        <Typography>
+                            Don't have an account?
+                            <a
+                                href="/register"
+                                style={{
+                                    textDecoration: 'none',
+                                    color: 'inherit',
+                                    fontWeight: 'bold',
+                                    padding: '5px'
+                                    }}>Sign Up</a>
+                        </Typography>
+                    </Box>
+                </Container>    
             </div>
         )
     }

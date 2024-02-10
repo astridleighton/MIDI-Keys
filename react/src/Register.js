@@ -66,6 +66,10 @@ class Register extends React.Component
     }
 
 
+    /**
+     * Ensures first name is not blank
+     * @returns boolean value for error message
+     */
     validateFirstName() {
         if(this.state.firstname) {
             this.setState({ firstNameMessage: 'First name cannot be left blank' });
@@ -75,6 +79,11 @@ class Register extends React.Component
         return true;
     }
 
+    /**
+     * Ensures username is not blank
+     * @param {*} username 
+     * @returns boolean value for error message
+     */
     validateUsername(username) {
         if(username.length === 0) {
             this.setState({ passwordMessage: 'Username cannot be left blank' });
@@ -84,6 +93,11 @@ class Register extends React.Component
         return true; // username is valid
     }
 
+    /**
+     * Checks if password meets complexity and security requirements
+     * @param {*} password 
+     * @returns boolean value for error message
+     */
     validatePassword(password) {
         if (password.length === 0) {
             this.setState({ passwordMessage: 'Password cannot be left blank' });

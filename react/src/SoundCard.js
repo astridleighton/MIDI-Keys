@@ -2,25 +2,36 @@ import React, { Component } from 'react';
 import { ListItem, ListItemIcon, FormControlLabel, Radio } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import StarIcon from '@mui/icons-material/Star';
-import StarBorderIcon from '@mui/icons-material/StarBorder';
 
-
-
+/**
+ * Defines a sound on user interface
+ */
 class SoundCard extends Component {
 
+    /**
+     * Handles user sound selection
+     * @param {*} event 
+     */
     handleSelect = (event) => {
-        const { id, onSelect } = this.props;
         this.props.onSelect(this.props.name, this.props.location);
     }
 
+    /**
+     * Handles user favorite selection (add/remove)
+     * @param {*} event 
+     */
     handleFavorite = (event) => {
         if (this.props.isFavorite) { // if already favorite, remove
-            this.props.addFavorite(this.props.name);
-        } else { // if not favorite, make favorite
             this.props.removeFavorite(this.props.name);
+        } else { // if not favorite, make favorite
+            this.props.addFavorite(this.props.name);
         }
     }
 
+    /**
+     * Renders sound card by displaying radio and star icon
+     * @returns 
+     */
     render() {
         const { name, id, isLoggedIn, isFavorite } = this.props;
 
@@ -36,7 +47,7 @@ class SoundCard extends Component {
                         <IconButton
                             color="white"
                             onClick={this.handleFavorite}>
-                                {isFavorite ? <StarIcon /> : <StarIcon style={{ color: 'yellow' }} />} {/* Render filled star if favorited, otherwise render empty star */}
+                                {isFavorite ? <StarIcon style={{ color: 'yellow' }} /> : <StarIcon />} {/* Render filled star if favorited, otherwise render empty star */}
                         </IconButton>
                     )}
                 </ListItemIcon>

@@ -150,21 +150,6 @@ class Database {
             
         })
 
-        /*return new Promise((resolve, reject) => {
-            try {
-                connection.query("SELECT * FROM favorites WHERE userID = ?", [username], (error, results) => {
-                    if (error) {
-                        reject(error);
-                    } else {
-                        resolve(results);
-                    }
-                })
-            } catch (error) {
-                reject(error);
-            }
-            
-        })*/
-
     }
 
      /**

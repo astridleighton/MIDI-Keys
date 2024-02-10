@@ -229,7 +229,7 @@ class Play extends React.Component
             Tone.Master.volume.value = -6;
             this.initalizeKeyboard();
             this.getAllSounds();
-            this.getAllFavorites();
+            //this.getAllFavorites();
       }
 
 /**
@@ -487,32 +487,8 @@ class Play extends React.Component
     /*
         Selects instrument type based on user option
     */
-    handleButtonClick = (instrument, e) => {
-        //e.preventDefault();
+    handleButtonClick = (instrument) => {
         console.log("Selected: " + instrument);
-
-        if(instrument === 'synth') {
-            this.state.selectedSound = 'synth';
-        } else if (instrument === 'amsynth') {
-            this.state.selectedSound = 'amSynth';
-        } else if (instrument === 'monosynth') {
-            this.state.selectedSound = 'monosynth';
-        } else if (instrument === 'casio') {
-            this.state.selectedSound = 'casio';
-        } else if (instrument === 'qwerty')
-        {
-            this.setState( { selectedSound: 'qwerty' });
-        } else {
-            console.log("Uh oh, no instrument connected.");
-        }
-    }
-
-    // TODO: get rid of other function
-
-    handleButtonClick1 = (value) => {
-        //e.preventDefault();
-        const instrument = value;
-        alert("Selected: " + instrument);
 
         if(instrument === 'synth') {
             this.state.selectedSound = 'synth';
@@ -735,15 +711,15 @@ class Play extends React.Component
                     <div className="row">
                         <div className="col-md-6">
                             <div className="pb-4">
-                                <h2>Samples</h2>
                                 {isLoading ? (
-                                    <p>Loading sounds from database...</p>
+                                    <p>Could not load sounds from database. Please refresh to try again.</p>
                                 ) : (
                                     <Box sx={{ width: '100%', maxWidth: 260, bgColor: 'background.paper' }}>
                                         <FormControl>
+                                            <FormLabel>Sounds</FormLabel>
                                             <RadioGroup
                                                 aria-label="sounds"
-                                                name="build-in-sounds"
+                                                name="sound-group"
                                                 defaultValue="synth"
                                                 /*onChange={(e) => this.handleButtonClick1(e.target.value)}*/
                                                 >
@@ -763,47 +739,6 @@ class Play extends React.Component
                                                   },
                                             }}
                                             >
-                                        {this.state.soundObjects.map(sound => (
-                                            <SoundCard key={sound.id} id={sound.id} name={sound.name} isLoggedIn={isAuthenticated} addFavorite={this.addFavorite} removeFavorite={this.removeFavorite} />
-                                        ))}
-                                        </List> 
-                                            </RadioGroup>
-                                        </FormControl>
-                                    </Box>
-                                )}
-                            </div>
-                        </div>
-                        <div>
-                            <Box sx={{ width: '100%', maxWidth: 260, bgColor: 'background.paper' }}>
-                            <FormControl>
-                                <FormLabel>Built In</FormLabel>
-                                <RadioGroup
-                                    aria-label="sounds"
-                                    name="build-in-sounds"
-                                    defaultValue="synth"
-                                    onChange={(e) => this.handleButtonClick1(e.target.value)}
-                                    >
-                                        <List
-                                            sx = {{
-                                                '& .MuiListItem-root': {
-                                                    borderRadius: '8px',
-                                                    backgroundColor: 'black',
-                                                    marginBottom: '8px',
-                                                    color: 'white'
-                                                  },
-                                                  '& .MuiRadio-root': {
-                                                    color: 'white', // Radio button color
-                                                  },
-                                                  '& .MuiSvgIcon-root': {
-                                                    stroke: 'white', // Star icon outline color
-                                                  },
-                                            }}
-                                            >
-                                        <SoundCard
-                                            name="synth (test)"
-                                            onSelect={this.handleButtonClick1}
-                                            onFavorite={this.handleAddFavorite}
-                                            />
                                         <ListItem>
                                             <FormControlLabel
                                             value="synth"
@@ -822,54 +757,41 @@ class Play extends React.Component
                                         <ListItem>
                                             <FormControlLabel
                                             value="amsynth"
-                                            control={<Radio />}
+                                            control={<Radio onClick={(e) => this.handleButtonClick("amsynth")}/>}
                                             label="AM Synth"
                                             />
                                         </ListItem>
                                         <ListItem>
                                             <FormControlLabel
                                             value="monosynth"
-                                            control={<Radio />}
+                                            control={<Radio onClick={(e) => this.handleButtonClick("monosynth")}/>}
                                             label="Mono Synth"
                                             />
                                         </ListItem>
                                         <ListItem>
                                             <FormControlLabel
                                             value="casio"
-                                            control={<Radio />}
+                                            control={<Radio onClick={(e) => this.handleButtonClick("casio")}/>}
                                             label="Casio Piano (Sample)"
                                             />
                                         </ListItem>
                                         <ListItem>
                                             <FormControlLabel
                                             value="qwerty"
-                                            control={<Radio />}
+                                            control={<Radio onClick={(e) => this.handleButtonClick("qwerty")}/>}
                                             label="Qwerty"
                                             />
                                         </ListItem>
-                                        </List>
-                                    </RadioGroup>
-                            </FormControl>
-                            </Box>
-                        </div>
-                    </div>
-                    <div className="col-md-6">
-                        <div>
-                            {isAuthenticated ? (
-                                <div>
-                                    <h2>Favorites</h2>
-                                    <ul>
-                                        {/* Displays favorites for user - TODO: return list of sounds, or correlate ID to sample list */}
-                                        {this.state.favoriteSoundObjects.map(sound => (
-                                        <SoundCard key={sound.id} sound={sound} />
+                                        {this.state.soundObjects.map(sound => (
+                                            <SoundCard key={sound.id} id={sound.id} name={sound.name} isLoggedIn={isAuthenticated} onSelect={this.handleButtonClick1} addFavorite={this.addFavorite} removeFavorite={this.removeFavorite} />
                                         ))}
-                                    </ul>
-                                </div>
-                            ) : (
-                               <p>{/* Does nothing */}</p> 
-                            )}
+                                        </List> 
+                                            </RadioGroup>
+                                        </FormControl>
+                                    </Box>
+                                )}
+                            </div>
                         </div>
-                        
                     </div>
                 </div>
                 <div className="m-3">

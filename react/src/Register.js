@@ -18,7 +18,11 @@ class Register extends React.Component
             id: 3,
             username: '',
             password: '',
-            firstname: ''
+            firstname: '',
+            submitted: false,
+            firstNameMessage: '',
+            usernameMessage: '',
+            passwordMessage: ''
         };
     }
 
@@ -43,15 +47,57 @@ class Register extends React.Component
      * Passes registration credentials to registration function
      * @param {*} event 
      */
-    handleSubmit = (event) => {
+    handleSubmit = async (event) => {
+
         event.preventDefault();
 
-        console.log('First Name', this.state.firstname);
-        console.log('Username:', this.state.username);
-        console.log('Password:', this.state.password);
+        // check for blanks
+        const firstNameValid = this.validateFirstName();
+        const usernameValid = this.validateUsername(this.state.username);
+        const passwordValid = this.validatePassword(this.state.password);
 
-        this.processRegister(this.state);
 
+        if(firstNameValid && usernameValid && passwordValid) {
+            await this.processRegister(this.state);
+            console.log("registered.");
+            // TODO: redirect to Play page
+        }
+
+    }
+
+
+    validateFirstName() {
+        if(this.state.firstname) {
+            this.setState({ firstNameMessage: 'First name cannot be left blank' });
+            return false;
+        }
+
+        return true;
+    }
+
+    validateUsername(username) {
+        if(username.length === 0) {
+            this.setState({ passwordMessage: 'Username cannot be left blank' });
+            return false; // username is not valid
+        }
+
+        return true; // username is valid
+    }
+
+    validatePassword(password) {
+        if (password.length === 0) {
+            this.setState({ passwordMessage: 'Password cannot be left blank' });
+            return false;
+        } else if (password.length < 8) {
+            this.setState({ passwordMessage: 'Password must be at least 8 characters long' });
+            return false;
+        } else if (!/\d/.test(password)) {
+            this.setState({ passwordMessage: 'Password must contain at least one number' });
+            return false;
+        } else {
+            this.setState({ passwordMessage: '' }); // Reset message if password is valid
+            return true;
+        }
     }
 
     /**
@@ -74,7 +120,7 @@ class Register extends React.Component
             } else if (error.response.status === 500) {
                 alert("Database error. Please try again.");
             } else {
-                alert("An error occurred. Please try again.");
+                alert("An error occurred. No response from back-end.");
             }
             
         }
@@ -122,6 +168,8 @@ class Register extends React.Component
                     id="firstname"
                     label="First Name"
                     name="firstname"
+                    error={this.state.firstNameMessage} // check if empty
+                    helperText={this.state.firstNameMessage}
                     value={this.state.firstname}
                     onChange={this.handleInputChange}
                     autoComplete="firstname"
@@ -134,6 +182,10 @@ class Register extends React.Component
                     id="username"
                     label="Username"
                     name="username"
+                    error={this.state.usernameMessage} // check if empty
+                    helperText={
+                        this.state.usernameMessage // Show password message if provided
+                    }
                     value={this.state.username}
                     onChange={this.handleInputChange}
                     autoComplete="username"
@@ -147,6 +199,10 @@ class Register extends React.Component
                     label="Password"
                     type="password"
                     id="password"
+                    error={this.state.passwordMessage} // check if empty
+                    helperText={
+                        this.state.passwordMessage // Show password message if provided
+                    }
                     value={this.state.password}
                     onChange={this.handleInputChange}
                     autoComplete="current-password"

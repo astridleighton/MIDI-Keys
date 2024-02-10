@@ -3,7 +3,7 @@ import { withRouter, Link, useNavigate, Redirect, useOutletContext, createContex
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import * as Tone from 'tone';
-import { Button, Box, TextField, Typography, Container, CssBaseline, Avatar, Grid } from '@mui/material';
+import { Button, Box, TextField, Typography, Container, CssBaseline, Avatar, Grid, Input } from '@mui/material';
 
 /**
  * Allows user to log in to account
@@ -23,7 +23,8 @@ class Login extends React.Component
         this.state = {
             username: '',
             password: '',
-            loginSuccess: false
+            loginSuccess: false,
+            submitted: false
         };
     }
 
@@ -46,9 +47,14 @@ class Login extends React.Component
      * @param {*} event 
      */
     handleSubmit = async (event) => {
+
         event.preventDefault();
-        await this.processLogin(this.state);
-        window.location.reload(); // TODO: remove once redirect is added
+
+        this.setState({ submitted: true });
+        if(this.state.username && this.state.password) {
+            await this.processLogin(this.state);
+            // TODO: redirect to Play page
+        }
       };
 
     /**
@@ -84,10 +90,15 @@ class Login extends React.Component
         catch (error) {
             if (error.response && error.response.status === 401) {
                 alert("Invalid login credentials. Please try again.");
+
+                // reset login credentials
+                this.setState( { username: '' });
+                this.setState( { password: '' });
+                this.setState( { submitted: false });
             } else if (error.response && error.response.status === 500) {
                 alert("A server error occurred during login. Please try again!");
             } else {
-                alert("An error occurred. Please try again.");
+                alert("An error occurred. No response from back-end.");
             }
         }
     }
@@ -105,91 +116,94 @@ class Login extends React.Component
         const {username, password} = this.state;
 
         return (
-            <div>
-                    
-                    <Container maxWidth="xs">
-                        <Container
-                            sx={{
-                                mt: '50px',
-                                mb: '-30px'
-                            }}>
-                        <Typography
-                        component="h1"
-                        variant="h5"
-                        sx={{
-                            textAlign: 'center',
-                        }}
-                    >
-                        Log In
-                    </Typography>
-                        </Container>
-                    <Box
-                        component="form"
-                        onSubmit={this.handleSubmit}
-                        noValidate
-                        sx={{
-                            marginTop: 8,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                          }}
-                    >
-                    <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="username"
-                        label="Username"
-                        name="username"
-                        value={this.state.username}
-                        onChange={this.handleInputChange}
-                        autoComplete="username"
-                        autoFocus
-                    />
-                    <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        name="password"
-                        label="Password"
-                        type="password"
-                        id="password"
-                        value={this.state.password}
-                        onChange={this.handleInputChange}
-                        autoComplete="current-password"
-                    />
+            <div>  
+                <Container maxWidth="xs">
                     <Container
                         sx={{
-                            margin: '20px'
+                            mt: '50px',
+                            mb: '-30px'
                         }}>
-                    <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        onClick={this.handleSubmit}
-                        sx={{
-                            backgroundColor: 'black',
-                            color: 'white',
-                            padding: '10px'
+                    <Typography
+                    component="h1"
+                    variant="h5"
+                    sx={{
+                        textAlign: 'center',
+                    }}
+                >
+                    Log In
+                </Typography>
+                    </Container>
+                <Box
+                    component="form"
+                    onSubmit={this.handleSubmit}
+                    noValidate
+                    sx={{
+                        marginTop: 8,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
                         }}
+                >
+                <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    id="username"
+                    label="Username"
+                    name="username"
+                    error={this.state.submitted && !this.state.username} // check if empty
+                    helperText={this.state.submitted && !this.state.username ? 'Username is required ' : ''}
+                    value={this.state.username}
+                    onChange={this.handleInputChange}
+                    autoComplete="username"
+                    autoFocus
+                />
+                <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    type="password"
+                    id="password"
+                    error={this.state.submitted && !this.state.password} // check if empty
+                    helperText={this.state.submitted && !this.state.password ? 'Password is required ' : ''}
+                    value={this.state.password}
+                    onChange={this.handleInputChange}
+                    autoComplete="current-password"
+                />
+                <Container
+                    sx={{
+                        margin: '20px'
+                    }}>
+                <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    onClick={this.handleSubmit}
+                    sx={{
+                        backgroundColor: 'black',
+                        color: 'white',
+                        padding: '10px'
+                    }}
 
-                    >
-                        Log In
-                    </Button>
-                    </Container>
-                        <Typography>
-                            Don't have an account?
-                            <a
-                                href="/register"
-                                style={{
-                                    textDecoration: 'none',
-                                    color: 'inherit',
-                                    fontWeight: 'bold',
-                                    padding: '5px'
-                                    }}>Sign Up</a>
-                        </Typography>
-                    </Box>
-                    </Container>
+                >
+                    Log In
+                </Button>
+                </Container>
+                    <Typography>
+                        Don't have an account?
+                        <a
+                            href="/register"
+                            style={{
+                                textDecoration: 'none',
+                                color: 'inherit',
+                                fontWeight: 'bold',
+                                padding: '5px'
+                                }}>Sign Up</a>
+                    </Typography>
+                </Box>
+                </Container>
                     
             </div>
         )

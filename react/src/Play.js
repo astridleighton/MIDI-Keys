@@ -698,7 +698,7 @@ class Play extends React.Component
     }
 
     handleAddFavorite = async (sound, e) => {
-        e.preventDefault();
+        //e.preventDefault();
         await this.addFavorite(sound);
     }
 

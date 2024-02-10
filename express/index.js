@@ -177,7 +177,7 @@ app.post('/add-favorite', async function(req, res) {
 app.delete('/remove-favorite/:sound', async (req, res) => {
 
     const sound = req.params.sound;
-    const token = req.body.token;
+    const token = req.headers.authorization.split(' ')[1]; // Extract token from Authorization header
 
     try {
 
@@ -188,18 +188,16 @@ app.delete('/remove-favorite/:sound', async (req, res) => {
         if(username) {
 
             const userID = await Database.getIDFromUser(connection, username);
-    
             const soundID = await Database.getIDFromSound(connection, sound);
-
             const removeFavorite = await Database.removeFavorite(connection, userID, soundID);
 
             if (removeFavorite) {
                 res.status(200).send("Removed favorite successfully.");
             } else {
-                res.status(401).json({ message: 'Add favorite failed.', status: 401 });
+                res.status(401).json({ message: 'Remove favorite failed.', status: 401 });
             }
         } else {
-            res.status(401).send("Unauthorized to add favorite. Please log in.");
+            res.status(401).send("Unauthorized to remove favorite. Please log in.");
         }
 
         
@@ -227,10 +225,9 @@ app.get('/all-sounds', async (req, res) => {
 /*
 * Get all favorites
 */
-app.post('/all-favorites', async (req, res) => {
+app.get('/all-favorites', async (req, res) => {
 
-    const token = req.body.token;
-
+    const token = req.headers.authorization.split(' ')[1]; // Extract token from Authorization header
     console.log("Token: " + token);
 
     const username = await Security.getUserNameFromToken(token); // get username from token
@@ -240,7 +237,7 @@ app.post('/all-favorites', async (req, res) => {
     const usernameCheck = await Database.findByUsername(connection, username); // checks if username exists
 
     if (usernameCheck.length === 0) {
-        res.status(403).send("Username not found.");
+        res.status(403).send("Invalid token or username not found.");
     } else {
         try {
             const userID = await Database.getIDFromUser(connection, username);

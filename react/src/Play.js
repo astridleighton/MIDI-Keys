@@ -110,6 +110,11 @@ class Play extends React.Component
         }).toDestination();
       }
 
+      /**
+       * Creates an instance of the online sampler (used for online URLs)
+       * @param {*} note 
+       * @param {*} url 
+       */
       createOnlineSampler = (note, url) => {
         const sampler = new Tone.Sampler({
             urls: {
@@ -229,8 +234,15 @@ class Play extends React.Component
             Tone.setContext(new AudioContext({ sampleRate: 48000 }));
             Tone.Master.volume.value = -6;
             this.initalizeKeyboard();
-            this.getAllSounds();
-            this.getAllFavorites();
+            this.initializeSounds();
+      }
+
+      /**
+       * Ensures sounds are loaded before receiving favorite sounds
+       */
+      async initializeSounds() {
+        await this.getAllSounds();
+        this.getAllFavorites();
       }
 
 /**
@@ -354,12 +366,12 @@ class Play extends React.Component
             
     }
 
-        /*
-            - Sets up keyboard using AudioKeys and allows QWERTY keyboard input
+    /**
+     * - Sets up keyboard using AudioKeys and allows QWERTY keyboard input
             - Maps MIDI notes to music notes
             - Triggers audio output with keydown event
             - Stores current notes / chord being played
-        */
+     */
     initalizeKeyboard () {
 
         // set up connected keyboard - will add other devices in future implentations
@@ -493,8 +505,6 @@ class Play extends React.Component
     handleButtonClick = (instrument, location) => {
         console.log("Selected: " + instrument + " at " + location);
 
-        // TODO: make sure location is not blank
-
         if(location === "react" || !location) {
             if(instrument === 'Synth') {
                 this.state.selectedSound = 'synth';
@@ -571,14 +581,15 @@ class Play extends React.Component
         
     }  
     
+    /**
+     * Retrieves all sounds from the database
+     */
     getAllSounds = async () => {
         try {
             const result = await axios.get('http://localhost:3000/all-sounds');
 
             if (result.status === 200) {
-                console.log("200");
-
-                const sounds = result.data.map(sound => new Sound(sound.id, sound.name, sound.source));
+                const sounds = result.data.map(sound => new Sound(sound.id, sound.name, sound.source, sound.isFavorite));
                 console.log(sounds);
 
                 this.setState({ soundObjects: sounds, isLoading: false });
@@ -586,34 +597,31 @@ class Play extends React.Component
                 console.log("Error");
             }
 
-            console.log("Test1");
-
-
         } catch (error) {
             console.log("Database error.");
         }
     }
 
+    /**
+     * Retrieves all favorite sounds from the database
+     * Only called when user is logged in with a valid token
+     */
     getAllFavorites = async () => {
 
         const token = Cookies.get('token');
         console.log(token);
 
         try {
-            const result = await axios.post('http://localhost:3000/all-favorites', { token: token });
+            const result = await axios.get('http://localhost:3000/all-favorites', {
+                headers:{
+                    Authorization: `Bearer ${token}`
+                }
+                });
 
             if (result.status === 200) {
-
-                // TODO: add results if there are NO favorites in the database
-
                 if(result.data.length > 0) {
 
                     const favorites = result.data.map(sound => new Sound(sound.id, sound.name, sound.source));
-                    console.log(favorites);
-                    console.log("test2");
-                    //console.log("sounds" + this.state.soundObjects);
-
-                    // TODO: make sure favorites sync with sound objects
 
                     for(let i = 0; i < favorites.length; i++) {
 
@@ -632,6 +640,7 @@ class Play extends React.Component
                         }
                     }
 
+                    console.log("favorites");
                     console.log(this.state.soundObjects);
 
                 } else {
@@ -647,51 +656,73 @@ class Play extends React.Component
 
 
         } catch (error) {
-            console.log("Caught - Database error.");
+            console.log("Caught - Database error." + error);
         }
     }
 
-    addFavorite = (soundName) => {
+    /**
+     * Adds a specified sound to the user's favorites
+     * Only called if user is logged in with a valid token
+     * @param {*} soundName 
+     */
+    addFavorite = async (soundName) => {
 
-        axios.post('http://localhost:3000/add-favorite', {
-            token: Cookies.get('token'),
-            sound: soundName
-          })
-          .then(function (response) {
+        try {
+            const response = await axios.post('http://localhost:3000/add-favorite', {
+                token: Cookies.get('token'),
+                sound: soundName
+            });
+    
             console.log(response);
-          })
-          .catch(function (error) {
+    
+            for (let i = 0; i < this.state.soundObjects.length; i++) {
+                if (this.state.soundObjects[i].name === soundName) {
+                    const updatedSoundObjects = [...this.state.soundObjects];
+                    updatedSoundObjects[i].isFavorite = true;
+                    this.setState({ soundObjects: updatedSoundObjects });
+                    break; // Once found, exit the loop
+                }
+            }
+    
+            console.log(this.state.soundObjects);
+        } catch (error) {
             console.log(error);
-          });
+        }
+
+        
     }
 
-    removeFavorite = (soundName) => {
-
-        console.log(soundName);
+    /**
+     * Removes a specified sound from the user's favorites
+     * Only called if user is logged in with a valid token
+     * @param {*} soundName 
+     */
+    removeFavorite = async (soundName) => {
         const token = Cookies.get('token');
-        console.log(token);
-
-        // TODO: fix me, make sure token authentication works
-
-        /*axios.delete(`http://localhost:3000/remove-favorite/${soundName}`, {
-            token: Cookies.get('token')
-        })
-          .then(function (response) {
+    
+        try {
+            const response = await axios.delete(`http://localhost:3000/remove-favorite/${soundName}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            
             console.log(response);
-          })
-          .catch(function (error) {
+            // Check if the sound is present in state and update its isFavorite property
+        const updatedSoundObjects = this.state.soundObjects.map(sound => {
+            if (sound.name === soundName) {
+                return { ...sound, isFavorite: false };
+            }
+            return sound;
+        });
+
+        // Update state with the modified soundObjects array
+        this.setState({ soundObjects: updatedSoundObjects });
+            
+        } catch (error) {
             console.log(error);
-          });*/
+        }
     }
-
-    handleStarClick = async (e) => {
-        alert("you clicked the star");
-    }
-
-    /*
-        Idea: get all sounds and then have a favorited state on the sound in the sound.js file
-            - can either remove this from soundlist or set as a different color somehow, maybe user master soundlist
-    */
 
     /*
         Renders user session and displays available sounds and notes played
@@ -751,7 +782,7 @@ class Play extends React.Component
                                             }}
                                             >
                                         {this.state.soundObjects.map(sound => (
-                                            <SoundCard key={sound.id} id={sound.id} name={sound.name} location={sound.location} isLoggedIn={isAuthenticated} onSelect={this.handleButtonClick} addFavorite={this.addFavorite} removeFavorite={this.removeFavorite} />
+                                            <SoundCard key={sound.id} id={sound.id} name={sound.name} location={sound.location} isFavorite={sound.isFavorite} isLoggedIn={isAuthenticated} onSelect={this.handleButtonClick} addFavorite={this.addFavorite} removeFavorite={this.removeFavorite} />
                                         ))}
                                         </List> 
                                             </RadioGroup>

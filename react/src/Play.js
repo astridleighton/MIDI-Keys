@@ -665,7 +665,7 @@ class Play extends React.Component
     }
 
     addFavorite = (soundName) => {
-        
+
         axios.post('http://localhost:3000/add-favorite', {
             token: Cookies.get('token'),
             sound: soundName
@@ -680,7 +680,13 @@ class Play extends React.Component
 
     removeFavorite = (soundName) => {
 
-        axios.delete(`http://localhost:3000/remove-favorite/${soundName}`, {
+        console.log(soundName);
+        const token = Cookies.get('token');
+        console.log(token);
+
+        // TODO: fix me, make sure token authentication works
+
+        /*axios.delete(`http://localhost:3000/remove-favorite/${soundName}`, {
             token: Cookies.get('token')
         })
           .then(function (response) {
@@ -688,17 +694,7 @@ class Play extends React.Component
           })
           .catch(function (error) {
             console.log(error);
-          });
-    }
-
-    handleAddFavorite = async (sound, e) => {
-        //e.preventDefault();
-        await this.addFavorite(sound);
-    }
-
-    handleRemoveFavorite = async (sound, e) => {
-        e.preventDefault();
-        await this.removeFavorite(sound);
+          });*/
     }
 
     handleStarClick = async (e) => {
@@ -728,8 +724,6 @@ class Play extends React.Component
                     {isAuthenticated ? (
                         <div>
                             <h1>Welcome, {firstName}!</h1>
-                            <button onClick={(e) => this.handleAddFavorite("synth", e)}>Add Favorite</button>
-                            <button onClick={(e) => this.handleRemoveFavorite("synth", e)}>Remove Favorite</button>
                         </div>
                     ) : (
                         <div>
@@ -770,7 +764,7 @@ class Play extends React.Component
                                             }}
                                             >
                                         {this.state.soundObjects.map(sound => (
-                                            <SoundCard key={sound.id} id={sound.id} name={sound.name} />
+                                            <SoundCard key={sound.id} id={sound.id} name={sound.name} isLoggedIn={isAuthenticated} addFavorite={this.addFavorite} removeFavorite={this.removeFavorite} />
                                         ))}
                                         </List> 
                                             </RadioGroup>

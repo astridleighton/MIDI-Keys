@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { ListItem, ListItemIcon, FormControlLabel, Radio } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
 
 
 
@@ -13,12 +14,15 @@ class SoundCard extends Component {
     }
 
     handleFavorite = (event) => {
-        const { id, onFavorite } = this.props;
-        onFavorite(id, event.target.value);
+        if (this.props.isFavorite) { // if already favorite, remove
+            this.props.addFavorite(this.props.name);
+        } else { // if not favorite, make favorite
+            this.props.removeFavorite(this.props.name);
+        }
     }
 
     render() {
-        const { name, id } = this.props;
+        const { name, id, isLoggedIn, isFavorite } = this.props;
 
         return (
             <ListItem>
@@ -28,12 +32,13 @@ class SoundCard extends Component {
                     label={name}
                 />
                 <ListItemIcon>
-                    <IconButton
-                        color="white"
-                        onClick={() => this.handleFavorite}>
-                            <StarIcon />
+                    {isLoggedIn && (
+                        <IconButton
+                            color="white"
+                            onClick={this.handleFavorite}>
+                                {isFavorite ? <StarIcon /> : <StarIcon style={{ color: 'yellow' }} />} {/* Render filled star if favorited, otherwise render empty star */}
                         </IconButton>
-                    
+                    )}
                 </ListItemIcon>
             </ListItem> 
             

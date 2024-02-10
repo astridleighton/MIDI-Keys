@@ -10,7 +10,7 @@ class SoundCard extends Component {
 
     handleSelect = (event) => {
         const { id, onSelect } = this.props;
-        onSelect(id, event.target.value);
+        this.props.onSelect(this.props.name, this.props.location);
     }
 
     handleFavorite = (event) => {

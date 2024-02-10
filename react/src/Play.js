@@ -41,7 +41,8 @@ class Play extends React.Component
             chordNotes: [],
             soundObjects: [],
             isLoading: true,
-            favoriteSoundObjects: []
+            favoriteSoundObjects: [],
+            url: ''
         }
 
       }
@@ -110,14 +111,14 @@ class Play extends React.Component
       }
 
       createOnlineSampler = (note, url) => {
-        const casio = new Tone.Sampler({
+        const sampler = new Tone.Sampler({
             urls: {
             A1: "A1.mp3",
             A2: "A2.mp3",
         },
 	        baseUrl: url,
             onload: () => {
-                casio.triggerAttackRelease(note, 0.8);
+                sampler.triggerAttackRelease(note, 0.8);
             }
         }).toDestination();
       }
@@ -229,7 +230,7 @@ class Play extends React.Component
             Tone.Master.volume.value = -6;
             this.initalizeKeyboard();
             this.getAllSounds();
-            //this.getAllFavorites();
+            this.getAllFavorites();
       }
 
 /**
@@ -302,7 +303,7 @@ class Play extends React.Component
                             /*if (Tone.context.state !== 'closed') {
                                 Tone.context.close();
                             }*/
-                        } else if (this.state.selectedSound === 'amSynth') {
+                        } else if (this.state.selectedSound === 'amsynth') {
                             const amSynth = this.createAMSynth();
                             amSynth.triggerAttackRelease(note, "4n");
                         } else if (this.state.selectedSound === 'monosynth') {
@@ -310,6 +311,8 @@ class Play extends React.Component
                             monoSynth.triggerAttackRelease(note, "4n");
                         } else if (this.state.selectedSound === 'casio') {
                             this.createSampler(note);
+                        } else if (this.state.selectedSound === 'online') {
+                            this.createOnlineSampler(note, this.state.url);
                         }
                     
                     }
@@ -487,22 +490,30 @@ class Play extends React.Component
     /*
         Selects instrument type based on user option
     */
-    handleButtonClick = (instrument) => {
-        console.log("Selected: " + instrument);
+    handleButtonClick = (instrument, location) => {
+        console.log("Selected: " + instrument + " at " + location);
 
-        if(instrument === 'synth') {
-            this.state.selectedSound = 'synth';
-        } else if (instrument === 'amsynth') {
-            this.state.selectedSound = 'amSynth';
-        } else if (instrument === 'monosynth') {
-            this.state.selectedSound = 'monosynth';
-        } else if (instrument === 'casio') {
-            this.state.selectedSound = 'casio';
-        } else if (instrument === 'qwerty')
-        {
-            this.setState( { selectedSound: 'qwerty' });
-        } else {
-            console.log("Uh oh, no instrument connected.");
+        // TODO: make sure location is not blank
+
+        if(location === "react" || !location) {
+            if(instrument === 'Synth') {
+                this.state.selectedSound = 'synth';
+            } else if (instrument === 'AM Synth') {
+                this.state.selectedSound = 'amsynth';
+            } else if (instrument === 'Mono Synth') {
+                this.state.selectedSound = 'monosynth';
+            } else if (instrument === 'Casio Piano') {
+                this.state.selectedSound = 'casio';
+            } else if (instrument === 'QWERTY') {
+                this.setState( { selectedSound: 'qwerty' });
+            } else {
+                console.log("No instrument found on front-end for selected instrument.");
+            }
+        } else if (location === "") {
+            console.log("Could not load sample because URL is blank.");
+        } else { // external sample
+            this.setState({selectedSound: 'online'});
+            this.setState({url: location});
         }
     }
 
@@ -739,51 +750,8 @@ class Play extends React.Component
                                                   },
                                             }}
                                             >
-                                        <ListItem>
-                                            <FormControlLabel
-                                            value="synth"
-                                            control={<Radio />}
-                                            label="Synth"
-                                            />
-                                            <ListItemIcon>
-                                                <IconButton
-                                                    color="white"
-                                                    onClick={() => this.handleStarClick('test')}>
-                                                        <StarIcon />
-                                                    </IconButton>
-                                                
-                                            </ListItemIcon>
-                                        </ListItem>
-                                        <ListItem>
-                                            <FormControlLabel
-                                            value="amsynth"
-                                            control={<Radio onClick={(e) => this.handleButtonClick("amsynth")}/>}
-                                            label="AM Synth"
-                                            />
-                                        </ListItem>
-                                        <ListItem>
-                                            <FormControlLabel
-                                            value="monosynth"
-                                            control={<Radio onClick={(e) => this.handleButtonClick("monosynth")}/>}
-                                            label="Mono Synth"
-                                            />
-                                        </ListItem>
-                                        <ListItem>
-                                            <FormControlLabel
-                                            value="casio"
-                                            control={<Radio onClick={(e) => this.handleButtonClick("casio")}/>}
-                                            label="Casio Piano (Sample)"
-                                            />
-                                        </ListItem>
-                                        <ListItem>
-                                            <FormControlLabel
-                                            value="qwerty"
-                                            control={<Radio onClick={(e) => this.handleButtonClick("qwerty")}/>}
-                                            label="Qwerty"
-                                            />
-                                        </ListItem>
                                         {this.state.soundObjects.map(sound => (
-                                            <SoundCard key={sound.id} id={sound.id} name={sound.name} isLoggedIn={isAuthenticated} onSelect={this.handleButtonClick1} addFavorite={this.addFavorite} removeFavorite={this.removeFavorite} />
+                                            <SoundCard key={sound.id} id={sound.id} name={sound.name} location={sound.location} isLoggedIn={isAuthenticated} onSelect={this.handleButtonClick} addFavorite={this.addFavorite} removeFavorite={this.removeFavorite} />
                                         ))}
                                         </List> 
                                             </RadioGroup>

@@ -137,7 +137,7 @@ class Database {
     {
         return new Promise((resolve, reject) => {
             try {
-                connection.query("SELECT * FROM favorites WHERE userID = ?", [username], (error, results) => {
+                connection.query("SELECT sounds.id, sounds.name, sounds.source FROM sounds JOIN favorites ON sounds.id = favorites.soundID WHERE favorites.userID = ?;", [username], (error, results) => {
                     if (error) {
                         reject(error);
                     } else {

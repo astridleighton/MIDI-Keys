@@ -82,6 +82,22 @@ class Security {
         }
     }
 
+    /**
+    * Verifies token matches with secret key
+    * @param {*} token 
+    * @returns decoded token on success, error message and null on failure
+    */
+   static async getUserNameFromToken(token) {
+       try {
+           const decoded = jwt.verify(token, secretKey);
+           console.log("test");
+           return decoded.username;
+       } catch (error) {
+           console.error('Token verification error.', error);
+           return null;
+       }
+   }
+
 }
 
 module.exports = Security;

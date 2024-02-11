@@ -41,7 +41,7 @@ class Play extends React.Component
             chordNotes: [],
             soundObjects: [],
             isLoading: true,
-            favoriteSoundObjects: []
+            url: ''
         }
 
       }
@@ -109,15 +109,20 @@ class Play extends React.Component
         }).toDestination();
       }
 
+      /**
+       * Creates an instance of the online sampler (used for online URLs)
+       * @param {*} note 
+       * @param {*} url 
+       */
       createOnlineSampler = (note, url) => {
-        const casio = new Tone.Sampler({
+        const sampler = new Tone.Sampler({
             urls: {
             A1: "A1.mp3",
             A2: "A2.mp3",
         },
 	        baseUrl: url,
             onload: () => {
-                casio.triggerAttackRelease(note, 0.8);
+                sampler.triggerAttackRelease(note, 0.8);
             }
         }).toDestination();
       }
@@ -228,8 +233,15 @@ class Play extends React.Component
             Tone.setContext(new AudioContext({ sampleRate: 48000 }));
             Tone.Master.volume.value = -6;
             this.initalizeKeyboard();
-            this.getAllSounds();
-            this.getAllFavorites();
+            this.initializeSounds();
+      }
+
+      /**
+       * Ensures sounds are loaded before receiving favorite sounds
+       */
+      async initializeSounds() {
+        await this.getAllSounds();
+        this.getAllFavorites();
       }
 
 /**
@@ -302,7 +314,7 @@ class Play extends React.Component
                             /*if (Tone.context.state !== 'closed') {
                                 Tone.context.close();
                             }*/
-                        } else if (this.state.selectedSound === 'amSynth') {
+                        } else if (this.state.selectedSound === 'amsynth') {
                             const amSynth = this.createAMSynth();
                             amSynth.triggerAttackRelease(note, "4n");
                         } else if (this.state.selectedSound === 'monosynth') {
@@ -310,6 +322,8 @@ class Play extends React.Component
                             monoSynth.triggerAttackRelease(note, "4n");
                         } else if (this.state.selectedSound === 'casio') {
                             this.createSampler(note);
+                        } else if (this.state.selectedSound === 'online') {
+                            this.createOnlineSampler(note, this.state.url);
                         }
                     
                     }
@@ -351,12 +365,12 @@ class Play extends React.Component
             
     }
 
-        /*
-            - Sets up keyboard using AudioKeys and allows QWERTY keyboard input
+    /**
+     * - Sets up keyboard using AudioKeys and allows QWERTY keyboard input
             - Maps MIDI notes to music notes
             - Triggers audio output with keydown event
             - Stores current notes / chord being played
-        */
+     */
     initalizeKeyboard () {
 
         // set up connected keyboard - will add other devices in future implentations
@@ -487,46 +501,28 @@ class Play extends React.Component
     /*
         Selects instrument type based on user option
     */
-    handleButtonClick = (instrument, e) => {
-        //e.preventDefault();
-        console.log("Selected: " + instrument);
+    handleButtonClick = (instrument, location) => {
+        console.log("Selected: " + instrument + " at " + location);
 
-        if(instrument === 'synth') {
-            this.state.selectedSound = 'synth';
-        } else if (instrument === 'amsynth') {
-            this.state.selectedSound = 'amSynth';
-        } else if (instrument === 'monosynth') {
-            this.state.selectedSound = 'monosynth';
-        } else if (instrument === 'casio') {
-            this.state.selectedSound = 'casio';
-        } else if (instrument === 'qwerty')
-        {
-            this.setState( { selectedSound: 'qwerty' });
-        } else {
-            console.log("Uh oh, no instrument connected.");
-        }
-    }
-
-    // TODO: get rid of other function
-
-    handleButtonClick1 = (value) => {
-        //e.preventDefault();
-        const instrument = value;
-        alert("Selected: " + instrument);
-
-        if(instrument === 'synth') {
-            this.state.selectedSound = 'synth';
-        } else if (instrument === 'amsynth') {
-            this.state.selectedSound = 'amSynth';
-        } else if (instrument === 'monosynth') {
-            this.state.selectedSound = 'monosynth';
-        } else if (instrument === 'casio') {
-            this.state.selectedSound = 'casio';
-        } else if (instrument === 'qwerty')
-        {
-            this.setState( { selectedSound: 'qwerty' });
-        } else {
-            console.log("Uh oh, no instrument connected.");
+        if(location === "react" || !location) {
+            if(instrument === 'Synth') {
+                this.state.selectedSound = 'synth';
+            } else if (instrument === 'AM Synth') {
+                this.state.selectedSound = 'amsynth';
+            } else if (instrument === 'Mono Synth') {
+                this.state.selectedSound = 'monosynth';
+            } else if (instrument === 'Casio Piano') {
+                this.state.selectedSound = 'casio';
+            } else if (instrument === 'QWERTY') {
+                this.setState( { selectedSound: 'qwerty' });
+            } else {
+                console.log("No instrument found on front-end for selected instrument.");
+            }
+        } else if (location === "") {
+            console.log("Could not load sample because URL is blank.");
+        } else { // external sample
+            this.setState({selectedSound: 'online'});
+            this.setState({url: location});
         }
     }
 
@@ -584,107 +580,148 @@ class Play extends React.Component
         
     }  
     
+    /**
+     * Retrieves all sounds from the database
+     */
     getAllSounds = async () => {
         try {
             const result = await axios.get('http://localhost:3000/all-sounds');
 
             if (result.status === 200) {
-                console.log("200");
-
-                const sounds = result.data.map(sound => new Sound(sound.id, sound.name, sound.location));
-                //console.log(sounds);
+                const sounds = result.data.map(sound => new Sound(sound.id, sound.name, sound.source, sound.isFavorite));
+                console.log(sounds);
 
                 this.setState({ soundObjects: sounds, isLoading: false });
             } else {
                 console.log("Error");
             }
 
-
         } catch (error) {
             console.log("Database error.");
         }
     }
 
+    /**
+     * Retrieves all favorite sounds from the database
+     * Only called when user is logged in with a valid token
+     */
     getAllFavorites = async () => {
 
         const token = Cookies.get('token');
-        const userFirstName = Cookies.get('name');
-
-        // TODO: if token is valid, get all favorites from user
-
-        const username = "aleighton1";
+        console.log(token);
 
         try {
-            const result = await axios.get(`http://localhost:3000/all-favorites/${username}`);
+            const result = await axios.get('http://localhost:3000/all-favorites', {
+                headers:{
+                    Authorization: `Bearer ${token}`
+                }
+                });
 
             if (result.status === 200) {
-                console.log("200");
+                if(result.data.length > 0) {
 
-                const favorites = result.data.map(sound => new Sound(sound.id, sound.name, sound.location));
-                //console.log(sounds);
+                    const favorites = result.data.map(sound => new Sound(sound.id, sound.name, sound.source));
 
-                this.setState({ favoriteSoundObjects: favorites, isLoading: false });
+                    for(let i = 0; i < favorites.length; i++) {
+
+                        for(let j = 0; j < this.state.soundObjects.length; j++) {
+
+                            if(favorites[i].id === this.state.soundObjects[j].id) {
+
+                                const updatedSoundObjects = [...this.state.soundObjects];
+
+                                updatedSoundObjects[j].isFavorite = true;
+                                this.setState({ soundObjects : updatedSoundObjects });
+                                break;
+
+                            }
+
+                        }
+                    }
+
+                    console.log("favorites");
+                    console.log(this.state.soundObjects);
+
+                } else {
+                    console.log("No favorites to show.");
+                }
+
+                
+            } else if (result.status === 404) {
+                console.log("No favorites to show for user");
             } else {
                 console.log("Error");
             }
 
 
         } catch (error) {
-            console.log("Database error.");
+            console.log("Caught - Database error." + error);
         }
     }
 
-    addFavorite = (soundName) => {
+    /**
+     * Adds a specified sound to the user's favorites
+     * Only called if user is logged in with a valid token
+     * @param {*} soundName 
+     */
+    addFavorite = async (soundName) => {
 
-        // TODO: only call if user is logged in
-        // TODO: do not hard-code username, get from cookies?
-
-        axios.post('http://localhost:3000/add-favorite', {
-            username: 'aleighton1',
-            sound: soundName
-          })
-          .then(function (response) {
+        try {
+            const response = await axios.post('http://localhost:3000/add-favorite', {
+                token: Cookies.get('token'),
+                sound: soundName
+            });
+    
             console.log(response);
-          })
-          .catch(function (error) {
+    
+            for (let i = 0; i < this.state.soundObjects.length; i++) {
+                if (this.state.soundObjects[i].name === soundName) {
+                    const updatedSoundObjects = [...this.state.soundObjects];
+                    updatedSoundObjects[i].isFavorite = true;
+                    this.setState({ soundObjects: updatedSoundObjects });
+                    break; // Once found, exit the loop
+                }
+            }
+    
+            console.log(this.state.soundObjects);
+        } catch (error) {
             console.log(error);
-          });
+        }
+
+        
     }
 
-    removeFavorite = (soundName) => {
-
-        // TODO: only call if user is logged in
-        // TODO: do not hard-code username, get from cookies?
-
-        const username = 'aleighton1';
-
-        axios.delete(`http://localhost:3000/remove-favorite/${username}/${soundName}`)
-          .then(function (response) {
+    /**
+     * Removes a specified sound from the user's favorites
+     * Only called if user is logged in with a valid token
+     * @param {*} soundName 
+     */
+    removeFavorite = async (soundName) => {
+        const token = Cookies.get('token');
+    
+        try {
+            const response = await axios.delete(`http://localhost:3000/remove-favorite/${soundName}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            
             console.log(response);
-          })
-          .catch(function (error) {
+            // Check if the sound is present in state and update its isFavorite property
+            const updatedSoundObjects = this.state.soundObjects.map(sound => {
+                if (sound.name === soundName) {
+                    return { ...sound, isFavorite: false };
+                }
+                return sound;
+            });
+
+        // Update state with the modified soundObjects array
+        this.setState({ soundObjects: updatedSoundObjects });
+            
+        } catch (error) {
             console.log(error);
-          });
+        }
     }
-
-    handleAddFavorite = async (sound, e) => {
-        e.preventDefault();
-        await this.addFavorite(sound);
-    }
-
-    handleRemoveFavorite = async (sound, e) => {
-        e.preventDefault();
-        await this.removeFavorite(sound);
-    }
-
-    handleStarClick = async (e) => {
-        alert("you clicked the star");
-    }
-
-    /*
-        Idea: get all sounds and then have a favorited state on the sound in the sound.js file
-            - can either remove this from soundlist or set as a different color somehow, maybe user master soundlist
-    */
 
     /*
         Renders user session and displays available sounds and notes played
@@ -704,8 +741,6 @@ class Play extends React.Component
                     {isAuthenticated ? (
                         <div>
                             <h1>Welcome, {firstName}!</h1>
-                            <button onClick={(e) => this.handleAddFavorite("synth", e)}>Add Favorite</button>
-                            <button onClick={(e) => this.handleRemoveFavorite("synth", e)}>Remove Favorite</button>
                         </div>
                     ) : (
                         <div>
@@ -717,15 +752,15 @@ class Play extends React.Component
                     <div className="row">
                         <div className="col-md-6">
                             <div className="pb-4">
-                                <h2>Samples</h2>
                                 {isLoading ? (
-                                    <p>Loading sounds from database...</p>
+                                    <p>Could not load sounds from database. Please refresh to try again.</p>
                                 ) : (
                                     <Box sx={{ width: '100%', maxWidth: 260, bgColor: 'background.paper' }}>
                                         <FormControl>
+                                            <FormLabel>Sounds</FormLabel>
                                             <RadioGroup
                                                 aria-label="sounds"
-                                                name="build-in-sounds"
+                                                name="sound-group"
                                                 defaultValue="synth"
                                                 /*onChange={(e) => this.handleButtonClick1(e.target.value)}*/
                                                 >
@@ -746,7 +781,7 @@ class Play extends React.Component
                                             }}
                                             >
                                         {this.state.soundObjects.map(sound => (
-                                            <SoundCard key={sound.id} id={sound.id} name={sound.name} />
+                                            <SoundCard key={sound.id} id={sound.id} name={sound.name} location={sound.location} isFavorite={sound.isFavorite} isLoggedIn={isAuthenticated} onSelect={this.handleButtonClick} addFavorite={this.addFavorite} removeFavorite={this.removeFavorite} />
                                         ))}
                                         </List> 
                                             </RadioGroup>
@@ -755,103 +790,6 @@ class Play extends React.Component
                                 )}
                             </div>
                         </div>
-                        <div>
-                            <Box sx={{ width: '100%', maxWidth: 260, bgColor: 'background.paper' }}>
-                            <FormControl>
-                                <FormLabel>Built In</FormLabel>
-                                <RadioGroup
-                                    aria-label="sounds"
-                                    name="build-in-sounds"
-                                    defaultValue="synth"
-                                    onChange={(e) => this.handleButtonClick1(e.target.value)}
-                                    >
-                                        <List
-                                            sx = {{
-                                                '& .MuiListItem-root': {
-                                                    borderRadius: '8px',
-                                                    backgroundColor: 'black',
-                                                    marginBottom: '8px',
-                                                    color: 'white'
-                                                  },
-                                                  '& .MuiRadio-root': {
-                                                    color: 'white', // Radio button color
-                                                  },
-                                                  '& .MuiSvgIcon-root': {
-                                                    stroke: 'white', // Star icon outline color
-                                                  },
-                                            }}
-                                            >
-                                        <SoundCard
-                                            name="synth (test)"
-                                            onSelect={this.handleButtonClick1}
-                                            onFavorite={this.handleAddFavorite}
-                                            />
-                                        <ListItem>
-                                            <FormControlLabel
-                                            value="synth"
-                                            control={<Radio />}
-                                            label="Synth"
-                                            />
-                                            <ListItemIcon>
-                                                <IconButton
-                                                    color="white"
-                                                    onClick={() => this.handleStarClick('test')}>
-                                                        <StarIcon />
-                                                    </IconButton>
-                                                
-                                            </ListItemIcon>
-                                        </ListItem>
-                                        <ListItem>
-                                            <FormControlLabel
-                                            value="amsynth"
-                                            control={<Radio />}
-                                            label="AM Synth"
-                                            />
-                                        </ListItem>
-                                        <ListItem>
-                                            <FormControlLabel
-                                            value="monosynth"
-                                            control={<Radio />}
-                                            label="Mono Synth"
-                                            />
-                                        </ListItem>
-                                        <ListItem>
-                                            <FormControlLabel
-                                            value="casio"
-                                            control={<Radio />}
-                                            label="Casio Piano (Sample)"
-                                            />
-                                        </ListItem>
-                                        <ListItem>
-                                            <FormControlLabel
-                                            value="qwerty"
-                                            control={<Radio />}
-                                            label="Qwerty"
-                                            />
-                                        </ListItem>
-                                        </List>
-                                    </RadioGroup>
-                            </FormControl>
-                            </Box>
-                        </div>
-                    </div>
-                    <div className="col-md-6">
-                        <div>
-                            {isAuthenticated ? (
-                                <div>
-                                    <h2>Favorites</h2>
-                                    <ul>
-                                        {/* Displays favorites for user - TODO: return list of sounds, or correlate ID to sample list */}
-                                        {this.state.favoriteSoundObjects.map(sound => (
-                                        <SoundCard key={sound.id} sound={sound} />
-                                        ))}
-                                    </ul>
-                                </div>
-                            ) : (
-                               <p>{/* Does nothing */}</p> 
-                            )}
-                        </div>
-                        
                     </div>
                 </div>
                 <div className="m-3">

@@ -131,32 +131,38 @@ app.post('/register', async function(req, res, next) {
 */
 app.post('/add-favorite', async function(req, res) {
 
-    const username = req.body.username;
     const sound = req.body.sound;
+    const token = req.body.token;
     
     try {
-
-        // TODO: check if token is valid?
         
-        const userID = await Database.getIDFromUser(connection, username);
-        const soundID = await Database.getIDFromSound(connection, sound);
+        const username = await Security.getUserNameFromToken(token); // get username from token
 
-        const favoriteExists = await Database.findFavoriteByUserAndSound(connection, userID, soundID);
+        if(username) { // if token is valid
+            const userID = await Database.getIDFromUser(connection, username);
+            const soundID = await Database.getIDFromSound(connection, sound);
 
-        if(favoriteExists.length === 0) {
+            const favoriteExists = await Database.findFavoriteByUserAndSound(connection, userID, soundID);
 
-            const addFavorite = await Database.addFavorite(connection, userID, soundID);
+            if(favoriteExists.length === 0) {
 
-            if (addFavorite) {
-                res.status(200).send("Added favorite successfully.");
-            } else {
-                res.status(401).json({ message: 'Add favorite failed.', status: 401 });
+                const addFavorite = await Database.addFavorite(connection, userID, soundID);
+
+                if (addFavorite) {
+                    res.status(200).send("Added favorite successfully.");
+                } else {
+                    res.status(401).json({ message: 'Add favorite failed.', status: 401 });
+                }
+            } else { // favorite already exists in database
+                
+                res.status(403).json({ message: 'Favorite already exists.', status: 403 });
+
             }
-        } else { // favorite already exists in database
-            
-            res.status(403).json({ message: 'Favorite already exists.', status: 403 });
-
+        } else {
+            res.status(401).send("Unauthorized to add favorite. Please log in.");
         }
+
+        
 
     } catch (error) {
         console.error(error);
@@ -168,30 +174,36 @@ app.post('/add-favorite', async function(req, res) {
 /*
 * Allows user to remove sound from his favorites tab (INCOMPLETE)
 */
-app.delete('/remove-favorite/:username/:sound', async (req, res) => {
+app.delete('/remove-favorite/:sound', async (req, res) => {
 
-    const username = req.params.username;
     const sound = req.params.sound;
-
-    // TODO: check if token is valid?
-    //const validateToken = await Security.validateToken(token);
+    const token = req.headers.authorization.split(' ')[1]; // Extract token from Authorization header
 
     try {
 
-        const userID = await Database.getIDFromUser(connection, username);
-    
-        const soundID = await Database.getIDFromSound(connection, sound);
+        const username = await Security.getUserNameFromToken(token); // get username from token
 
-        const removeFavorite = await Database.removeFavorite(connection, userID, soundID);
+        console.log(username);
 
-        if (removeFavorite) {
-            res.status(200).send("Removed favorite successfully.");
+        if(username) {
+
+            const userID = await Database.getIDFromUser(connection, username);
+            const soundID = await Database.getIDFromSound(connection, sound);
+            const removeFavorite = await Database.removeFavorite(connection, userID, soundID);
+
+            if (removeFavorite) {
+                res.status(200).send("Removed favorite successfully.");
+            } else {
+                res.status(401).json({ message: 'Remove favorite failed.', status: 401 });
+            }
         } else {
-            res.status(401).json({ message: 'Add favorite failed.', status: 401 });
+            res.status(401).send("Unauthorized to remove favorite. Please log in.");
         }
 
+        
     } catch (error) {
-
+        console.error(error);
+        res.status(500).json({ message: 'An error occurred while checking the username.' });
     }
 
 })
@@ -213,22 +225,27 @@ app.get('/all-sounds', async (req, res) => {
 /*
 * Get all favorites
 */
-app.get('/all-favorites/:username', async (req, res) => {
+app.get('/all-favorites', async (req, res) => {
 
-    const username = req.params.username;
+    const token = req.headers.authorization.split(' ')[1]; // Extract token from Authorization header
+    console.log("Token: " + token);
+
+    const username = await Security.getUserNameFromToken(token); // get username from token
+
+    console.log("Username: " + username);
 
     const usernameCheck = await Database.findByUsername(connection, username); // checks if username exists
 
     if (usernameCheck.length === 0) {
-        res.status(403).send("Username not found.");
+        res.status(403).send("Invalid token or username not found.");
     } else {
         try {
             const userID = await Database.getIDFromUser(connection, username);
-    
+
             const allFavorites = await Database.getAllFavoritesFromUser(connection, userID);
 
             if(allFavorites.length === 0) {
-                res.status(404).send("No favorites found for user.");
+                return res.status(404).json({ error: 'No favorites found for the user.' });
             } else {
                 res.status(200).json(allFavorites);
             }

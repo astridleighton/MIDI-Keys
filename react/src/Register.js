@@ -71,7 +71,7 @@ class Register extends React.Component
      * @returns boolean value for error message
      */
     validateFirstName() {
-        if(this.state.firstname) {
+        if(!this.state.firstname) {
             this.setState({ firstNameMessage: 'First name cannot be left blank' });
             return false;
         }

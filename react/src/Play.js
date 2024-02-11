@@ -41,7 +41,6 @@ class Play extends React.Component
             chordNotes: [],
             soundObjects: [],
             isLoading: true,
-            favoriteSoundObjects: [],
             url: ''
         }
 
@@ -709,12 +708,12 @@ class Play extends React.Component
             
             console.log(response);
             // Check if the sound is present in state and update its isFavorite property
-        const updatedSoundObjects = this.state.soundObjects.map(sound => {
-            if (sound.name === soundName) {
-                return { ...sound, isFavorite: false };
-            }
-            return sound;
-        });
+            const updatedSoundObjects = this.state.soundObjects.map(sound => {
+                if (sound.name === soundName) {
+                    return { ...sound, isFavorite: false };
+                }
+                return sound;
+            });
 
         // Update state with the modified soundObjects array
         this.setState({ soundObjects: updatedSoundObjects });

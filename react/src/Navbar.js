@@ -39,6 +39,11 @@ class Navbar extends React.Component
                         <Button
                             variant="outline"
                         >
+                            <a href="/connect" style={{ textDecoration: 'none', color: 'inherit'}}>Connect</a>
+                        </Button>
+                        <Button
+                            variant="outline"
+                        >
                             <a href="/about" style={{ textDecoration: 'none', color: 'inherit'}}>About</a>
                         </Button>
                         <span style={{ marginLeft: 'auto' }}>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Container, Typography, Grid } from '@mui/material';
 
 /**
  * Displays basic website information
@@ -13,12 +14,20 @@ class About extends React.Component
     render()
     {
         return(
-            <div className="container d-flex align-items-center">
-                <div className="text-center">
-                    <div className="m-5">
-                        <h1>About</h1>
-                    </div>
-                    <div className="text-start">
+            <Container>
+                <Grid container>
+                    <Grid item sm={12}>
+                        <Container sx={{p: '20px', textAlign: 'center'}}>
+                            <Typography variant="h3">
+                                About
+                            </Typography>
+                        </Container>
+                    </Grid>
+                    <Grid item sm={1} md={2}>
+                        {/*Left margin*/}
+                    </Grid>
+                    <Grid item sm={10} md={8}>
+                    <Container>
                         <p>
                             <strong>MIDI Keys</strong> is a simple MIDI-based online synthesizer. It is designed to be a place where musicians and producers can learn to creatively interact with MIDI devices.
                         </p>
@@ -29,20 +38,23 @@ class About extends React.Component
                             To begin, connect a MIDI device using a MIDI cable. Then, select the device from the <a href="/connect">connect</a> page.
                         </p>
                         <p>
-                            Right now, MIDI Keys is in its early stages of development, with new features being added next semester in April. Here is what will be implemented:
+                            Right now, MIDI Keys is in its final stages of development, with the final features being added by the end of April. Here is what will be implemented:
                             <ul className="m-2">
                                 <li>Display current chord played</li>
                                 <li>Additional instrument samples</li>
-                                <li>Improved user interface (UI)</li>
-                                <li>Ability to save favorite sounds to user account</li>
+                                <li>Ability to select MIDI device</li>
                             </ul>
                         </p>
                         <span>
                             <p>Developer: <a href="https://github.com/astridleighton" alt="link to developer's GitHub">Astrid Leighton</a></p>
                         </span>
-                    </div>
-                </div>
-            </div>
+                        </Container>
+                    </Grid>
+                    <Grid item sm={1} md={2}>
+                        {/*Right margin*/}
+                    </Grid>
+                </Grid>
+            </Container>
         )
     }
 }

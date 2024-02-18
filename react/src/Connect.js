@@ -1,6 +1,8 @@
 import React, {useContext} from 'react';
 import WebMidi from 'webmidi';
 import * as Tone from 'tone';
+import DeviceCard from './DeviceCard';
+import { Button, List, FormControl, FormLabel, RadioGroup, FromControlLabel, ListItemButton, ListItemText, ListItemIcon, Radio, Box, FormControlLabel, Container, Typography, Grid } from '@mui/material';
 
 /**
  * Allows the user to connect to a selected device
@@ -40,7 +42,7 @@ class Connect extends React.Component
        */
       setDevice = () => {
         this.setState({
-          midiDevices: ["Alesis V49"],
+          midiDevices: ["Alesis V49", "Test Device 2"],
         })
       }
 
@@ -55,7 +57,7 @@ class Connect extends React.Component
       /**
        * Passes selected device
        */
-      handleSelect = () => {
+      handleSelect = (event) => {
 
         if (this.state.selectedDevice)
         {
@@ -75,29 +77,71 @@ class Connect extends React.Component
     render()
     {
         return(
-          <div className="container d-flex align-items-center flex-column">
-            <div className="m-4 d-flex justify-content-center">
-              <h2>Connect MIDI Device</h2>
-            </div>
-            <div className="text-center">
-              <h5 className="m-2">Available Devices:</h5>
-              <form>
-                    {this.state.midiDevices.map((device, index) => (
-                      <div key={index} className="form-check">
-                        <input
-                          type="radio"
-                          id={device}
-                          name="midiDevice"
-                          value={device}
-                          class="form-check-input"
-                          checked={this.state.selectedDevice === device}
-                          onChange={this.handleDeviceChange}
-                        />
-                        <label className="form-check-label" htmlFor={device}>{device}</label>
-                      </div>
-                    ))}
-                  </form>
-            </div>
+          <Container>
+            <Grid container>
+              <Grid item sm={2}>
+                {/*Left margin*/}
+              </Grid>
+              <Grid item sm={8} sx={{ display: 'flex', justifyContent: 'center', mt: '50px' }}>
+                <Typography variant="h4" sx={{fontFamily: 'Lato, sans-serif', fontWeight: "bold"}}>
+                  Connect MIDI Device
+                </Typography>
+              </Grid>
+              <Grid item  sm={2}>
+                {/*Right margin*/}
+              </Grid>
+              <Grid item sm={12} sx={{ display: 'flex', justifyContent: 'center', margin: '50px' }}>
+                <FormControl
+                sx={{
+                  textAlign: 'center'
+                  }}>
+                  <FormLabel>Select MIDI device from list.</FormLabel>
+                    <RadioGroup
+                      aria-label="sounds"
+                      name="sound-group"
+                      defaultValue="synth"
+                      /*onChange={(e) => this.handleButtonClick1(e.target.value)}*/
+                      >
+                        <List
+                          sx = {{
+                            '& .MuiListItem-root': {
+                                borderRadius: '8px',
+                                backgroundColor: 'black',
+                                marginBottom: '8px',
+                                color: 'white'
+                              },
+                              '& .MuiRadio-root': {
+                                color: 'white', // Radio button color
+                              },
+                              '& .MuiSvgIcon-root': {
+                                stroke: 'white', // Star icon outline color
+                              },
+                          }}
+                        >
+                          {this.state.midiDevices.map((device, index) => 
+                          <DeviceCard key={index} name={device} />
+                          )
+                          }
+                        </List>
+                          
+                          <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                onClick={this.handleSubmit}
+                                sx={{
+                                    backgroundColor: 'grey',
+                                    color: 'white',
+                                    padding: '10px',
+                                    margin: '15px',
+                                }}
+                            >
+                              Connect
+                          </Button>
+                    </RadioGroup>
+              </FormControl>
+              </Grid>
+            </Grid>
             <div className="text-center m-2">
               {this.state.selectedDevice && (
                     <div>
@@ -105,7 +149,7 @@ class Connect extends React.Component
                     </div>
               )} 
             </div> 
-          </div>
+          </Container>
         )
     }
 }

@@ -22,11 +22,9 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: '14.x'
-        cache: 'npm'
-        cache-dependency-path: './express/package.json'
 
     - name: (Express) Install dependencies
-      run: npm ci
+      run: ls | npm ci
 
     - name: (Express) Start server
       run: node index.js

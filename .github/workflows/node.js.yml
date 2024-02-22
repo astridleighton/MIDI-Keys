@@ -17,15 +17,28 @@ jobs:
     steps:
     - name: Check out repository
       uses: actions/checkout@v3
+
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '14.x'
         cache: 'npm'
         cache-dependency-path: './react/package.json'
+
     - name: Install dependencies and build
       run: npm ci
     - name: Build app
       run: npm run build && serve -s build --if-present
+
+      # back-end
+
+    - name: (Express) Install dependencies
+      working-directory: ./express
+      run: npm ci
+
+    - name: (Express) Start server
+      working-directory: ./express
+      run: node index.js
+
 
       # TODO: can add docker image and testing here

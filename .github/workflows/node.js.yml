@@ -23,6 +23,7 @@ jobs:
       with:
         node-version: '14.x'
         cache: 'npm'
+        cache-dependency-path: './react/package.json'
     - name: Install dependencies and build
       run: |
         cd react

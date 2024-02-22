@@ -23,7 +23,7 @@ jobs:
       with:
         node-version: '14.x'
         cache: 'npm'
-        #cache-dependency-path: './react/package.json'
+        cache-dependency-path: './express/package.json'
 
     - name: (Express) Install dependencies
       run: npm ci

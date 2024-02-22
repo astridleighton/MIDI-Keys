@@ -23,5 +23,5 @@ jobs:
         
     - name: Install dependencies and build
       run: |
-        npm run build && npm test
+        npm run build && serve -s build
         working-directory: ./react

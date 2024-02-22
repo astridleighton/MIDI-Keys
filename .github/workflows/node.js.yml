@@ -25,6 +25,14 @@ jobs:
         cache: 'npm'
         cache-dependency-path: './react/package.json'
 
+        - name: (Express) Install dependencies
+      working-directory: ./express
+      run: npm ci
+
+    - name: (Express) Start server
+      working-directory: ./express
+      run: node index.js
+
     - name: Install dependencies and build
       run: npm ci
     - name: Build app
@@ -32,13 +40,7 @@ jobs:
 
       # back-end
 
-    - name: (Express) Install dependencies
-      working-directory: ./express
-      run: npm ci
-
-    - name: (Express) Start server
-      working-directory: ./express
-      run: node index.js
+    
 
 
       # TODO: can add docker image and testing here

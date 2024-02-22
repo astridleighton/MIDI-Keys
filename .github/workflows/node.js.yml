@@ -24,7 +24,7 @@ jobs:
         cache: 'npm'
         cache-dependency-path: './react/package.json'
     - name: Install dependencies and build
-      run: npm install
+      run: npm ci
     - name: Build app
       run: npm run build && serve -s build --if-present
 

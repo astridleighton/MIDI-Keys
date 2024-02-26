@@ -8,7 +8,7 @@ const Database = require('./app/database/database');
 app.use(cors());
 app.use(express.json());
 
-const mysql = require('mysql');
+const mysql = require('mysql2');
 
 // sets up database configuration
 const dbConfig = {

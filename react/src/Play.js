@@ -41,7 +41,7 @@ class Play extends React.Component
             chordNotes: [],
             soundObjects: [],
             isLoading: true,
-            url: ''
+            url: '',
         }
 
       }
@@ -51,8 +51,13 @@ class Play extends React.Component
        * @returns instance
        */
       createSynth = () => {
-        const synth = new Tone.Synth().toDestination();
-        return synth;
+        try {
+            const synth = new Tone.Synth().toDestination();
+            return synth;
+        } catch (error) {
+            console.error('Could not create synth. An error occurred:', error);
+        }
+        
       }
 
       /**
@@ -60,8 +65,13 @@ class Play extends React.Component
        * @returns instance
        */
       createAMSynth = () => {
-        const amSynth = new Tone.AMSynth().toDestination();
-        return amSynth;
+        try {
+            const amSynth = new Tone.AMSynth().toDestination();
+            return amSynth;
+        } catch (error) {
+            console.error('Could not create AM Synth. An error occurred: ', error);
+        }
+        
       }
 
       /**
@@ -69,16 +79,21 @@ class Play extends React.Component
        * @returns instance
        */
       createMonoSynth = () => {
-        const monoSynth = new Tone.MonoSynth({
-            oscillator: {
-                type: "square"
-            },
-            envelope: {
-                attack: 0.1
-            }
-        }).toDestination();
-        monoSynth.volume.value = -5;
-        return monoSynth;
+        try {
+            const monoSynth = new Tone.MonoSynth({
+                oscillator: {
+                    type: "square"
+                },
+                envelope: {
+                    attack: 0.1
+                }
+            }).toDestination();
+            monoSynth.volume.value = -5;
+            return monoSynth;
+        } catch (error) {
+            console.error("Could not create Mono Synth. An error occurred: ", error);
+        }
+        
       }
 
       /**
@@ -86,27 +101,37 @@ class Play extends React.Component
        * @returns instance
        */
       createQwerty = () => {
-        const keyboard = new AudioKeys({
-            polyphony: 10, // Adjust the polyphony as needed
-        });
-        return keyboard;
+        try {
+            const keyboard = new AudioKeys({
+                polyphony: 10, // Adjust the polyphony as needed
+            });
+            return keyboard;
+        } catch (error) {
+            console.error('Could not set up QWERTY keyboard. An error occurred: ', error);
+        }
+        
       }
 
       /**
-       * Creates an instance of the sampler
+       * Creates an instance of the sampler - hard-coded URL
        * @param {*} note 
        */
       createSampler = (note) => {
-        const casio = new Tone.Sampler({
-            urls: {
-            A1: "A1.mp3",
-            A2: "A2.mp3",
-        },
-	        baseUrl: "https://tonejs.github.io/audio/casio/",
-            onload: () => {
-                casio.triggerAttackRelease(note, 0.8);
-            }
-        }).toDestination();
+        try {
+            const casio = new Tone.Sampler({
+                urls: {
+                A1: "A1.mp3",
+                A2: "A2.mp3",
+            },
+                baseUrl: "https://tonejs.github.io/audio/casio/",
+                onload: () => {
+                    casio.triggerAttackRelease(note, 0.8);
+                }
+            }).toDestination();
+        } catch (error) {
+            console.error('Could not create online sampler. An error occurred: ', error);
+        }
+        
       }
 
       /**
@@ -115,40 +140,52 @@ class Play extends React.Component
        * @param {*} url 
        */
       createOnlineSampler = (note, url) => {
-        const sampler = new Tone.Sampler({
-            urls: {
-            A1: "A1.mp3",
-            A2: "A2.mp3",
-        },
-	        baseUrl: url,
-            onload: () => {
-                sampler.triggerAttackRelease(note, 0.8);
-            }
-        }).toDestination();
+        try {
+            const sampler = new Tone.Sampler({
+                urls: {
+                A1: "A1.mp3",
+                A2: "A2.mp3",
+            },
+                baseUrl: url,
+                onload: () => {
+                    sampler.triggerAttackRelease(note, 0.8);
+                }
+            }).toDestination();
+        } catch (error) {
+            console.error("Could not create sampler. An error occurred: ", error);
+        }
+        
       }
 
       /**
        * Creates an instance of the kick
        */
       createKickPlayer = () => {
-
-        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/kick.mp3", function(){
+        try {
+            var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/kick.mp3", function(){
             const kickPlayer = new Tone.Player(buffer.get()).toDestination();
             kickPlayer.start(0.5);
 
         });
+        } catch (error) {
+            console.error("Error loading kick sample: ", error);
+        }
+        
       }
 
       /**
        * Creates an instance of the snare
        */
       createSnarePlayer = () => {
-
-        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/snare.mp3", function(){
+        try {
+            var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/snare.mp3", function(){
             const snarePlayer = new Tone.Player(buffer.get()).toDestination();
             snarePlayer.start(0.5);
 
         });
+        } catch (error) {
+            console.error("Error loading snare sample: ", error);
+        }
       }
 
       /**
@@ -156,11 +193,17 @@ class Play extends React.Component
        */
       createTom1Player = () => {
 
-        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/tom1.mp3", function(){
+        try {
+            var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/tom1.mp3", function(){
             const tom1Player = new Tone.Player(buffer.get()).toDestination();
             tom1Player.start(0.5);
 
-        });
+            });
+        } catch (error) {
+            console.error("Error loading tom1 sample: ", error);
+        }
+
+        
       }
 
       /**
@@ -168,11 +211,16 @@ class Play extends React.Component
        */
       createTom2Player = () => {
 
-        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/tom2.mp3", function(){
+        try {
+            var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/tom2.mp3", function(){
             const tom2Player = new Tone.Player(buffer.get()).toDestination();
             tom2Player.start(0.5);
 
-        });
+            });
+        } catch (error) {
+            console.error("Error loading tom 2 sample: ", error);
+        }
+
       }
 
       /**
@@ -180,11 +228,17 @@ class Play extends React.Component
        */
       createTom3Player = () => {
 
-        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/tom3.mp3", function(){
+        try {
+            var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/tom3.mp3", function(){
             const tom3Player = new Tone.Player(buffer.get()).toDestination();
             tom3Player.start(0.5);
 
-        });
+            });
+        } catch (error) {
+            console.error("Error loading tom 3. Error:", error);
+        }
+
+        
       }
 
       /**
@@ -192,11 +246,17 @@ class Play extends React.Component
        */
       createHiHatPlayer = () => {
 
-        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/hihat.mp3", function(){
+        try {
+            var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/hihat.mp3", function(){
             const hiHatPlayer = new Tone.Player(buffer.get()).toDestination();
             hiHatPlayer.start(0.5);
 
-        });
+            });
+        } catch (error) {
+            console.error("Error loading hi-hat sample. Error: ", error);
+        }
+
+        
       }
 
       /**
@@ -204,11 +264,16 @@ class Play extends React.Component
        */
       createBongo1Player = () => {
 
-        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/Bongos/snare.mp3", function(){
+        try {
+            var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/Bongos/snare.mp3", function(){
             const hiHatPlayer = new Tone.Player(buffer.get()).toDestination();
             hiHatPlayer.start(0.5);
 
-        });
+            });
+        } catch (error) {
+            console.error("Error loading bongo 1. Error: ", error);
+        }
+
       }
 
       /**
@@ -216,10 +281,15 @@ class Play extends React.Component
        */
       createBongo2Player = () => {
 
-        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/Bongos/tom1.mp3", function(){
+        try {
+            var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/Bongos/tom1.mp3", function(){
             const bongo2Player = new Tone.Player(buffer.get()).toDestination();
             bongo2Player.start(0.5);
-        });
+            });
+        } catch (error) {
+            console.error("Error loading bongo 2 sample. Error: ", error);
+        }
+        
       }
 
       /**
@@ -267,9 +337,14 @@ class Play extends React.Component
             {
 
                 console.log(`Found MIDI input: ${input.name}, ID: ${input.id}`);
-                if(input.name === "V49")
+
+                // TODO: display message if no device connected
+                // TODO: use keyboard always?
+
+                if(input.name === "V49") // automatically sets keyboard as connected device
                 {
                     keyboard = input;
+                    this.setState({ selectedDevice: 'V49' });
                 }
                 //input.onMIDIMessage = this.onMIDIMessage.bind(this);
             }
@@ -284,6 +359,10 @@ class Play extends React.Component
             this.useKeyboard(keyboard);
         }
         
+    }
+
+    onMIDIFailure(message) {
+        console.error("Failed to gain MIDI access. Error: " + message);
     }
 
     /**
@@ -473,6 +552,9 @@ class Play extends React.Component
         Adds note to chordNotes state to be displayed
     */
     addNote = (newNote) => {
+
+        console.log("Test" + newNote);
+        console.log(this.state.chordNotes);
 
         this.setState((prevState) => {
             if(!prevState.chordNotes.includes(newNote)) {
@@ -731,7 +813,7 @@ class Play extends React.Component
         // get user session cookie if applicable
         const isAuthenticated = !!Cookies.get('token');
         const firstName = Cookies.get('name');
-        const { soundObjects, isLoading } = this.state;
+        const { soundObjects, isLoading, selectedDevice } = this.state;
 
         {/* TODO: combine lists so it is one comprehensive list? or categorize better */}
         return(

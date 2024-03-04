@@ -8,58 +8,37 @@ import { Button, Box, TextField, Typography, Container, CssBaseline, Avatar, Gri
 /**
  * Allows user to register for an account
  */
-class Register extends React.Component
+const Register = () =>
 {
-
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            id: 3,
-            username: '',
-            password: '',
-            firstname: '',
-            submitted: false,
-            firstNameMessage: '',
-            usernameMessage: '',
-            passwordMessage: ''
-        };
-    }
-
-    /**
-     * Stops sound when on this page
-     * TODO: ensure this is the proper way to do this
-     */
-    componentDidMount () {
-        Tone.Transport.pause();
-    }
-
-    /**
-     * Changes the state of the username and/or password
-     * @param {*} event 
-     */
-    handleInputChange = (event) => {
-        const { name, value } = event.target;
-        this.setState({ [name]: value });
-    }
+    const [firstName, setFirstName] = useState("");
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [submitted, setSubmitted] = useState("");
+    const [firstNameMessage, setFirstNameMessage] = useState("");
+    const [usernameMessage, setUsernameMessage] = useState("");
+    const [passwordMessage, setPasswordMessage] = useState("");
+    const navigate = useNavigate();
 
     /**
      * Passes registration credentials to registration function
      * @param {*} event 
      */
-    handleSubmit = async (event) => {
+    const handleSubmit = async (event) => {
 
-        event.preventDefault();
+        if (event) {
+            event.preventDefault();
+        }
 
         // check for blanks
-        const firstNameValid = this.validateFirstName();
-        const usernameValid = this.validateUsername(this.state.username);
-        const passwordValid = this.validatePassword(this.state.password);
-
+        // TODO: move to auth class?
+        const firstNameValid = validateFirstName();
+        const usernameValid = validateUsername(username);
+        const passwordValid = validatePassword(password);
 
         if(firstNameValid && usernameValid && passwordValid) {
-            await this.processRegister(this.state);
-            console.log("registered.");
+            // TODO: move to auth class?
+            //await processRegister({firstName, username, password});
+            navigate('/login')
             // TODO: redirect to Play page
         }
 
@@ -70,9 +49,9 @@ class Register extends React.Component
      * Ensures first name is not blank
      * @returns boolean value for error message
      */
-    validateFirstName() {
-        if(!this.state.firstname) {
-            this.setState({ firstNameMessage: 'First name cannot be left blank' });
+    function validateFirstName () {
+        if(!firstName) {
+            setFirstNameMessage('First name cannot be left blank');
             return false;
         }
 
@@ -84,9 +63,9 @@ class Register extends React.Component
      * @param {*} username 
      * @returns boolean value for error message
      */
-    validateUsername(username) {
+    function validateUsername(username) {
         if(username.length === 0) {
-            this.setState({ passwordMessage: 'Username cannot be left blank' });
+            setUsernameMessage('Username cannot be left blank');
             return false; // username is not valid
         }
 
@@ -98,18 +77,18 @@ class Register extends React.Component
      * @param {*} password 
      * @returns boolean value for error message
      */
-    validatePassword(password) {
+    function validatePassword(password) {
         if (password.length === 0) {
-            this.setState({ passwordMessage: 'Password cannot be left blank' });
+            setPasswordMessage('Password cannot be left blank' );
             return false;
         } else if (password.length < 8) {
-            this.setState({ passwordMessage: 'Password must be at least 8 characters long' });
+            setPasswordMessage('Password must be at least 8 characters long' );
             return false;
         } else if (!/\d/.test(password)) {
-            this.setState({ passwordMessage: 'Password must contain at least one number' });
+            setPasswordMessage('Password must contain at least one number' );
             return false;
         } else {
-            this.setState({ passwordMessage: '' }); // Reset message if password is valid
+            setPasswordMessage(''); // Reset message if password is valid
             return true;
         }
     }
@@ -119,7 +98,7 @@ class Register extends React.Component
      * TODO: redirect to login page
      * @param {*} registerCredentials 
      */
-    processRegister = async (registerCredentials) => {
+    const processRegister = async (registerCredentials) => {
 
         console.log("Details: " + JSON.stringify(registerCredentials));
         try {
@@ -144,118 +123,115 @@ class Register extends React.Component
      * Displays registration form
      * @returns view
      */
-    render()
-    {
-        return(
-            <div>
-                <Container maxWidth="xs">
-                    <Container
-                        sx={{
-                            mt: '50px',
-                            mb: '-30px'
-                        }}>
-                    <Typography
-                    component="h1"
-                    variant="h5"
-                    sx={{
-                        textAlign: 'center',
-                    }}
-                >
-                    Create An Account
-                </Typography>
-                    </Container>
-                <Box
-                    component="form"
-                    onSubmit={this.handleSubmit}
-                    noValidate
-                    sx={{
-                        marginTop: 8,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        }}
-                >
-                <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    id="firstname"
-                    label="First Name"
-                    name="firstname"
-                    error={this.state.firstNameMessage} // check if empty
-                    helperText={this.state.firstNameMessage}
-                    value={this.state.firstname}
-                    onChange={this.handleInputChange}
-                    autoComplete="firstname"
-                    autoFocus
-                />
-                <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    id="username"
-                    label="Username"
-                    name="username"
-                    error={this.state.usernameMessage} // check if empty
-                    helperText={
-                        this.state.usernameMessage // Show password message if provided
-                    }
-                    value={this.state.username}
-                    onChange={this.handleInputChange}
-                    autoComplete="username"
-                    autoFocus
-                />
-                <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    name="password"
-                    label="Password"
-                    type="password"
-                    id="password"
-                    error={this.state.passwordMessage} // check if empty
-                    helperText={
-                        this.state.passwordMessage // Show password message if provided
-                    }
-                    value={this.state.password}
-                    onChange={this.handleInputChange}
-                    autoComplete="current-password"
-                />
+    return(
+        <div>
+            <Container maxWidth="xs">
                 <Container
                     sx={{
-                        margin: '20px'
+                        mt: '50px',
+                        mb: '-30px'
                     }}>
-                <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    onClick={this.handleSubmit}
-                    sx={{
-                        backgroundColor: 'black',
-                        color: 'white',
-                        padding: '10px'
+                <Typography
+                component="h1"
+                variant="h5"
+                sx={{
+                    textAlign: 'center',
+                }}
+            >
+                Create An Account
+            </Typography>
+                </Container>
+            <Box
+                component="form"
+                onSubmit={this.handleSubmit}
+                noValidate
+                sx={{
+                    marginTop: 8,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
                     }}
+            >
+            <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="firstname"
+                label="First Name"
+                name="firstname"
+                error={firstNameMessage} // check if empty
+                helperText={firstNameMessage}
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                autoComplete="firstname"
+                autoFocus
+            />
+            <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="username"
+                label="Username"
+                name="username"
+                error={usernameMessage} // check if empty
+                helperText={
+                    usernameMessage
+                }
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                autoComplete="username"
+                autoFocus
+            />
+            <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="password"
+                label="Password"
+                type="password"
+                id="password"
+                error={passwordMessage} // check if empty
+                helperText={
+                    passwordMessage // Show password message if provided
+                }
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+            />
+            <Container
+                sx={{
+                    margin: '20px'
+                }}>
+            <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                onClick={handleSubmit}
+                sx={{
+                    backgroundColor: 'black',
+                    color: 'white',
+                    padding: '10px'
+                }}
 
-                >
-                    Register
-                </Button>
-                </Container>
-                    <Typography>
-                        Already have an account?
-                        <a
-                            href="/login"
-                            style={{
-                                textDecoration: 'none',
-                                color: 'inherit',
-                                fontWeight: 'bold',
-                                padding: '5px'
-                                }}>Log In</a>
-                    </Typography>
-                </Box>
-                </Container>
-            </div>
-        )
-    }
+            >
+                Register
+            </Button>
+            </Container>
+                <Typography>
+                    Already have an account?
+                    <a
+                        href="/login"
+                        style={{
+                            textDecoration: 'none',
+                            color: 'inherit',
+                            fontWeight: 'bold',
+                            padding: '5px'
+                            }}>Log In</a>
+                </Typography>
+            </Box>
+            </Container>
+        </div>
+    )
 }
 
 export default Register;

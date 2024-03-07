@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from 'react';
+import { React, useState, useEffect, useContext, createContext } from 'react';
 import { Route, Link, Routes, BrowserRouter as Router} from 'react-router-dom';
 import './App.css';
 import Connect from './pages/Connect';
@@ -14,67 +14,34 @@ import Footer from './layouts/Footer';
  * Start-up: To begin application, navigate to the react folder and type "npm start"; make sure back-end is running as well by navigated to express and typing "index.js"
  * Parent component used to handle state
  */
+
 const App = () => {
   const [fullName, setFullName] = useState("");
   const [connectedDevice, setConnectedDevice] = useState(null);
-  const [midiSupported, setMIDISupported] = useState(false);
+  const [midiAccess, setMIDIAccess] = useState(null);
   const [midi, setMIDI] = useState(null);
   const [inputDevices, setInputDevices] = useState([]);
-  
-  useEffect(() => {
-    // TODO: fix midi access
-    const midiAccess = async () => {
-      try {
-        navigator.requestMIDIAccess();
-        console.log("test!");
-      } catch (error) {
-        console.log("error!");
-      }
-    }
-    /*navigator.requestMIDIAccess()
-      .then(onMIDISuccess)
-      .catch(onMIDIFailure);*/
-  });
-
-  const onMIDISuccess = (midiAccess) => {
-    setMIDISupported(true);
-    console.log("WebMIDI is supported in browser.", midiAccess);
-    midiAccess.addEventListener('statechange', updateDevices);
-    setMIDI(midiAccess);
-
-    const midiIns = midiAccess.inputs;
-    const inputs = midiIns.values();
-    let keyboard = null;
-    let midiInputArray = [];
-
-    if (inputs != null) {
-      for (let input of inputs) {
-        console.log("Pushing " + input);
-        midiInputArray.push(input);
-        console.log(`Found MIDI input: ${input.name}, ID: ${input.id}`);
-          if (input.name === "V49") {
-              keyboard = input;
-          }
-      }
-    } else {
-      console.log("No MIDI inputs detected.");
-    }
-
-    /*if(keyboard != null) {
-      useKeyboard(keyboard);
-    }*/
-  }
-
-  const onMIDIFailure = (error) => {
-    console.log("MIDI access not supported in browser: ", error);
-  }
 
   const updateDevices = (e) => {
     console.log(`Name: ${e.port.name}, Brand: ${e.port.manufacturer}, State: ${e.port.state}, Type: ${e.port.type}`);
   }
 
-  const updateConnectedDevice = (value) => {
-    setConnectedDevice(value);
+  useEffect(() => {
+    navigator.requestMIDIAccess()
+      .then(
+        midiAccess => {
+          setMIDIAccess(midiAccess);
+        },
+        error => {
+          console.error('MIDI access request failed:', error);
+          setMIDIAccess(error);
+        }
+      );
+  }, [])
+
+  const updateConnectedDevice = (device) => {
+    // establish connection to device
+    setConnectedDevice(device);
   }
 
   /*const removeConnectedDevice = () => {
@@ -90,7 +57,7 @@ const App = () => {
             <Router>
                 <Navbar />
                 <Routes>
-                    <Route exact path="/" element={<Play selectedDevice={connectedDevice} fullName={fullName} />} />
+                    <Route exact path="/" element={<Play midiAccess={midiAccess} selectedDevice={connectedDevice} fullName={fullName} />} />
                     <Route exact path="/connect" element={<Connect connectedDevice={connectedDevice} updateConnectedDevice={updateConnectedDevice} midiInputs={inputDevices} />} />
                     <Route exact path="/about" element={<About />} />
                     <Route exact path="/login" element={<Login />} />
@@ -103,5 +70,6 @@ const App = () => {
         </div>
   )
 }
+
 
 export default App;

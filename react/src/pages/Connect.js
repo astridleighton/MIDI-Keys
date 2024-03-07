@@ -10,9 +10,7 @@ import { Button, List, FormControl, FormLabel, RadioGroup, FromControlLabel, Lis
  */
 const Connect = ({connectedDevice, midiInputs, updateConnectedDevice}) =>
 {
-  useEffect(() => {
-    console.log("Connected device changed to: ", connectedDevice)
-  }, [connectedDevice]);
+  
 
   const handleDeviceSelection = (device) => {
     updateConnectedDevice(device);

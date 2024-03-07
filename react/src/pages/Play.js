@@ -225,7 +225,7 @@ class Play extends React.Component
        * Starts tone.JS and sets up sounds
        */
       componentDidMount () {
-            this.onMIDISuccess(this.props.midiAccess);
+            //this.onMIDISuccess(this.props.midiAccess);
             console.log(this.props.midiAccess);
             Tone.start();
             Tone.setContext(new AudioContext({ sampleRate: 48000 }));
@@ -234,43 +234,7 @@ class Play extends React.Component
             this.initializeSounds();
       }
 
-      onMIDISuccess(midiAccess)
-    {
-        //Tone.start();
-        console.log("WebMIDI is supported in browser.");
-        console.log(midiAccess);
-        midiAccess.addEventListener('statechange', this.updateDevices);
-        this.midi = midiAccess;
-
-        const midiIns = midiAccess.inputs;
-        const inputs = midiIns.values();
-        let keyboard = null;
-
-        // list midi inputs to console
-        if (inputs != null)
-        {
-            for(let input of inputs)
-            {
-
-                console.log(`Found MIDI input: ${input.name}, ID: ${input.id}`);
-                if(input.name === "V49")
-                {
-                    keyboard = input;
-                }
-                //input.onMIDIMessage = this.onMIDIMessage.bind(this);
-            }
-        }
-        else
-        {
-            console.log("No MIDI inputs detected.");
-        }
-
-        if(keyboard != null)
-        {
-            this.useKeyboard(keyboard);
-        }
-        
-    }
+    
 
 
       /**

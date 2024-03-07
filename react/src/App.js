@@ -22,35 +22,31 @@ const App = () => {
   const [midi, setMIDI] = useState(null);
   const [inputDevices, setInputDevices] = useState([]);
 
-  const updateDevices = (e) => {
-    console.log(`Name: ${e.port.name}, Brand: ${e.port.manufacturer}, State: ${e.port.state}, Type: ${e.port.type}`);
-  }
-
   useEffect(() => {
-    navigator.requestMIDIAccess()
-      .then(
-        midiAccess => {
-          setMIDIAccess(midiAccess);
-        },
-        error => {
-          console.error('MIDI access request failed:', error);
-          setMIDIAccess(error);
-        }
-      );
+      navigator.requestMIDIAccess()
+      .then((midiAccess)=> {
+        setMIDIAccess(midiAccess);
+        listMIDIInputs(midiAccess);
+      }).catch((error) => {
+        console.error('MIDI Access failed: ', error);
+      })
   }, [])
 
-  const updateConnectedDevice = (device) => {
-    // establish connection to device
+  const listMIDIInputs = (midiAccess) => {
+    const inputs = midiAccess.inputs.values();
+    console.log('MIDI inputs: ');
+    for (let input of inputs) {
+      console.log(input.name);
+    }
+  }
+
+  const updateConnectedDevice = (device) => { // establish connection to device
     setConnectedDevice(device);
   }
 
   /*const removeConnectedDevice = () => {
     setSelectedDevice(null);
   }*/
-
-  const useKeyboard = (keyboard) => {
-    // TODO: add
-  }
 
   return (
     <div className="app-container d-flex flex-column" style={{ backgroundColor: '#f8f8f8' }}>

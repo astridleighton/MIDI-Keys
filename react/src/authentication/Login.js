@@ -1,20 +1,42 @@
-import React, {useState} from 'react';
-import { withRouter, Link, useNavigate, Redirect, useOutletContext, createContext } from 'react-router-dom';
+import React, {useState, useEffect} from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import * as Tone from 'tone';
-import { Button, Box, TextField, Typography, Container, CssBaseline, Avatar, Grid, Input } from '@mui/material';
+import { Button, Box, TextField, Typography, Container, Alert } from '@mui/material';
 
 /**
  * Allows user to log in to account
- * TODO: move login data to additional class
+ * Future implementation: move authentication logic to new file
  */
 const Login = () =>
 {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [firstName, setFirstName] = useState('');
     const [submitted, setSubmitted] = useState(false);
+    const [isFormValid, setIsFormValid] = useState(false);
+    const [error, setError] = useState('');
     const navigate = useNavigate();
+    
+    /**
+     * Updates username
+     * @param {*} event 
+     */
+    const handleUsernameChange = (event) => {
+        event.preventDefault();
+        const newUsername = event.target.value;
+        setUsername(newUsername);
+    }
+
+    /**
+     * Updates password and allows login if values are not blank
+     */
+    const handlePasswordChange = (event) => {
+        event.preventDefault();
+        const newPassword = event.target.value;
+        setPassword(newPassword);
+        setIsFormValid(username != '' && newPassword != null);
+    }
 
     /**
      * Passes login credentials to login function
@@ -27,12 +49,16 @@ const Login = () =>
         }
         setSubmitted(true);
 
-        if(username && password) {
-            // TODO: move to other component?
-            //await processLogin({username, password});
-            navigate('/');
+        try {
+            await processLogin({username, password});
+        } catch (error) {
+            console.log("Login failed:", error);
+        } finally {
+            setUsername('');
+            setPassword('');
+            setIsFormValid(false);
         }
-      };
+    };
 
     /**
      * Sends login credentials to the back-end
@@ -41,42 +67,34 @@ const Login = () =>
      */
     const processLogin = async (loginCredentials) => {
 
-        console.log("Details: " + JSON.stringify(loginCredentials));
-        try {
-            const result = await axios.post(`http://localhost:3000/login`, loginCredentials);
-
+        await axios.post(`http://localhost:3000/login`, loginCredentials)
+        .then((result) => {
             if (result.status === 200) {
-                
                 const token = result.data.token;
                 const name = result.data.firstName;
-
                 if (token && name) {
                     Cookies.set('token', token, { expires: 1 });
                     Cookies.set('name', name, {expires: 1 });
-                    this.state.firstname = name;
-                    this.setState( { loginSuccess: true });
-                    alert("Login successful. Please navigate to the Play page to start creating music.");
+                    setFirstName(name);
+                    navigate('/')
                 } else {
-                    alert("Did not receive token and/or name from database. Please try again.");
+                    setError("An error occurred. Please try again.")
                 }
             } else {
-                alert("An error occurred during login. Please try again!");
+                setError("An error occurred during login. Please try again!");
             }
-        }
-        catch (error) {
+        }).catch((error) => {
             if (error.response && error.response.status === 401) {
-                alert("Invalid login credentials. Please try again.");
-
-                // reset login credentials
-                this.setState( { username: '' });
-                this.setState( { password: '' });
-                this.setState( { submitted: false });
+                setError("Invalid login credentials. Please try again.")
+                setUsername(null);
+                setPassword(null);
+                setSubmitted(false);
             } else if (error.response && error.response.status === 500) {
-                alert("A server error occurred during login. Please try again!");
+                setError("A network error occurred. Please try again.");
             } else {
-                alert("An error occurred. No response from back-end.");
+                setError("An unknown error occurred. Please try again.")
             }
-        }
+        })
     }
 
     return (
@@ -105,33 +123,30 @@ const Login = () =>
                         alignItems: 'center',
                         }}
                 >
+                    {error && <Alert severity="error">{error}</Alert> }
                     <TextField
                         margin="normal"
                         required
                         fullWidth
-                        id="username"
                         label="Username"
-                        name="username"
+                        value={username}
                         error={submitted && !username} // check if empty
                         helperText={submitted && !username ? 'Username is required ' : ''}
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        autoComplete="username"
+                        onChange={handleUsernameChange}
                         autoFocus
+                        autoComplete='off'
                     />
                     <TextField
                         margin="normal"
                         required
                         fullWidth
-                        name="password"
                         label="Password"
                         type="password"
-                        id="password"
+                        value={password}
                         error={submitted && !password} // check if empty
                         helperText={submitted && !password ? 'Password is required ' : ''}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        autoComplete="current-password"
+                        onChange={handlePasswordChange}
+                        autoComplete='off'
                     />
                     <Container
                         sx={{
@@ -142,6 +157,7 @@ const Login = () =>
                             fullWidth
                             variant="contained"
                             onClick={handleSubmit}
+                            disabled = {!isFormValid}
                             sx={{
                                 backgroundColor: 'black',
                                 color: 'white',

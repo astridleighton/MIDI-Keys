@@ -1,12 +1,15 @@
-import React from 'react';
+import React, {useState} from 'react';
 import axios from 'axios';
 import * as Tone from 'tone';
 import { withRouter, Link, useNavigate, Redirect } from 'react-router-dom';
-import { Button, Box, TextField, Typography, Container, CssBaseline, Avatar, Grid } from '@mui/material';
+import { Button, Box, TextField, Typography, Container, CssBaseline, Avatar, Grid, Alert } from '@mui/material';
 
 
 /**
- * Allows user to register for an account
+ * Allows user to create an account
+ * Future improvements: moving authentication logic to auth class
+ * @returns 
+ * 
  */
 const Register = () =>
 {
@@ -17,8 +20,40 @@ const Register = () =>
     const [firstNameMessage, setFirstNameMessage] = useState("");
     const [usernameMessage, setUsernameMessage] = useState("");
     const [passwordMessage, setPasswordMessage] = useState("");
+    const [isFormValid, setIsFormValid] = useState(false);
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
+    /**
+     * Updates first name
+     * @param {*} event 
+     */
+    const handleFirstNameChange = (event) => {
+        event.preventDefault();
+        const newFirstName = event.target.value;
+        setFirstName(newFirstName);
+    }
+
+    /**
+     * Updates username
+     * @param {*} event 
+     */
+    const handleUsernameChange = (event) => {
+        event.preventDefault();
+        const newUsername = event.target.value;
+        setUsername(newUsername);
+    }
+
+    /**
+     * Updates password and allows register if values are not blank
+     * @param {*} event 
+     */
+    const handlePasswordChange = (event) => {
+        event.preventDefault();
+        const newPassword = event.target.value;
+        setPassword(newPassword);
+        setIsFormValid(firstName != null && username != null && newPassword != null);
+    }
     /**
      * Passes registration credentials to registration function
      * @param {*} event 
@@ -29,21 +64,24 @@ const Register = () =>
             event.preventDefault();
         }
 
-        // check for blanks
-        // TODO: move to auth class?
         const firstNameValid = validateFirstName();
         const usernameValid = validateUsername(username);
         const passwordValid = validatePassword(password);
 
         if(firstNameValid && usernameValid && passwordValid) {
-            // TODO: move to auth class?
-            //await processRegister({firstName, username, password});
-            navigate('/login')
-            // TODO: redirect to Play page
+            try {
+                await processRegister({firstName, username, password});
+            } catch (error) {
+                console.log("Registration failed: ", error);
+            } finally {
+                setFirstName('');
+                setUsername('');
+                setPassword('');
+            }
         }
+            
 
     }
-
 
     /**
      * Ensures first name is not blank
@@ -54,7 +92,6 @@ const Register = () =>
             setFirstNameMessage('First name cannot be left blank');
             return false;
         }
-
         return true;
     }
 
@@ -68,7 +105,6 @@ const Register = () =>
             setUsernameMessage('Username cannot be left blank');
             return false; // username is not valid
         }
-
         return true; // username is valid
     }
 
@@ -95,28 +131,24 @@ const Register = () =>
 
     /**
      * Sends registration credentials to back-end
-     * TODO: redirect to login page
      * @param {*} registerCredentials 
      */
     const processRegister = async (registerCredentials) => {
 
-        console.log("Details: " + JSON.stringify(registerCredentials));
-        try {
-            const result = await axios.post(`http://localhost:3000/register`, registerCredentials);
+        await axios.post(`http://localhost:3000/register`, registerCredentials)
+        .then((result) => {
             console.log(result);
-            alert("Account created. Please navigate to the login page.");
-        }
-            catch (error)
-        {
+            alert("Account created successfully. Please log in to access your account.");
+            navigate('/login')
+        }).catch((error) => {
             if(error.response.status === 403) {
-                alert("Username already exists. Please choose another one.");
+                setError("Username already exists. Please choose another one.");
             } else if (error.response.status === 500) {
-                alert("Database error. Please try again.");
+                setError("Network error. Please try again.");
             } else {
-                alert("An error occurred. No response from back-end.");
+                setError("An unknown error occurred. Please try again.");
             }
-            
-        }
+        })
     }
 
     /**
@@ -143,7 +175,7 @@ const Register = () =>
                 </Container>
             <Box
                 component="form"
-                onSubmit={this.handleSubmit}
+                onSubmit={handleSubmit}
                 noValidate
                 sx={{
                     marginTop: 8,
@@ -152,51 +184,45 @@ const Register = () =>
                     alignItems: 'center',
                     }}
             >
+                {error && <Alert severity="error">{error}</Alert>}
             <TextField
                 margin="normal"
                 required
                 fullWidth
-                id="firstname"
                 label="First Name"
-                name="firstname"
                 error={firstNameMessage} // check if empty
                 helperText={firstNameMessage}
                 value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                autoComplete="firstname"
+                onChange={handleFirstNameChange}
+                autoComplete="off"
                 autoFocus
             />
             <TextField
                 margin="normal"
                 required
                 fullWidth
-                id="username"
                 label="Username"
-                name="username"
+                value={username}
                 error={usernameMessage} // check if empty
                 helperText={
                     usernameMessage
                 }
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                autoComplete="username"
-                autoFocus
+                onChange={handleUsernameChange}
+                autoComplete="off"
             />
             <TextField
                 margin="normal"
                 required
                 fullWidth
-                name="password"
                 label="Password"
                 type="password"
-                id="password"
+                value={password}
                 error={passwordMessage} // check if empty
                 helperText={
                     passwordMessage // Show password message if provided
                 }
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
+                onChange={handlePasswordChange}
+                autoComplete="off"
             />
             <Container
                 sx={{

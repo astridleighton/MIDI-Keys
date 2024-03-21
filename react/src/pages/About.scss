@@ -1,0 +1,23 @@
+.about-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    .about-header {
+        width: 100%;
+        margin: 15px;
+        display: flex;
+        justify-content: center;
+
+        .about-title {
+            font-size: 45px;
+        }
+    } 
+
+    .about-content {
+        margin-left: 80px;
+        margin-right: 80px;
+        font-size: 15px;
+    }
+}

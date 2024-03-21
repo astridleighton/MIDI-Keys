@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container, Typography, Grid } from '@mui/material';
 
+import './About.scss'
 /**
  * Displays basic website information
  */
@@ -13,21 +14,12 @@ const About = () =>
      */
 
     return(
-        <Container>
-            <Grid container>
-                <Grid item sm={12}>
-                    <Container sx={{p: '20px', textAlign: 'center'}}>
-                        <Typography variant="h3">
-                            About
-                        </Typography>
-                    </Container>
-                </Grid>
-                <Grid item sm={1} md={2}>
-                    {/*Left margin*/}
-                </Grid>
-                <Grid item sm={10} md={8}>
-                <Container>
-                    <p>
+        <div className='about-container'>
+            <div className='about-header'>
+                <h1 className='about-title'>About</h1>
+            </div>
+            <div className='about-content'>
+            <p>
                         <strong>MIDI Keys</strong> is a simple MIDI-based online synthesizer. It is designed to be a place where musicians and producers can learn to creatively interact with MIDI devices.
                     </p>
                     <p>
@@ -47,13 +39,8 @@ const About = () =>
                     <span>
                         <p>Developer: <a href="https://github.com/astridleighton" alt="link to developer's GitHub">Astrid Leighton</a></p>
                     </span>
-                    </Container>
-                </Grid>
-                <Grid item sm={1} md={2}>
-                    {/*Right margin*/}
-                </Grid>
-            </Grid>
-        </Container>
+            </div>
+        </div>
     )
 }
 

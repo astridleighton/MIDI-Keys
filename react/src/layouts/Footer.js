@@ -1,17 +1,23 @@
 import React from 'react';
+import { useMIDIContext } from '../App';
+import { useNavigate } from 'react-router-dom';
+
 
 /**
  * Displays connected device
  */
-const Footer = ({ selectedDevice }) =>
+const Footer = ({ selectedDevice, removeConnectedDevice }) =>
 {
+
+    const { midiInputs, setConnectedDevice, connectedDevice } = useMIDIContext();
+    // const navigate = useNavigate();
 
     /**
      * removes connected device from properties
      * @param {*} e 
      */
-    const removeConnectedDevice = (e) => {
-        removeConnectedDevice();
+    const changeConnectedDevice = (e) => {
+        // navigate('/connect')
     }
 
     /**
@@ -26,7 +32,7 @@ const Footer = ({ selectedDevice }) =>
                     <span className="text-light">
                         {selectedDevice ? (
                             <span>Connected Device: {selectedDevice}&nbsp;&nbsp;
-                                <button type="submit" className="btn btn-primary btn-block ms-auto" style={{ backgroundColor: 'grey', color: 'black'}} onClick={removeConnectedDevice()}>Disconnect</button>
+                                <button type="submit" className="btn btn-primary btn-block ms-auto" style={{ backgroundColor: 'grey', color: 'black'}} onClick={changeConnectedDevice()}>Change Device</button>
                             </span>
                         ) : (
                             <span>No device connected.</span>

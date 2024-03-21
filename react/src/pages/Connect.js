@@ -1,46 +1,43 @@
-import React, {useEffect} from 'react';
+import React, {useState} from 'react';
 import WebMidi from 'webmidi';
 import * as Tone from 'tone';
 import DeviceCard from '../cards/DeviceCard';
 import { Button, List, FormControl, FormLabel, RadioGroup, FromControlLabel, ListItemButton, ListItemText, ListItemIcon, Radio, Box, FormControlLabel, Container, Typography, Grid } from '@mui/material';
+import { useMIDIContext } from '../App';
 
+import './Connect.scss'
 /**
  * Allows the user to connect to a selected device
  * NOTE: Automatically connects to QWERTY keyboard?
  */
-const Connect = ({connectedDevice, midiInputs, updateConnectedDevice}) =>
+const Connect = ({updateConnectedDevice, midiInputDevices}) =>
 {
-  
 
-  const handleDeviceSelection = (device) => {
+  // TODO: ensure device can actually be selected
+
+  const [selectedDevice, setSelectedDevice] = useState(null);
+  const { midiInputs, connectedDevice } = useMIDIContext();
+
+  const handleDeviceSelect = (device) => {
+    setSelectedDevice(device);
+  }
+
+  const handleDeviceConnect = (device) => {
     updateConnectedDevice(device);
   }
 
     return(
-      <Container>
-        <Grid container>
-          <Grid item sm={2}>
-            {/*Left margin*/}
-          </Grid>
-          <Grid item sm={8} sx={{ display: 'flex', justifyContent: 'center', mt: '50px' }}>
-            <Typography variant="h4" sx={{fontFamily: 'Lato, sans-serif', fontWeight: "bold"}}>
-              Connect MIDI Device
-            </Typography>
-          </Grid>
-          <Grid item  sm={2}>
-            {/*Right margin*/}
-          </Grid>
-          <Grid item sm={12} sx={{ display: 'flex', justifyContent: 'center', margin: '50px' }}>
-            <FormControl
-            sx={{
-              textAlign: 'center'
-              }}>
-              <FormLabel>Select MIDI device from list.</FormLabel>
+      <div className="connect-container">
+        <div className="connect-header">
+          <h1 className="connect-title">Connect</h1>
+        </div>
+        <div className="connect-content">
+        <FormLabel>Select MIDI device from list.</FormLabel>
                 <RadioGroup
                   aria-label="sounds"
                   name="sound-group"
                   defaultValue="synth"
-                  /*onChange={(e) => this.handleButtonClick1(e.target.value)}*/
+                  onChange={(e) => this.handleDeviceSelect(e.target.value)}
                   >
                     <List
                       sx = {{
@@ -58,7 +55,7 @@ const Connect = ({connectedDevice, midiInputs, updateConnectedDevice}) =>
                           },
                       }}
                     >
-                      {midiInputs.map((device, index) => 
+                      {midiInputDevices && midiInputDevices.map((device, index) => 
                       <DeviceCard key={index} name={device} />
                       )
                       }
@@ -68,7 +65,7 @@ const Connect = ({connectedDevice, midiInputs, updateConnectedDevice}) =>
                             type="submit"
                             fullWidth
                             variant="contained"
-                            onClick={handleDeviceSelection()}
+                            onClick={handleDeviceConnect()}
                             sx={{
                                 backgroundColor: 'grey',
                                 color: 'white',
@@ -79,10 +76,8 @@ const Connect = ({connectedDevice, midiInputs, updateConnectedDevice}) =>
                           Connect
                       </Button>
                 </RadioGroup>
-          </FormControl>
-          </Grid>
-        </Grid>
-      </Container>
+        </div>
+      </div>
     )
 }
 

@@ -1,8 +1,7 @@
 import React, {useState} from 'react';
 import WebMidi from 'webmidi';
 import * as Tone from 'tone';
-import DeviceCard from '../cards/DeviceCard';
-import { Button, List, FormControl, FormLabel, RadioGroup, FromControlLabel, ListItemButton, ListItemText, ListItemIcon, Radio, Box, FormControlLabel, Container, Typography, Grid } from '@mui/material';
+import { Button, List, FormControl, FormLabel, RadioGroup, FromControlLabel, ListItemButton, ListItemText, ListItemIcon, ListItem, Radio, Box, FormControlLabel, Container, Typography, Grid } from '@mui/material';
 import { useMIDIContext } from '../App';
 
 import './Connect.scss'
@@ -13,7 +12,8 @@ import './Connect.scss'
 const Connect = ({updateConnectedDevice, midiInputDevices}) =>
 {
 
-  // TODO: ensure device can actually be selected
+  // TODO: add connected device as default value
+  // TODO: pass values as MIDI context?
 
   const [selectedDevice, setSelectedDevice] = useState(null);
   const { midiInputs, connectedDevice } = useMIDIContext();
@@ -22,8 +22,9 @@ const Connect = ({updateConnectedDevice, midiInputDevices}) =>
     setSelectedDevice(device);
   }
 
-  const handleDeviceConnect = (device) => {
-    updateConnectedDevice(device);
+  const handleDeviceConnect = () => {
+    console.log('Connecting to: ' + selectedDevice);
+    updateConnectedDevice(selectedDevice);
   }
 
     return(
@@ -34,10 +35,10 @@ const Connect = ({updateConnectedDevice, midiInputDevices}) =>
         <div className="connect-content">
         <FormLabel>Select MIDI device from list.</FormLabel>
                 <RadioGroup
-                  aria-label="sounds"
-                  name="sound-group"
-                  defaultValue="synth"
-                  onChange={(e) => this.handleDeviceSelect(e.target.value)}
+                  aria-label="devices"
+                  name="device-group"
+                  defaultValue={connectedDevice}
+                  onChange={(e) => handleDeviceSelect(midiInputDevices[e.target.value])}
                   >
                     <List
                       sx = {{
@@ -56,16 +57,22 @@ const Connect = ({updateConnectedDevice, midiInputDevices}) =>
                       }}
                     >
                       {midiInputDevices && midiInputDevices.map((device, index) => 
-                      <DeviceCard key={index} name={device} />
+                      <ListItem sx={{color:"#FFF"}}>
+                      <FormControlLabel
+                      value={index}
+                      control={<Radio/>}
+                      label={device}
+                    />
+                  </ListItem>
                       )
                       }
+
                     </List>
-                      
                       <Button
                             type="submit"
                             fullWidth
                             variant="contained"
-                            onClick={handleDeviceConnect()}
+                            onClick={handleDeviceConnect}
                             sx={{
                                 backgroundColor: 'grey',
                                 color: 'white',

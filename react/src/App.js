@@ -72,6 +72,7 @@ const App = () => {
   }
 
   const updateConnectedDevice = (device) => { // establish connection to device
+    // alert('test!');
     setConnectedDevice(device);
   }
 

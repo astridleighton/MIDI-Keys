@@ -34,11 +34,9 @@ const Footer = ({ removeConnectedDevice }) =>
                             <span>No device connected.</span>
                         )}
                     </span>
-                    
                 </div>
             </footer>
         </div>
-        
     )
     
 }

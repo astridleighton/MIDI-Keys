@@ -32,26 +32,19 @@ const App = () => {
         try {
           await navigator.requestMIDIAccess().then(async (midiAccess) => {
             const midiIns = await listMIDIInputs(midiAccess);
-            const connectedDev = await updateConnectedDevice(midiIns[0]);
 
-            console.log("MIDI inputs:");
-            console.log(midiIns);
-            
-            // TODO: update state
-            // TODO: ensure tone can connect to device
-            console.log('first device: ' + midiIns[0]);
-            const connectedDevice = new Tone.Midi(midiIns[0]);
-            Tone.Transport.set({ midi: connectedDevice })
-            
-            
+            // set default device
+            /*if(!connectedDevice && midiIns.length > 0) {
+              await updateConnectedDevice(midiIns[0]);
+              console.log('Connected device is blank');
+            }*/
+
+            if (connectedDevice) {
+              Tone.Transport.set({ midi: connectedDevice })
+            } else {
+              console.log('Connected device is blank.');
+            }
           })
-          // const inputDevices = midiAccess.inputs.values();
-          // console.log("Input devices " + inputDevices[0]);
-          /* 
-
-          setMIDIAccess(midiAccess);
-          const midiDevices = await listMIDIInputs(midiAccess);
-          setInputDevices(midiDevices);*/
         } catch (error) {
           console.error('MIDI Access failed: ', error);
         }
@@ -59,12 +52,12 @@ const App = () => {
 
       fetchMIDIData();
 
-  }, []);
+  }, [connectedDevice]);
 
   const listMIDIInputs = async (midiAccess) => {
     const inputs = midiAccess.inputs.values();
     const midiInputs = [];
-    console.log('MIDI inputs: ');
+    console.log('MIDI inputs2: ');
     for (let input of inputs) {
       console.log(input.name);
       midiInputs.push(input.name)
@@ -73,14 +66,16 @@ const App = () => {
     return midiInputs;
   }
 
-  const updateConnectedDevice = (device) => {
+  const updateConnectedDevice = async (device) => {
+    console.log('Setting connected device ' + device);
     setConnectedDevice(device);
     // TODO: update Tone.js output
     // TODO: add error handling
   }
 
   const removeConnectedDevice = () => {
-    setConnectedDevice(null);
+    setConnectedDevice(undefined);
+    console.log('Disconnecting device ' + connectedDevice);
     // TODO: update Tone.js output
     // TODO: add error handling
   }

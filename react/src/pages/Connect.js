@@ -14,6 +14,8 @@ const Connect = ({updateConnectedDevice, midiInputDevices}) =>
 
   // TODO: add connected device as default value
   // TODO: pass values as MIDI context?
+  // TODO: show success message on device connection (maybe do this in app)
+  // TODO: navigate to app?
 
   const [selectedDevice, setSelectedDevice] = useState(null);
   const { midiInputs, connectedDevice } = useMIDIContext();

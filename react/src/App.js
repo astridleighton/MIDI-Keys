@@ -24,6 +24,8 @@ const App = () => {
   const [midiAccess, setMIDIAccess] = useState(null);
   const [inputDevices, setInputDevices] = useState([]);
 
+  // TODO: ensure midi device list updates when a device is disconnected abruptly or reconnected
+
   useEffect(() => {
       const fetchMIDIData = async () => {
 
@@ -71,13 +73,16 @@ const App = () => {
     return midiInputs;
   }
 
-  const updateConnectedDevice = (device) => { // establish connection to device
-    // alert('test!');
+  const updateConnectedDevice = (device) => {
     setConnectedDevice(device);
+    // TODO: update Tone.js output
+    // TODO: add error handling
   }
 
   const removeConnectedDevice = () => {
-    // setConnectedDevice(null);
+    setConnectedDevice(null);
+    // TODO: update Tone.js output
+    // TODO: add error handling
   }
 
   return (
@@ -94,7 +99,7 @@ const App = () => {
                 </Routes>
             </Router>
             <div className="fixed-bottom">
-                <Footer selectedDevice={connectedDevice} removeConnectedDevice={removeConnectedDevice} />
+                <Footer connectedDevice={connectedDevice} removeConnectedDevice={removeConnectedDevice} />
             </div>
         </div>
     </MIDIContext.Provider>

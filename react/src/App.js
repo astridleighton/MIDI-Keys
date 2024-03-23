@@ -23,21 +23,22 @@ const App = () => {
   const [connectedDevice, setConnectedDevice] = useState(null);
   const [midiAccess, setMIDIAccess] = useState(null);
   const [inputDevices, setInputDevices] = useState([]);
+  const [isAuthenticated, setIsAuthenticated] = useState();
 
   // TODO: ensure midi device list updates when a device is disconnected abruptly or reconnected
+  // TODO: look into midiAccess.onstatechange function
 
   useEffect(() => {
       const fetchMIDIData = async () => {
-
         try {
-          await navigator.requestMIDIAccess().then(async (midiAccess) => {
-            const midiIns = await listMIDIInputs(midiAccess);
-
-            // set default device
-            /*if(!connectedDevice && midiIns.length > 0) {
-              await updateConnectedDevice(midiIns[0]);
-              console.log('Connected device is blank');
-            }*/
+          navigator.requestMIDIAccess().then(async (midiAccess) => {
+            midiAccess.addEventListener('statechange', function(e) {
+                console.log(e);
+            })
+            /* midiAccess.onstatechange = (event) => {
+              console.log('MIDI event!');
+            } */
+            await listMIDIInputs(midiAccess);
 
             if (connectedDevice) {
               Tone.Transport.set({ midi: connectedDevice })
@@ -52,7 +53,7 @@ const App = () => {
 
       fetchMIDIData();
 
-  }, [connectedDevice]);
+  }, []);
 
   const listMIDIInputs = async (midiAccess) => {
     const inputs = midiAccess.inputs.values();
@@ -80,11 +81,16 @@ const App = () => {
     // TODO: add error handling
   }
 
+  // TODO: implement this or add auth context
+  const userAuthenticated = () => {
+    setIsAuthenticated(true);
+  }
+
   return (
     <MIDIContext.Provider value={{ connectedDevice, inputDevices }}>
       <div className="app-container d-flex flex-column" style={{ backgroundColor: '#f8f8f8' }}>
             <Router>
-                <Navbar />
+                <Navbar isAuthenticated={isAuthenticated}/>
                 <Routes>
                     <Route exact path="/" element={<Play midiAccess={midiAccess} selectedDevice={connectedDevice} fullName={fullName} />} />
                     <Route exact path="/connect" element={<Connect connectedDevice={connectedDevice} updateConnectedDevice={updateConnectedDevice} midiInputDevices={inputDevices} />} />

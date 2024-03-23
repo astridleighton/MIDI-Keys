@@ -8,10 +8,14 @@ import { AppBar, Button, TextField, Typography, Container, CssBaseline, Avatar, 
 /**
  * Displays navigation bar for site navigation
  */
-function Navbar()
+const Navbar = () =>
 {
 
-    function handleLogout () {
+    // TODO: have this rely on auth context?
+
+    let isAuthenticated = !!Cookies.get('token');
+
+    const handleLogout = () => {
         Cookies.remove('token');
         Cookies.remove('name');
         window.location.reload();
@@ -21,8 +25,6 @@ function Navbar()
      * Shows navigation links and shows login/logout button depending on session cookie
      * @returns 
      */
-    const isAuthenticated = !!Cookies.get('token');
-
     return(
         <div>
             <AppBar position="static" color="primary" sx={{ backgroundColor: '#000000' }}>
@@ -49,7 +51,7 @@ function Navbar()
                         {isAuthenticated ? (
                                 <Button
                                     variant="outlined"
-                                    onClick={handleLogout()}
+                                    onClick={handleLogout}
                                     >
                                         Log Out
                                 </Button>

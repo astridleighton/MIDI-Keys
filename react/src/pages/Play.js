@@ -5,8 +5,9 @@ import Cookies from 'js-cookie';
 import SoundCard from '../cards/SoundCard';
 import Sound from '../sound/Sound';
 import axios from 'axios';
-import { ListItem, List, FormControl, FormLabel, RadioGroup, FromControlLabel, ListItemButton, ListItemText, ListItemIcon, Radio, Box, FormControlLabel } from '@mui/material';
+import { ListItem, List, FormControl, FormLabel, RadioGroup, FromControlLabel, ListItemButton, ListItemText, ListItemIcon, Radio, Box, FormControlLabel, Switch, FormGroup } from '@mui/material';
 
+import './Play.scss'
 
 /**
  *   Contains the Tone.JS instruments and references online samples
@@ -47,6 +48,8 @@ const Play = (props) =>
     const [url, setURL] = useState('');
     const [midiDevices, setMIDIDevices] = useState([]);
     const [currentChord, setCurrentChord] = useState('');
+    const [notesEnabled, setNotesEnabled] = useState(true);
+    const [chordEnabled, setChordEnabled] = useState(true);
 
     /**
        * Starts tone.JS and sets up sounds
@@ -248,6 +251,14 @@ const Play = (props) =>
         await getAllFavorites();
       }
 
+      const handleNotesToggle = () => {
+        setChordEnabled(!notesEnabled);
+      }
+
+      const handleChordToggle = () => {
+        setChordEnabled(!chordEnabled);
+      }
+
     /**
      * Used to set up MIDI keyboard with note mappings, sounds, and MIDI events
      * @param {*} midiKeyboard 
@@ -264,7 +275,6 @@ const Play = (props) =>
 
             switch (command)
             {
-                
                 case 144: // note on
                     if(velocity > 0)
                     {
@@ -273,9 +283,6 @@ const Play = (props) =>
                         if (selectedSound === 'synth') {
                             const synth = createSynth();
                             synth.triggerAttackRelease(Tone.Midi(noteInput).toFrequency(), "4n");
-                            /*if (Tone.context.state !== 'closed') {
-                                Tone.context.close();
-                            }*/
                         } else if (selectedSound === 'amsynth') {
                             const amSynth = createAMSynth();
                             amSynth.triggerAttackRelease(note, "4n");
@@ -369,8 +376,6 @@ const Play = (props) =>
         */
         keyboard.down(async (e) => {
 
-            console.log('test and selected sound: ' + selectedSound);
-
             // TODO: fix so selectedSound is always set as qwerty -- showing as null
 
             if(selectedSound === "qwerty") {
@@ -379,7 +384,7 @@ const Play = (props) =>
                 if(note)
                 {
                     await addNote(note);
-                    await getChord();
+                    // await getChord();
 
                     if (selectedSound === 'synth') {
                         const synth = createSynth();
@@ -395,7 +400,6 @@ const Play = (props) =>
                     } else if (selectedSound === 'qwerty') {
                         const synth = new Tone.Synth().toDestination();
                         synth.triggerAttackRelease(note, '4n');
-                        synthTest.triggerAttack(note);
                     }
                 }
             } else {
@@ -415,7 +419,7 @@ const Play = (props) =>
             await removeNote(note);
 
             // will add longer note duration in future implentations
-            synthTest.triggerRelease();
+            // synthTest.triggerRelease();
             /* this.amSynth.triggerRelease();
             this.monosynth.triggerRelease();
             //this.sampler.triggerRelease();*/
@@ -445,6 +449,7 @@ const Play = (props) =>
     const addNote = async (newNote) => {
         console.log('Playing:' + newNote);
         const previousChord = chordNotes;
+        console.log()
 
         // do not add duplicate notes
         // TODO: fix so duplicates cannot be added
@@ -690,8 +695,8 @@ const Play = (props) =>
         Renders user session and displays available sounds and notes played
     */        
     return(
-        <div className="container d-flex flex-column align-items-center">
-            <div className="text-center m-4">
+        <div className="play-container">
+            <div className="play-container play-header">
                 {isAuthenticated ? (
                     <div>
                         <h1>Welcome, {firstName}!</h1>
@@ -702,60 +707,61 @@ const Play = (props) =>
                     </div>
                 )}
             </div>
-            <div className="text-center container w-50">
-                <div className="row">
-                    <div className="col-md-6">
-                        <div className="pb-4">
-                            {isLoading ? (
-                                <p>Could not load sounds from database. Please refresh to try again.</p>
-                            ) : (
-                                <Box sx={{ width: '100%', maxWidth: 260, bgColor: 'background.paper' }}>
-                                    <FormControl>
-                                        <FormLabel>Sounds</FormLabel>
-                                        <RadioGroup
-                                            aria-label="sounds"
-                                            name="sound-group"
-                                            defaultValue="synth"
-                                            /*onChange={(e) => this.handleButtonClick1(e.target.value)}*/
-                                            >
-                                                <List
-                                        sx = {{
-                                            '& .MuiListItem-root': {
-                                                borderRadius: '8px',
-                                                backgroundColor: 'black',
-                                                marginBottom: '8px',
-                                                color: 'white'
-                                                },
-                                                '& .MuiRadio-root': {
-                                                color: 'white', // Radio button color
-                                                },
-                                                '& .MuiSvgIcon-root': {
-                                                stroke: 'white', // Star icon outline color
-                                                },
-                                        }}
-                                        >
+            <div className="play-container play-content">
+                {isLoading ? (
+                    <p>Could not load sounds from database. Please refresh to try again.</p>
+                ) : (
+                    <Box sx={{ width: '100%', maxWidth: 260, bgColor: 'background.paper' }}>
+                        <FormControl>
+                            <FormLabel>Sounds</FormLabel>
+                            <RadioGroup
+                                aria-label="sounds"
+                                name="sound-group"
+                                defaultValue="synth"
+                                /*onChange={(e) => this.handleButtonClick1(e.target.value)}*/
+                            >
+                                <List
+                                    sx = {{
+                                        '& .MuiListItem-root': {
+                                        borderRadius: '8px',
+                                        backgroundColor: 'black',
+                                        marginBottom: '8px',
+                                        color: 'white'
+                                        },
+                                        '& .MuiRadio-root': {
+                                        color: 'white', // Radio button color
+                                        },
+                                        '& .MuiSvgIcon-root': {
+                                        stroke: 'white', // Star icon outline color
+                                        },
+                                    }}
+                                >
                                     {soundObjects.map(sound => (
                                         <SoundCard key={sound.id} id={sound.id} name={sound.name} location={sound.location} isFavorite={sound.isFavorite} isLoggedIn={isAuthenticated} onSelect={handleButtonClick} addFavorite={addFavorite} removeFavorite={removeFavorite} />
                                     ))}
-                                    </List> 
-                                        </RadioGroup>
-                                    </FormControl>
-                                </Box>
-                            )}
-                        </div>
-                    </div>
-                </div>
+                                </List> 
+                            </RadioGroup>
+                        </FormControl>
+                    </Box>
+                )}
             </div>
-            <div className="m-3">
-                <h3 className="ml-2 w-100">Notes:</h3>
-            </div>
-            <div>
-                {/* Displays current chord for user */}
-                <span className="h2">
+            <div className="chord-container">
+                <FormGroup>
+                    <FormControlLabel
+                        control={<Switch />} label="Notes:"
+                        onChange={handleNotesToggle}
+                    />
+                    <FormControlLabel
+                        control={<Switch />} label="Chord:"
+                        onChange={handleChordToggle}
+                    />
+                </FormGroup>
+                {/* move chord and notes inline */}
+                <div className="chord-content">
                     {chordNotes.map((note) => (
-                        <p className="d-inline" key={note}> {note}</p>
+                        <p className="d-inline" key={note}>{note}</p>
                     ))}
-                </span>
+                </div>
             </div>
         </div>
     )

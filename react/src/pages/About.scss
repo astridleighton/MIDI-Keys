@@ -3,10 +3,12 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    margin-bottom: 50px;
 
     .about-header {
         width: 100%;
         margin: 15px;
+        margin-top: 30px;
         display: flex;
         justify-content: center;
 
@@ -16,8 +18,8 @@
     } 
 
     .about-content {
-        margin-left: 80px;
-        margin-right: 80px;
-        font-size: 15px;
+        margin-left: 120px;
+        margin-right: 120px;
+        font-size: 20px;
     }
 }

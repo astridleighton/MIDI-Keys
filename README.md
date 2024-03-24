@@ -7,20 +7,18 @@ This project will take the entire school year to complete. Here is what I have c
 - SQL database to hold user information, sound data, and saved sounds
 - Playback functionality from V49 MIDI device and QWERTY keyboard using a few sound samples
 - JWT token authentication and session functionality
-- Basic user interface using Material UI and Bootstrap
+- Basic user interface using Material UI and Sass
+- Allow user to select between different MIDI devices
+- Additional error handling
 
 # In Progress
-
 - Add more sound samples to database
-- Allow user to select between different MIDI devices
-- Secure website using HTTPS and secured pages
-- Implement chord display functionality
+- Implement chord display functionality (out of scope)
 - Improved user interface using Material UI
-- Additional error handling
+- Add on-screen keyboard (out of scope)
 
 # Out of Scope (Future Implementations)
 - Deploy to cloud (AWS or Azure)
 - Dockerize
-- Show visual on-screen keyboard
 - Implement audio recording functionality
 - Add sheet music display

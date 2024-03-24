@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, Link, Routes, BrowserRouter } from 'react-router-dom';
-import './Navbar.css';
+import './Navbar.scss';
 import Cookies from 'js-cookie';
 import { AppBar, Button, TextField, Typography, Container, CssBaseline, Avatar, Grid, Toolbar } from '@mui/material';
 //import PianoIcon from '@mui/icons-material/Piano';

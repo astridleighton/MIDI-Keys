@@ -25,9 +25,15 @@
         border-radius: 20px;
         padding: 8px;
 
-        .chord-content {
-            // TODO: add styling
-            // TODO: maybe add collapse button or toggle?
+        .display-notes-container {
+            display: flex;
+            align-items: center;
+
+            .note-content {
+                margin-left: -10px;
+            }
         }
+
+        
     }
 }

@@ -4,11 +4,10 @@ const app = express();
 const cors = require('cors');
 const Security = require('./app/security/security');
 const Database = require('./app/database/database');
+const mysql = require('mysql2');
 
 app.use(cors());
 app.use(express.json());
-
-const mysql = require('mysql');
 
 // sets up database configuration
 const dbConfig = {

@@ -2,14 +2,14 @@ import React, {useState} from 'react';
 import WebMidi from 'webmidi';
 import * as Tone from 'tone';
 import { Button, List, FormControl, FormLabel, RadioGroup, FromControlLabel, ListItemButton, ListItemText, ListItemIcon, ListItem, Radio, Box, FormControlLabel, Container, Typography, Grid } from '@mui/material';
-import { useMIDIContext } from '../App';
+// import { useMIDIContext } from '../App';
 
 import './Connect.scss'
 /**
  * Allows the user to connect to a selected device
  * NOTE: Automatically connects to QWERTY keyboard?
  */
-const Connect = ({updateConnectedDevice, midiInputDevices}) =>
+const Connect = ({connectedDevice, updateConnectedDevice, midiInputDevices}) =>
 {
 
   // TODO: add connected device as default value
@@ -18,14 +18,14 @@ const Connect = ({updateConnectedDevice, midiInputDevices}) =>
   // TODO: navigate to app?
 
   const [selectedDevice, setSelectedDevice] = useState(null);
-  const { midiInputs, connectedDevice } = useMIDIContext();
+  const connectedDeviceName = connectedDevice;
 
   const handleDeviceSelect = (device) => {
     setSelectedDevice(device);
   }
 
   const handleDeviceConnect = () => {
-    console.log('Connecting to: ' + selectedDevice);
+    console.log('Connecting to: ' + selectedDevice.name);
     updateConnectedDevice(selectedDevice);
   }
 
@@ -63,7 +63,7 @@ const Connect = ({updateConnectedDevice, midiInputDevices}) =>
                       <FormControlLabel
                       value={index}
                       control={<Radio/>}
-                      label={device}
+                      label={device.name}
                     />
                   </ListItem>
                       )

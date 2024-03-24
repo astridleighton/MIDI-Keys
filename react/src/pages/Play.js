@@ -8,13 +8,14 @@ import axios from 'axios';
 import { ListItem, List, FormControl, FormLabel, RadioGroup, FromControlLabel, ListItemButton, ListItemText, ListItemIcon, Radio, Box, FormControlLabel, Switch, FormGroup } from '@mui/material';
 
 import './Play.scss'
+// import { useMIDIContext } from '../App';
 
 /**
  *   Contains the Tone.JS instruments and references online samples
  *   Allows user to select between instruments
  *   Displays notes played
  */
-const Play = (props) =>
+const Play = ({connectedDevice}) =>
 {
     // used to instantiate synthesizers from Tone.JS, selected sound, and notes/chords played
     // TODO: move all drums into kit in future implementation
@@ -48,23 +49,38 @@ const Play = (props) =>
     const [url, setURL] = useState('');
     const [midiDevices, setMIDIDevices] = useState([]);
     const [currentChord, setCurrentChord] = useState('');
-    const [notesEnabled, setNotesEnabled] = useState(true);
-    const [chordEnabled, setChordEnabled] = useState(true);
+    const [notesEnabled, setNotesEnabled] = useState(false);
+    const [chordEnabled, setChordEnabled] = useState(false);
 
     /**
        * Starts tone.JS and sets up sounds
        */
     useEffect (() => {
         const initTone = async() => {
+            const manuallyConnectedDevice = await manuallyConnectV49();
             Tone.start();
             await Tone.setContext(new AudioContext({ sampleRate: 48000 }));
             Tone.Master.volume.value = -6;
-            await initializeKeyboard();
+            await setUpQwertyKeyboard();
             await initializeSounds();
+
+            if(manuallyConnectedDevice) {
+                console.log('setting up MIDI keyboard');
+                await setUpMIDIKeyboard(manuallyConnectedDevice);
+            }
         }
 
         initTone();
   }, []);
+
+    const manuallyConnectV49 = async () => {
+        const midiAccess = await navigator.requestMIDIAccess();
+        const inputs = Array.from(midiAccess.inputs.values());
+        const device = inputs.find(input => input.name === 'V49');
+        if (device) {
+          return device;
+        }
+    }
 
       /**
        * Creates an instance of the synth
@@ -252,7 +268,7 @@ const Play = (props) =>
       }
 
       const handleNotesToggle = () => {
-        setChordEnabled(!notesEnabled);
+        setNotesEnabled(!notesEnabled);
       }
 
       const handleChordToggle = () => {
@@ -340,20 +356,13 @@ const Play = (props) =>
             - Triggers audio output with keydown event
             - Stores current notes / chord being played
      */
-    const initializeKeyboard = async() => {
+    const setUpQwertyKeyboard = async() => {
 
-        // set up connected keyboard - will add other devices in future implentations
         console.log('Setting up QWERTY keyboard');
-        let midiKeyboard = null;
-
-        if(midiKeyboard != null)
-        {
-            console.log('Setting up keyboard pt. 2');
-            await setUpMIDIKeyboard(midiKeyboard);
-        }
 
         const keyboard = await createQwerty();
 
+        // maps QWERTY keys to notes
         const keyToNote = {
             65: 'C4', // A
             87: 'Db4', // W
@@ -375,7 +384,7 @@ const Play = (props) =>
         Triggers audio output, converts MIDI note to music note, and adds note to notes played
         */
         keyboard.down(async (e) => {
-
+            console.log(e);
             // TODO: fix so selectedSound is always set as qwerty -- showing as null
 
             if(selectedSound === "qwerty") {
@@ -383,8 +392,8 @@ const Play = (props) =>
 
                 if(note)
                 {
-                    await addNote(note);
-                    // await getChord();
+                    const notes = await addNote(note);
+                    // TODO: implement getChord()
 
                     if (selectedSound === 'synth') {
                         const synth = createSynth();
@@ -403,8 +412,7 @@ const Play = (props) =>
                     }
                 }
             } else {
-                console.log('test2');
-                // TODO: pass variable to other components
+                console.log('this should not work');
             }  
         });
 
@@ -412,17 +420,12 @@ const Play = (props) =>
         Stops audio output and removes note from notes played
     */
         keyboard.up(async(e) => {
+            console.log(e);
 
             if(selectedSound === "qwerty") {
                 const note = keyToNote[e.keyCode];
 
             await removeNote(note);
-
-            // will add longer note duration in future implentations
-            // synthTest.triggerRelease();
-            /* this.amSynth.triggerRelease();
-            this.monosynth.triggerRelease();
-            //this.sampler.triggerRelease();*/
             }
 
             
@@ -444,33 +447,25 @@ const Play = (props) =>
     }
 
     /*
-        Adds note to chordNotes state to be displayed
+        Adds note to state array, checks for duplicates
     */
     const addNote = async (newNote) => {
-        console.log('Playing:' + newNote);
-        const previousChord = chordNotes;
-        console.log()
-
-        // do not add duplicate notes
-        // TODO: fix so duplicates cannot be added
-        if(!previousChord.includes(newNote)) {
-            setChordNotes((prevState) => {
-                return [...prevState, newNote];
-            })
-        }
+        setChordNotes((previousChord) => {
+            if(!previousChord.includes(newNote)) {
+                return [...previousChord, newNote]
+            } else {
+                return previousChord;
+            }
+        })        
     }
 
     /*
-        Removes note from chordNotes state
+        Removes note from state array
     */
     const removeNote = async (oldNote) => {
-        console.log('Stopped playing:' + oldNote);
         const previousChord = chordNotes;
-        
         const newChord = previousChord.filter((note) => note !== oldNote);
-
         setChordNotes(newChord);
-
     }
 
     /*
@@ -505,16 +500,15 @@ const Play = (props) =>
         - Starter code to display the chord being played (not used yet)
         - TODO: implement additional instruments, samples, and intervals
     */
-    const getChord = async () =>
+    const getChord = async (notes) =>
     {
         // only works for three note chords
-        /*if (chordNotes && chordNotes.length === 3) {
+        if (chordNotes && chordNotes.length === 3) {
             const root = currentChord[0];
             const note2 = currentChord[1];
             const note3 = currentChord[2];
 
             console.log("Root: " + root);
-            //console.log(this.currentChord);
 
             const interval1 = note2 - root;
             const interval2 = note3 - root;
@@ -550,7 +544,7 @@ const Play = (props) =>
             } else {
                 console.log("Other");
             }
-        }  */ 
+        }
     }  
     
     /**
@@ -747,20 +741,28 @@ const Play = (props) =>
             </div>
             <div className="chord-container">
                 <FormGroup>
-                    <FormControlLabel
-                        control={<Switch />} label="Notes:"
-                        onChange={handleNotesToggle}
-                    />
+                    <div className="display-notes-container">
+                        <FormControlLabel
+                            control={<Switch />} label="Notes:"
+                            onChange={handleNotesToggle}
+                        />
+                        <div className="note-content">
+                            {notesEnabled && (
+                                <>
+                                    {chordNotes.map((note) => (
+                                        <p className="d-inline" key={note}>{note}&nbsp;</p>
+                                    ))}
+                                </>
+                            )}
+                        </div>
+                    </div>
                     <FormControlLabel
                         control={<Switch />} label="Chord:"
                         onChange={handleChordToggle}
                     />
                 </FormGroup>
-                {/* move chord and notes inline */}
                 <div className="chord-content">
-                    {chordNotes.map((note) => (
-                        <p className="d-inline" key={note}>{note}</p>
-                    ))}
+                   {/* TODO: display chord here */} 
                 </div>
             </div>
         </div>

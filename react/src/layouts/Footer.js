@@ -1,15 +1,14 @@
-import React from 'react';
-import { useMIDIContext } from '../App';
+import React, {useEffect} from 'react';
+// import { useMIDIContext } from '../App';
 import { useNavigate } from 'react-router-dom';
 
 
 /**
  * Displays connected device
  */
-const Footer = ({ removeConnectedDevice }) =>
+const Footer = ({ connectedDevice, removeConnectedDevice }) =>
 {
 
-    const { midiInputs, setConnectedDevice, connectedDevice } = useMIDIContext();
     // const navigate = useNavigate();
 
     const removeDevice = () => {
@@ -37,8 +36,7 @@ const Footer = ({ removeConnectedDevice }) =>
                 </div>
             </footer>
         </div>
-    )
-    
+    ) 
 }
 
 export default Footer;

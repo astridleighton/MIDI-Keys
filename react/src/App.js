@@ -22,7 +22,7 @@ export const useMIDIContext = () => useContext(MIDIContext);*/
 const App = () => {
   const [fullName, setFullName] = useState("");
   const [connectedDevice, setConnectedDevice] = useState();
-  const [connectedDeviceName, setConnectedDeviceName] = useState(null);
+  const [connectedDeviceName, setConnectedDeviceName] = useState('V49'); // TODO: change so this is no longer default
   const [midiState, setMIDIState] = useState(null);
   const [inputDevices, setInputDevices] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState();
@@ -42,9 +42,6 @@ const App = () => {
             setMIDIState(midiAccess);
             // await setUpMIDI(midiAccess);
             await listMIDIInputs(midiAccess);
-
-            // manually setting connected device for now
-            await manuallySetUpConnectedDevice();
 
             /* if (connectedDevice) {
               Tone.Transport.set({ midi: connectedDevice })
@@ -88,34 +85,25 @@ const App = () => {
     const inputs = Array.from(midiAccess.inputs.values());
     inputs.forEach(input => {
       console.log(input);
-      if(input.name === 'V49') {
+      /*if(input.name === 'V49') {
         setConnectedDevice(input);
         setConnectedDeviceName(input.name);
-      }
+      }*/
     });
     setInputDevices(inputs);
     return inputs;
   }
 
-  const manuallySetUpConnectedDevice = async () => {
-    const inputs = inputDevices;
-    inputs.forEach(input => {
-      console.log(input.name);
-      if(input.name === 'V49') {
-        setConnectedDevice(input);
-      }
-    });
-
-  }
-
   const updateConnectedDevice = async (device) => {
     console.log('Setting connected device ' + device.name);
     setConnectedDevice(device);
+    setConnectedDeviceName(device.name);
     // TODO: update Tone.js output
   }
 
   const removeConnectedDevice = () => {
     setConnectedDevice(undefined);
+    setConnectedDeviceName(null);
     console.log('Disconnecting device.' + connectedDevice.name);
     Tone.Transport.set({ midi: null });
   }

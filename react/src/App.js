@@ -11,81 +11,114 @@ import Register from './authentication/Register';
 import Footer from './layouts/Footer';
 
 /**
- * Start-up: To begin application, navigate to the react folder and type "npm start"; make sure back-end is running as well by navigated to express and typing "index.js"
- * Parent component used to handle state
+ * Main component used to handle Tone.js, MIDI device connections, and routing
+ * @returns routes
  */
-
-const MIDIContext = createContext();
-export const useMIDIContext = () => useContext(MIDIContext);
-
 const App = () => {
+  
+  // state
   const [fullName, setFullName] = useState("");
-  const [connectedDevice, setConnectedDevice] = useState(null);
-  const [midiAccess, setMIDIAccess] = useState(null);
+  const [connectedDevice, setConnectedDevice] = useState();
+  const [connectedDeviceName, setConnectedDeviceName] = useState('V49'); // TODO: change so this is no longer default
+  const [midiState, setMIDIState] = useState(null);
   const [inputDevices, setInputDevices] = useState([]);
+  const [isAuthenticated, setIsAuthenticated] = useState();
 
+  /*
+  * Runs when component mounts, sets up MIDI access and lists MIDI devices
+  */
   useEffect(() => {
-      const fetchMIDIData = async () => {
 
-        try {
-          await navigator.requestMIDIAccess().then(async (midiAccess) => {
-            const midiIns = await listMIDIInputs(midiAccess);
-            const connectedDev = await updateConnectedDevice(midiIns[0]);
-
-            console.log("MIDI inputs:");
-            console.log(midiIns);
-            
-            // TODO: update state
-            // TODO: ensure tone can connect to device
-            console.log('first device: ' + midiIns[0]);
-            const connectedDevice = new Tone.Midi(midiIns[0]);
-            Tone.Transport.set({ midi: connectedDevice })
-            
-            
-          })
-          // const inputDevices = midiAccess.inputs.values();
-          // console.log("Input devices " + inputDevices[0]);
-          /* 
-
-          setMIDIAccess(midiAccess);
-          const midiDevices = await listMIDIInputs(midiAccess);
-          setInputDevices(midiDevices);*/
-        } catch (error) {
-          console.error('MIDI Access failed: ', error);
-        }
+    /**
+     * Sets up MIDI access
+     */
+    const setUpMIDI = async () => {
+      try {
+          const midiAccess = await navigator.requestMIDIAccess();
+          midiAccess.addEventListener("statechange", handleStateChange);
+          setMIDIState(midiAccess);
+          await listMIDIInputs(midiAccess);
+      } catch (error) {
+        console.error('MIDI Access failed: ', error);
       }
+    }
 
-      fetchMIDIData();
+    setUpMIDI();
+
+    /**
+     * Handles MIDI event (connect, disconnect)
+     * TODO: need to refactor so state runs properly and page reloads in a better way
+     * TODO: fix event type and handle disconnect
+     * @param {*} event MIDI change
+     */
+    const handleStateChange = async (event) => {
+      event.preventDefault();
+      console.log("MIDI event");
+      window.location.reload();
+      alert('MIDI status changed. Reloading page.');
+      if(event.type === 'disconnected') {
+        console.log('Disconnected');
+      } else {
+        setMIDIState(event);
+      }
+    }
+
+    // cleanup when component unmounts
+    return () => {
+      navigator.requestMIDIAccess().then((midiAccess) => {
+        midiAccess.removeEventListener('statechange', handleStateChange);
+      }).catch((error) => {
+        console.error('Error removing event listener', error);
+      })
+    };
 
   }, []);
+  
 
+  /**
+   * Lists MIDI inputs and adds to state
+   * @param {*} midiAccess 
+   * @returns MIDI inputs
+   */
   const listMIDIInputs = async (midiAccess) => {
-    const inputs = midiAccess.inputs.values();
-    const midiInputs = [];
-    console.log('MIDI inputs: ');
-    for (let input of inputs) {
-      console.log(input.name);
-      midiInputs.push(input.name)
-    }
-    setInputDevices(midiInputs);
-    return midiInputs;
+    const inputs = Array.from(midiAccess.inputs.values());
+    inputs.forEach(input => {
+      console.log(input);
+    });
+    setInputDevices(inputs);
+    return inputs;
   }
 
-  const updateConnectedDevice = (device) => { // establish connection to device
+  /**
+   * Changes connected device and updates state
+   * TODO: need to update Tone.js connection using Tone.transport.set()
+   * @param {*} device MIDI device to connect
+   */
+  const updateConnectedDevice = async (device) => {
+    console.log(`Connected device: ${device.name}`);
     setConnectedDevice(device);
+    setConnectedDeviceName(device.name);
   }
 
+  /**
+   * Removes connected device and updates state
+   * Removes Tone.js input device
+   */
   const removeConnectedDevice = () => {
-    // setConnectedDevice(null);
+    setConnectedDevice(undefined);
+    setConnectedDeviceName(null);
+    console.log(`Disconnecting device: ${connectedDevice.name}`);
+    Tone.Transport.set({ midi: null });
   }
 
+  // returns routes and basic view
   return (
-    <MIDIContext.Provider value={{ connectedDevice, inputDevices }}>
+    // <MIDIContext.Provider value={{ connectedDevice, inputDevices }}>
       <div className="app-container d-flex flex-column" style={{ backgroundColor: '#f8f8f8' }}>
             <Router>
-                <Navbar />
+                <Navbar/>
                 <Routes>
-                    <Route exact path="/" element={<Play midiAccess={midiAccess} selectedDevice={connectedDevice} fullName={fullName} />} />
+                    <Route exact path="/" element={<Play fullName={fullName} connectedDevice={connectedDevice} />} />
                     <Route exact path="/connect" element={<Connect connectedDevice={connectedDevice} updateConnectedDevice={updateConnectedDevice} midiInputDevices={inputDevices} />} />
                     <Route exact path="/about" element={<About />} />
                     <Route exact path="/login" element={<Login />} />
@@ -93,12 +126,11 @@ const App = () => {
                 </Routes>
             </Router>
             <div className="fixed-bottom">
-                <Footer selectedDevice={connectedDevice} removeConnectedDevice={removeConnectedDevice} />
+                <Footer connectedDevice={connectedDeviceName} removeConnectedDevice={removeConnectedDevice} />
             </div>
         </div>
-    </MIDIContext.Provider>
+    // </MIDIContext.Provider>
   )
 }
-
 
 export default App;

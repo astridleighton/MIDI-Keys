@@ -1,28 +1,28 @@
 import React from 'react';
-import { Route, Link, Routes, BrowserRouter } from 'react-router-dom';
-import './Navbar.css';
+import './Navbar.scss';
 import Cookies from 'js-cookie';
 import { AppBar, Button, TextField, Typography, Container, CssBaseline, Avatar, Grid, Toolbar } from '@mui/material';
-//import PianoIcon from '@mui/icons-material/Piano';
 
 /**
  * Displays navigation bar for site navigation
  */
-function Navbar()
+const Navbar = () =>
 {
 
-    function handleLogout () {
+    // checks if user has been authenticated
+    let isAuthenticated = !!Cookies.get('token');
+
+    /**
+     * Logs the user out and reloads the page
+     * TODO: add in useEffect or handle reload better
+     */
+    const handleLogout = () => {
         Cookies.remove('token');
         Cookies.remove('name');
         window.location.reload();
     }
     
-    /**
-     * Shows navigation links and shows login/logout button depending on session cookie
-     * @returns 
-     */
-    const isAuthenticated = !!Cookies.get('token');
-
+    // shows navigation link and user authentication status
     return(
         <div>
             <AppBar position="static" color="primary" sx={{ backgroundColor: '#000000' }}>
@@ -49,7 +49,7 @@ function Navbar()
                         {isAuthenticated ? (
                                 <Button
                                     variant="outlined"
-                                    onClick={handleLogout()}
+                                    onClick={handleLogout}
                                     >
                                         Log Out
                                 </Button>

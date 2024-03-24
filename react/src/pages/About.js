@@ -1,18 +1,14 @@
 import React from 'react';
-import { Container, Typography, Grid } from '@mui/material';
 
 import './About.scss'
+
 /**
  * Displays basic website information
  */
 const About = () =>
 {
 
-    /**
-     * Shows website information and helps users understand the purpose of the site
-     * @returns view
-     */
-
+    // returns about view
     return(
         <div className='about-container'>
             <div className='about-header'>

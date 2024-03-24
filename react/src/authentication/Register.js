@@ -8,14 +8,12 @@ import { Button, Box, TextField, Typography, Container, CssBaseline, Avatar, Gri
 /**
  * Allows user to create an account
  * Future improvements: moving authentication logic to auth class
- * @returns 
- * 
  */
 const Register = () =>
 {
-    const [firstName, setFirstName] = useState("");
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+    const [firstname, setFirstName] = useState(null);
+    const [username, setUsername] = useState(null);
+    const [password, setPassword] = useState(null);
     const [submitted, setSubmitted] = useState("");
     const [firstNameMessage, setFirstNameMessage] = useState("");
     const [usernameMessage, setUsernameMessage] = useState("");
@@ -52,7 +50,7 @@ const Register = () =>
         event.preventDefault();
         const newPassword = event.target.value;
         setPassword(newPassword);
-        setIsFormValid(firstName != null && username != null && newPassword != null);
+        setIsFormValid(firstname != null && username != null && newPassword != null);
     }
     /**
      * Passes registration credentials to registration function
@@ -64,35 +62,23 @@ const Register = () =>
             event.preventDefault();
         }
 
-        const firstNameValid = validateFirstName();
-        const usernameValid = validateUsername(username);
-        const passwordValid = validatePassword(password);
+        const usernameValid = await validateUsername(username);
+        const passwordValid = await validatePassword(password);
 
-        if(firstNameValid && usernameValid && passwordValid) {
+        console.log('Firstname: ' + firstname);
+
+        if(usernameValid && passwordValid) {
             try {
-                await processRegister({firstName, username, password});
+                await processRegister({username, firstname, password});
             } catch (error) {
                 console.log("Registration failed: ", error);
             } finally {
-                setFirstName('');
-                setUsername('');
-                setPassword('');
+                setFirstName(null);
+                setUsername(null);
+                setPassword(null);
+                setIsFormValid(false);
             }
         }
-            
-
-    }
-
-    /**
-     * Ensures first name is not blank
-     * @returns boolean value for error message
-     */
-    function validateFirstName () {
-        if(!firstName) {
-            setFirstNameMessage('First name cannot be left blank');
-            return false;
-        }
-        return true;
     }
 
     /**
@@ -100,8 +86,8 @@ const Register = () =>
      * @param {*} username 
      * @returns boolean value for error message
      */
-    function validateUsername(username) {
-        if(username.length === 0) {
+    const validateUsername = (user) => {
+        if(user.length === 0) {
             setUsernameMessage('Username cannot be left blank');
             return false; // username is not valid
         }
@@ -113,14 +99,11 @@ const Register = () =>
      * @param {*} password 
      * @returns boolean value for error message
      */
-    function validatePassword(password) {
-        if (password.length === 0) {
-            setPasswordMessage('Password cannot be left blank' );
-            return false;
-        } else if (password.length < 8) {
+    const validatePassword = (pass) => {
+        if (pass.length < 8) {
             setPasswordMessage('Password must be at least 8 characters long' );
             return false;
-        } else if (!/\d/.test(password)) {
+        } else if (!/\d/.test(pass)) {
             setPasswordMessage('Password must contain at least one number' );
             return false;
         } else {
@@ -153,7 +136,6 @@ const Register = () =>
 
     /**
      * Displays registration form
-     * @returns view
      */
     return(
         <div>
@@ -192,7 +174,7 @@ const Register = () =>
                 label="First Name"
                 error={firstNameMessage} // check if empty
                 helperText={firstNameMessage}
-                value={firstName}
+                value={firstname}
                 onChange={handleFirstNameChange}
                 autoComplete="off"
                 autoFocus
@@ -233,6 +215,7 @@ const Register = () =>
                 fullWidth
                 variant="contained"
                 onClick={handleSubmit}
+                disabled={!isFormValid}
                 sx={{
                     backgroundColor: 'black',
                     color: 'white',

@@ -8,25 +8,23 @@ import axios from 'axios';
 import { ListItem, List, FormControl, FormLabel, RadioGroup, FromControlLabel, ListItemButton, ListItemText, ListItemIcon, Radio, Box, FormControlLabel, Switch, FormGroup } from '@mui/material';
 
 import './Play.scss'
-// import { useMIDIContext } from '../App';
 
 /**
- *   Contains the Tone.JS instruments and references online samples
- *   Allows user to select between instruments
- *   Displays notes played
+ * Initiates QWERTY and MIDI keyboard setup
+ * Contains the Tone.JS instruments and database samples
+ * Allows user to select between instruments
+ * Displays notes played
+ * TODO: display chord played, do not set default instrument
+ * TODO: change note velocity
  */
 const Play = ({connectedDevice}) =>
 {
-    // used to instantiate synthesizers from Tone.JS, selected sound, and notes/chords played
     // TODO: move all drums into kit in future implementation
         /*const drumKit = new Tone.Players({
             "kick": "https://tonejs.github.io/audio/drum-samples/4OP-FM/snare.mp3",
         }).toDestination();*/
 
-        // TODO: always leave qwerty on?
-        // TODO: triggerrelease and remove arrays - change to constants
-        // TODO: add chord updates
-
+    // state
     const isAuthenticated = !!Cookies.get('token');
     const firstName = Cookies.get('name');
 
@@ -42,7 +40,7 @@ const Play = ({connectedDevice}) =>
     const [bongoSnarePlayer] = useState(new Tone.Player("https://tonejs.github.io/audio/drum-samples/Bongos/snare.mp3").toDestination());
     const [bongoTomPlayer] = useState(new Tone.Player("https://tonejs.github.io/audio/drum-samples/Bongos/tom1.mp3").toDestination());
 
-    const [selectedSound, setSelectedSound] = useState('qwerty');
+    const [selectedSound, setSelectedSound] = useState('');
     const [chordNotes, setChordNotes] = useState([undefined]);
     const [soundObjects, setSoundObjects] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -53,26 +51,37 @@ const Play = ({connectedDevice}) =>
     const [chordEnabled, setChordEnabled] = useState(false);
 
     /**
-       * Starts tone.JS and sets up sounds
+       * Starts tone.JS and sets up MIDI input devices
        */
     useEffect (() => {
         const initTone = async() => {
-            const manuallyConnectedDevice = await manuallyConnectV49();
-            Tone.start();
-            await Tone.setContext(new AudioContext({ sampleRate: 48000 }));
-            Tone.Master.volume.value = -6;
-            await setUpQwertyKeyboard();
-            await initializeSounds();
+            try {
+                Tone.start();
 
-            if(manuallyConnectedDevice) {
-                console.log('setting up MIDI keyboard');
-                await setUpMIDIKeyboard(manuallyConnectedDevice);
+                await Tone.setContext(new AudioContext({ sampleRate: 48000 })); // sets audio preferences
+                Tone.Master.volume.value = -6;
+
+                await setUpQwertyKeyboard(); // device setup
+                await initializeSounds();
+
+                const manuallyConnectedDevice = await manuallyConnectV49(); // manually connection set up for now
+                if(manuallyConnectedDevice) {
+                    console.log('setting up MIDI keyboard');
+                    await setUpMIDIKeyboard(manuallyConnectedDevice);
+                }
+            } catch (error) {
+                console.error('Error setting up MIDI in your browser. Please reload and try again.', error);
             }
+            
         }
 
         initTone();
-  }, []);
+  }, [selectedSound]);
 
+  /**
+   * Manual device connection to V49 (used for testing)
+   * @returns connected device
+   */
     const manuallyConnectV49 = async () => {
         const midiAccess = await navigator.requestMIDIAccess();
         const inputs = Array.from(midiAccess.inputs.values());
@@ -146,7 +155,26 @@ const Play = ({connectedDevice}) =>
       }
 
       /**
+       * Creates an instance of the online bass sampler
+       * @param {*} note 
+       * @param {*} url 
+       */
+      const createOnlineBassSampler = (note, url) => {
+        const sampler = new Tone.Sampler({
+            urls: {
+            A1: "As1.mp3",
+            A2: "As2.mp3",
+        },
+	        baseUrl: url,
+            onload: () => {
+                sampler.triggerAttackRelease(note, 0.8);
+            }
+        }).toDestination();
+      }
+
+      /**
        * Creates an instance of the online sampler (used for online URLs)
+       * TODO: fix CORS error
        * @param {*} note 
        * @param {*} url 
        */
@@ -267,10 +295,16 @@ const Play = ({connectedDevice}) =>
         await getAllFavorites();
       }
 
+      /**
+       * Changes state based on note toggle
+       */
       const handleNotesToggle = () => {
         setNotesEnabled(!notesEnabled);
       }
 
+      /**
+       * Changes state based on chord toggle
+       */
       const handleChordToggle = () => {
         setChordEnabled(!chordEnabled);
       }
@@ -282,7 +316,7 @@ const Play = ({connectedDevice}) =>
     const setUpMIDIKeyboard = async(midiKeyboard) =>
     {
         console.log('Setting up MIDI keyboard');
-        midiKeyboard.onmidimessage =  async(event) =>
+        midiKeyboard.onmidimessage =  async (event) =>
         {
             const command = event.data[0];
             const noteInput = event.data[1];
@@ -307,6 +341,9 @@ const Play = ({connectedDevice}) =>
                             monoSynth.triggerAttackRelease(note, "4n");
                         } else if (selectedSound === 'casio') {
                             createSampler(note);
+                        } else if (selectedSound === 'bass') {
+                            console.log('test!');
+                            createOnlineBassSampler(note, url);
                         } else if (selectedSound === 'online') {
                             createOnlineSampler(note, url);
                         }
@@ -352,9 +389,10 @@ const Play = ({connectedDevice}) =>
 
     /**
      * - Sets up keyboard using AudioKeys and allows QWERTY keyboard input
-            - Maps MIDI notes to music notes
-            - Triggers audio output with keydown event
-            - Stores current notes / chord being played
+        - Maps MIDI notes to music notes
+        - Triggers audio output with keydown event
+        - Stores current notes being played
+        TODO: determine if qwerty should always play
      */
     const setUpQwertyKeyboard = async() => {
 
@@ -385,35 +423,16 @@ const Play = ({connectedDevice}) =>
         */
         keyboard.down(async (e) => {
             console.log(e);
-            // TODO: fix so selectedSound is always set as qwerty -- showing as null
 
-            if(selectedSound === "qwerty") {
-                const note = keyToNote[e.keyCode];
+            const note = keyToNote[e.keyCode];
 
-                if(note)
-                {
-                    const notes = await addNote(note);
-                    // TODO: implement getChord()
-
-                    if (selectedSound === 'synth') {
-                        const synth = createSynth();
-                        synth.triggerAttackRelease(note, "4n");
-                    } else if (selectedSound === 'amSynth') {
-                        const amSynth = createAMSynth();
-                        amSynth.triggerAttackRelease(note, "4n");
-                    } else if (selectedSound === 'monosynth') {
-                        const monoSynth = createMonoSynth();
-                        monoSynth.triggerAttackRelease(note, "4n");
-                    } else if (selectedSound === 'sampler') {
-                        this.sampler.triggerAttackRelease(note, "4an");
-                    } else if (selectedSound === 'qwerty') {
-                        const synth = new Tone.Synth().toDestination();
-                        synth.triggerAttackRelease(note, '4n');
-                    }
-                }
-            } else {
-                console.log('this should not work');
-            }  
+            if(note)
+            {
+                const notes = await addNote(note);
+                const synth = new Tone.Synth().toDestination();
+                synth.triggerAttackRelease(note, '4n');
+                // TODO: implement getChord()
+            }
         });
 
     /*
@@ -471,7 +490,7 @@ const Play = ({connectedDevice}) =>
     /*
         Selects instrument type based on user option
     */
-    const handleButtonClick = (instrument, location) => {
+    const handleButtonClick = (instrument, location, e) => {
         console.log("Selected: " + instrument + " at " + location);
 
         if(location === "react" || !location) {
@@ -483,8 +502,8 @@ const Play = ({connectedDevice}) =>
                 setSelectedSound('monosynth');
             } else if (instrument === 'Casio Piano') {
                 setSelectedSound('casio');
-            } else if (instrument === 'QWERTY') { // TODO: remove qwerty from here
-                setSelectedSound('qwerty');
+            } else if (instrument === 'Bass Guitar') {
+                setSelectedSound('bass');
             } else {
                 console.log("No instrument found on front-end for selected instrument.");
             }
@@ -497,8 +516,8 @@ const Play = ({connectedDevice}) =>
     }
 
     /*
-        - Starter code to display the chord being played (not used yet)
-        - TODO: implement additional instruments, samples, and intervals
+    - Starter code to display the chord being played (not used yet)
+    - TODO: implement additional instruments, samples, and intervals
     */
     const getChord = async (notes) =>
     {
@@ -685,9 +704,7 @@ const Play = ({connectedDevice}) =>
         }
     }
 
-    /*
-        Renders user session and displays available sounds and notes played
-    */        
+    // renders user session and displays available sounds and notes played
     return(
         <div className="play-container">
             <div className="play-container play-header">
@@ -731,7 +748,16 @@ const Play = ({connectedDevice}) =>
                                     }}
                                 >
                                     {soundObjects.map(sound => (
-                                        <SoundCard key={sound.id} id={sound.id} name={sound.name} location={sound.location} isFavorite={sound.isFavorite} isLoggedIn={isAuthenticated} onSelect={handleButtonClick} addFavorite={addFavorite} removeFavorite={removeFavorite} />
+                                        <SoundCard
+                                            key={sound.id}
+                                            id={sound.id}
+                                            name={sound.name}
+                                            location={sound.location}
+                                            isFavorite={sound.isFavorite}
+                                            isLoggedIn={isAuthenticated}
+                                            onSelect={(instrument, location) => handleButtonClick(instrument, location)}
+                                            addFavorite={addFavorite}
+                                            removeFavorite={removeFavorite} />
                                     ))}
                                 </List> 
                             </RadioGroup>

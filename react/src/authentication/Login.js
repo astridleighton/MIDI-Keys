@@ -35,7 +35,7 @@ const Login = () =>
         event.preventDefault();
         const newPassword = event.target.value;
         setPassword(newPassword);
-        setIsFormValid(username != '' && newPassword != null);
+        setIsFormValid(username !== '' && newPassword !== null);
     }
 
     /**
@@ -97,6 +97,7 @@ const Login = () =>
         })
     }
 
+    // returns login view
     return (
         <div>  
             <Container maxWidth="xs">

@@ -6,6 +6,7 @@ import SoundCard from '../cards/SoundCard';
 import Sound from '../sound/Sound';
 import axios from 'axios';
 import { ListItem, List, FormControl, FormLabel, RadioGroup, FromControlLabel, ListItemButton, ListItemText, ListItemIcon, Radio, Box, FormControlLabel, Switch, FormGroup } from '@mui/material';
+import Piano from './Piano';
 
 import './Play.scss'
 
@@ -412,10 +413,13 @@ const Play = ({connectedDevice}) =>
             71: 'G4', // G
             89: 'Ab4', // Y
             72: 'A4', // H
-            73: 'B4', // J
-            74: 'C5', // K
+            85: 'Bb4', // U
+            74: 'B4', // J
+            75: 'C5', // K
             79: 'Db5', // O
-            80: 'Ab4', // P
+            76: 'D5', // L
+            80: 'Eb5', // P
+            59: 'E5' // ;
         };
 
         /*
@@ -441,11 +445,8 @@ const Play = ({connectedDevice}) =>
         keyboard.up(async(e) => {
             console.log(e);
 
-            if(selectedSound === "qwerty") {
-                const note = keyToNote[e.keyCode];
-
+            const note = keyToNote[e.keyCode];
             await removeNote(note);
-            }
 
             
         })
@@ -765,6 +766,7 @@ const Play = ({connectedDevice}) =>
                     </Box>
                 )}
             </div>
+            <Piano notes={chordNotes}/>
             <div className="chord-container">
                 <FormGroup>
                     <div className="display-notes-container">

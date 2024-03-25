@@ -6,6 +6,7 @@ import SoundCard from '../cards/SoundCard';
 import Sound from '../sound/Sound';
 import axios from 'axios';
 import { ListItem, List, FormControl, FormLabel, RadioGroup, FromControlLabel, ListItemButton, ListItemText, ListItemIcon, Radio, Box, FormControlLabel, Switch, FormGroup } from '@mui/material';
+import Piano from './Piano';
 
 import './Play.scss'
 
@@ -765,6 +766,7 @@ const Play = ({connectedDevice}) =>
                     </Box>
                 )}
             </div>
+            <Piano />
             <div className="chord-container">
                 <FormGroup>
                     <div className="display-notes-container">

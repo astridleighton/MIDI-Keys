@@ -5,8 +5,9 @@ import Cookies from 'js-cookie';
 import SoundCard from '../cards/SoundCard';
 import Sound from '../sound/Sound';
 import axios from 'axios';
-import { ListItem, List, FormControl, FormLabel, RadioGroup, FromControlLabel, ListItemButton, ListItemText, ListItemIcon, Radio, Box, FormControlLabel, Switch, FormGroup } from '@mui/material';
+import { List, FormControl, FormLabel, RadioGroup, Box, FormControlLabel, Switch, FormGroup, Card } from '@mui/material';
 import Piano from './Piano';
+// import Sampler from '../tonejs-instruments-master/tonejs-instruments-master/Tonejs-Instruments';
 
 import './Play.scss'
 
@@ -18,36 +19,24 @@ import './Play.scss'
  * TODO: display chord played, do not set default instrument
  * TODO: change note velocity
  */
-const Play = ({connectedDevice}) =>
+
+// TODO: pass in connected device
+const Play = () =>
 {
     // TODO: move all drums into kit in future implementation
-        /*const drumKit = new Tone.Players({
+        /* const drumKit = new Tone.Players({
             "kick": "https://tonejs.github.io/audio/drum-samples/4OP-FM/snare.mp3",
-        }).toDestination();*/
+        }).toDestination(); */
 
     // state
     const isAuthenticated = !!Cookies.get('token');
     const firstName = Cookies.get('name');
-
-    const [synths, setSynths] = useState({});
-    const [amSynths, setAmSynths] = useState({});
-    const [monoSynths, setMonoSynths] = useState({});
-    const [casioSamples, setCasioSamples] = useState({});
-    const [synthTest] = useState(new Tone.Synth().toDestination());
-    
-    const [useQwerty, setUseQwerty] = useState(true);
-
-    const [hiHatPlayer] = useState(new Tone.Player("https://tonejs.github.io/audio/drum-samples/4OP-FM/hihat.mp3").toDestination());
-    const [bongoSnarePlayer] = useState(new Tone.Player("https://tonejs.github.io/audio/drum-samples/Bongos/snare.mp3").toDestination());
-    const [bongoTomPlayer] = useState(new Tone.Player("https://tonejs.github.io/audio/drum-samples/Bongos/tom1.mp3").toDestination());
-
     const [selectedSound, setSelectedSound] = useState('');
     const [chordNotes, setChordNotes] = useState([undefined]);
     const [soundObjects, setSoundObjects] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [url, setURL] = useState('');
-    const [midiDevices, setMIDIDevices] = useState([]);
-    const [currentChord, setCurrentChord] = useState('');
+    // const [currentChord, setCurrentChord] = useState('');
     const [notesEnabled, setNotesEnabled] = useState(false);
     const [chordEnabled, setChordEnabled] = useState(false);
 
@@ -287,6 +276,49 @@ const Play = ({connectedDevice}) =>
         });
       }
 
+      // TODO: put these all in the database
+      const createChoirSampler = (note) => {
+        const sampler = new Tone.Sampler({
+            urls: {
+            A3: "femalevoices_aa2_A3.mp3",
+            A4: "femalevoices_aa2_A4.mp3",
+            A5: "femalevoices_aa2_A5.mp3"
+        },
+	        baseUrl: "https://tonejs.github.io/audio/berklee/",
+            onload: () => {
+                sampler.triggerAttackRelease(note, 1);
+            }
+        }).toDestination();
+      }
+
+      const createEerieSynthSampler = (note) => {
+        const sampler = new Tone.Sampler({
+            urls: {
+            A3: "eerie_synth1.mp3",
+            A4: "eerie_synth2.mp3",
+            A5: "eerie_synth3.mp3"
+        },
+	        baseUrl: "https://tonejs.github.io/audio/berklee/",
+            onload: () => {
+                sampler.triggerAttackRelease(note, 1);
+            }
+        }).toDestination();
+      }
+      const createGuitarSampler = (note) => {
+        const sampler = new Tone.Sampler({
+            urls: {
+            A3: "guitar_Astring.mp3",
+            E2: "guitar_LowEstring1.mp3",
+            G4: "guitar_Gstring.mp3"
+        },
+	        baseUrl: "https://tonejs.github.io/audio/berklee/",
+            onload: () => {
+                sampler.triggerAttackRelease(note, 1);
+            }
+        }).toDestination();
+      }
+
+
       /**
        * Ensures sounds are loaded before receiving favorite sounds
        */
@@ -432,9 +464,10 @@ const Play = ({connectedDevice}) =>
 
             if(note)
             {
-                const notes = await addNote(note);
-                const synth = new Tone.Synth().toDestination();
-                synth.triggerAttackRelease(note, '4n');
+                await addNote(note);
+                createGuitarSampler(note, url);
+                // const synth = new Tone.Synth().toDestination();
+                // synth.triggerAttackRelease(note, '4n');
                 // TODO: implement getChord()
             }
         });
@@ -491,11 +524,11 @@ const Play = ({connectedDevice}) =>
     /*
         Selects instrument type based on user option
     */
-    const handleButtonClick = (instrument, location, e) => {
+    const handleButtonClick = (instrument, location) => {
         console.log("Selected: " + instrument + " at " + location);
 
-        if(location === "react" || !location) {
-            if(instrument === 'Synth') {
+        if (location === "react" || !location) {
+            if (instrument === 'Synth') {
                 setSelectedSound('synth');
             } else if (instrument === 'AM Synth') {
                 setSelectedSound('amsynth');
@@ -520,7 +553,7 @@ const Play = ({connectedDevice}) =>
     - Starter code to display the chord being played (not used yet)
     - TODO: implement additional instruments, samples, and intervals
     */
-    const getChord = async (notes) =>
+    /* const getChord = async (notes) =>
     {
         // only works for three note chords
         if (chordNotes && chordNotes.length === 3) {
@@ -565,7 +598,7 @@ const Play = ({connectedDevice}) =>
                 console.log("Other");
             }
         }
-    }  
+    } */
     
     /**
      * Retrieves all sounds from the database

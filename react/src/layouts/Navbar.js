@@ -1,7 +1,8 @@
 import React from 'react';
 import './Navbar.scss';
 import Cookies from 'js-cookie';
-import { AppBar, Button, TextField, Typography, Container, CssBaseline, Avatar, Grid, Toolbar } from '@mui/material';
+import { AppBar, Button, Typography, Toolbar } from '@mui/material';
+import PianoIcon from '@mui/icons-material/Piano';
 
 /**
  * Displays navigation bar for site navigation
@@ -27,6 +28,7 @@ const Navbar = () =>
         <div>
             <AppBar position="static" color="primary" sx={{ backgroundColor: '#000000' }}>
                 <Toolbar>
+                    <PianoIcon/>
                     <Typography variant="h6" sx={{ my: 2 }}>
                         MIDI Keys
                     </Typography>

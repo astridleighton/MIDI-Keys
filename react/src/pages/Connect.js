@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { Button, List, FormControl, FormLabel, RadioGroup, ListItem, Radio, Box, FormControlLabel } from '@mui/material';
+import { Button, List,  FormLabel, RadioGroup, ListItem, Radio, FormControlLabel } from '@mui/material';
 
 import './Connect.scss'
 
@@ -10,7 +10,7 @@ import './Connect.scss'
 /**
  * Allows the user to view available MIDI devices and connect to a selected device
  * TODO: add connect device as default value
- * @param {*} param0 
+ * @param {*} param
  * @returns 
  */
 const Connect = ({connectedDevice, updateConnectedDevice, midiInputDevices}) =>
@@ -18,7 +18,7 @@ const Connect = ({connectedDevice, updateConnectedDevice, midiInputDevices}) =>
 
   // state
   const [selectedDevice, setSelectedDevice] = useState(null);
-  const connectedDeviceName = connectedDevice;
+  // const connectedDeviceName = connectedDevice;
 
   /**
    * Updates state based on selected device

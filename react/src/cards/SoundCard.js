@@ -1,38 +1,38 @@
-import React, { Component } from 'react';
+/* import React, { Component } from 'react';
 import { ListItem, ListItemIcon, FormControlLabel, Radio } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
-import StarIcon from '@mui/icons-material/Star';
+import StarIcon from '@mui/icons-material/Star'; */
 
 /**
  * Defines a sound on user interface
  */
-class SoundCard extends Component {
+/* class SoundCard extends Component {
 
     /**
      * Handles user sound selection
-     * @param {*} event 
+     * @param {*}  
      */
-    handleSelect = (event) => {
+    /* handleSelect = () => {
         this.props.onSelect(this.props.name, this.props.location);
-    }
+    } */
 
     /**
      * Handles user favorite selection (add/remove)
-     * @param {*} event 
+     * @param {*} 
      */
-    handleFavorite = (event) => {
+    /* handleFavorite = () => {
         if (this.props.isFavorite) { // if already favorite, remove
             this.props.removeFavorite(this.props.name);
         } else { // if not favorite, make favorite
             this.props.addFavorite(this.props.name);
         }
-    }
+    } */
 
     /**
      * Renders sound card by displaying radio and star icon
      * @returns 
      */
-    render() {
+    /* render() {
         const { name, id, isLoggedIn, isFavorite } = this.props;
 
         return (
@@ -47,7 +47,7 @@ class SoundCard extends Component {
                         <IconButton
                             color="white"
                             onClick={this.handleFavorite}>
-                                {isFavorite ? <StarIcon style={{ color: 'yellow' }} /> : <StarIcon />} {/* Render filled star if favorited, otherwise render empty star */}
+                                {isFavorite ? <StarIcon style={{ color: 'yellow' }} /> : <StarIcon />} {/* Render filled star if favorited, otherwise render empty star */ /* }
                         </IconButton>
                     )}
                 </ListItemIcon>
@@ -58,4 +58,4 @@ class SoundCard extends Component {
 
 }
 
-export default SoundCard;
+export default SoundCard; */

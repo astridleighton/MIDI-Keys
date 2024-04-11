@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -12,7 +12,7 @@ const Login = () =>
 {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [firstName, setFirstName] = useState('');
+    const [ /* firstName, */ setFirstName] = useState('');
     const [submitted, setSubmitted] = useState(false);
     const [isFormValid, setIsFormValid] = useState(false);
     const [error, setError] = useState('');
@@ -170,7 +170,7 @@ const Login = () =>
                         </Button>
                     </Container>
                     <Typography>
-                        Don't have an account?
+                        Don$apos;t have an account?
                         <a
                             href="/register"
                             style={{

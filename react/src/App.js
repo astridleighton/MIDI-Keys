@@ -1,5 +1,5 @@
-import { React, useState, useEffect, useContext, createContext } from 'react';
-import { Route, Link, Routes, BrowserRouter as Router} from 'react-router-dom';
+import { React, useState, useEffect } from 'react';
+import { Route, Routes, BrowserRouter as Router} from 'react-router-dom';
 import './App.css';
 import Connect from './pages/Connect';
 import Play from './pages/Play';
@@ -17,12 +17,12 @@ import Footer from './layouts/Footer';
 const App = () => {
   
   // state
-  const [fullName, setFullName] = useState("");
+  const [fullName] = useState();
   const [connectedDevice, setConnectedDevice] = useState();
   const [connectedDeviceName, setConnectedDeviceName] = useState('V49'); // TODO: change so this is no longer default
-  const [midiState, setMIDIState] = useState(null);
+  const [ /* midiState, */ setMIDIState] = useState(null);
   const [inputDevices, setInputDevices] = useState([]);
-  const [isAuthenticated, setIsAuthenticated] = useState();
+  // const [isAuthenticated, setIsAuthenticated] = useState();
 
   /*
   * Runs when component mounts, sets up MIDI access and lists MIDI devices
@@ -36,7 +36,7 @@ const App = () => {
       try {
           const midiAccess = await navigator.requestMIDIAccess();
           midiAccess.addEventListener("statechange", handleStateChange);
-          setMIDIState(midiAccess);
+          // setMIDIState(midiAccess); TODO: fix!
           await listMIDIInputs(midiAccess);
       } catch (error) {
         console.error('MIDI Access failed: ', error);
@@ -107,7 +107,12 @@ const App = () => {
   const removeConnectedDevice = () => {
     setConnectedDevice(undefined);
     setConnectedDeviceName(null);
-    console.log(`Disconnecting device: ${connectedDevice.name}`);
+
+    if(connectedDevice) {
+      console.log(`Disconnecting device: ${connectedDevice.name}`);
+    } else {
+      console.log('Disconnecting device.');
+    }
     Tone.Transport.set({ midi: null });
   }
 

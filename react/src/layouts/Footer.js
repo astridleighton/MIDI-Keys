@@ -1,4 +1,5 @@
 import React from 'react';
+import { AppBar, Toolbar, Button } from '@mui/material';
 
 /**
  * Displays connected device and allows user to remove it
@@ -15,7 +16,32 @@ const Footer = ({ connectedDevice, removeConnectedDevice }) =>
     // displays footer view and shows connected device
     return(
         <div>
-            <footer className="footer text-center text-lg-start bg-dark">
+            { /*<AppBar style= {{ position: 'fixed', bottom: 0}}>
+                <Toolbar>
+                <div className="container text-center p-3">
+                        <span className="text-light">
+                            {connectedDevice ? (
+                                <span>Connected Device:&nbsp;{connectedDevice}&nbsp;
+                                <Button
+                                    variant="outlined"
+                                    onClick={removeDevice}
+                                >
+                                    Disconnect
+                                </Button>
+                                </span>
+                            ) : (
+                                <span>No device connected.</span>
+                            )}
+                        </span>
+                    </div>
+                </Toolbar>
+                            </AppBar> */ }
+        </div>
+    ) 
+}
+
+export default Footer;
+/* <footer className="footer text-center text-lg-start bg-dark">
                 <div className="container text-center p-3">
                     <span className="text-light">
                         {connectedDevice ? (
@@ -27,9 +53,4 @@ const Footer = ({ connectedDevice, removeConnectedDevice }) =>
                         )}
                     </span>
                 </div>
-            </footer>
-        </div>
-    ) 
-}
-
-export default Footer;
+                        </footer> */

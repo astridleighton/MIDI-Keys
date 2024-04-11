@@ -10,7 +10,8 @@ const About = () =>
 
     // returns about view
     return(
-        <div className='about-container'>
+        <div>
+           <div className='about-container'>
             <div className='about-header'>
                 <h1 className='about-title'>About</h1>
             </div>
@@ -39,7 +40,9 @@ const About = () =>
                         <p>Developer: <a href="https://github.com/astridleighton" alt="link to developer's GitHub">Astrid Leighton</a></p>
                     </span>
             </div>
+    </div>
         </div>
+        
     )
 }
 

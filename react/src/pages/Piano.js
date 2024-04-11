@@ -4,7 +4,7 @@ import './Piano.scss';
 const Piano = ({ notes }) => {
 
     useEffect(() => {
-        //re-renders when notes is updated
+        // re-renders when notes is updated
 
     }, [notes]);
 

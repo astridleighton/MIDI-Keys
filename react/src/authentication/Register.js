@@ -1,8 +1,7 @@
 import React, {useState} from 'react';
 import axios from 'axios';
-import * as Tone from 'tone';
-import { withRouter, Link, useNavigate, Redirect } from 'react-router-dom';
-import { Button, Box, TextField, Typography, Container, CssBaseline, Avatar, Grid, Alert } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { Button, Box, TextField, Typography, Container, Alert } from '@mui/material';
 
 
 /**
@@ -14,8 +13,7 @@ const Register = () =>
     const [firstname, setFirstName] = useState(null);
     const [username, setUsername] = useState(null);
     const [password, setPassword] = useState(null);
-    const [submitted, setSubmitted] = useState("");
-    const [firstNameMessage, setFirstNameMessage] = useState("");
+    const [firstNameMessage, /* setFirstNameMessage */ ] = useState("");
     const [usernameMessage, setUsernameMessage] = useState("");
     const [passwordMessage, setPasswordMessage] = useState("");
     const [isFormValid, setIsFormValid] = useState(false);

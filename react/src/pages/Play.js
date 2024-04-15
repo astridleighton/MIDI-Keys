@@ -5,9 +5,9 @@ import Cookies from 'js-cookie';
 import SoundCard from '../cards/SoundCard';
 import Sound from '../sound/Sound';
 import axios from 'axios';
-import { List, FormControl, FormLabel, RadioGroup, Box, FormControlLabel, Switch, FormGroup, Card } from '@mui/material';
+import { List, FormControl, FormLabel, RadioGroup, InputLabel, Box, FormControlLabel, Switch, FormGroup, CircularProgress, Select, MenuItem, Menu, IconButton } from '@mui/material';
+import StarIcon from '@mui/icons-material/Star';
 import Piano from './Piano';
-// import Sampler from '../tonejs-instruments-master/tonejs-instruments-master/Tonejs-Instruments';
 
 import './Play.scss'
 
@@ -31,14 +31,15 @@ const Play = () =>
     // state
     const isAuthenticated = !!Cookies.get('token');
     const firstName = Cookies.get('name');
-    const [selectedSound, setSelectedSound] = useState('');
+    const [selectedSound, setSelectedSound] = useState('Synth');
     const [chordNotes, setChordNotes] = useState([undefined]);
     const [soundObjects, setSoundObjects] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [url, setURL] = useState('');
-    // const [currentChord, setCurrentChord] = useState('');
+    const [currentChord, setCurrentChord] = useState();
     const [notesEnabled, setNotesEnabled] = useState(false);
     const [chordEnabled, setChordEnabled] = useState(false);
+    console.log('test render');
 
     /**
        * Starts tone.JS and sets up MIDI input devices
@@ -52,6 +53,7 @@ const Play = () =>
                 Tone.Master.volume.value = -6;
 
                 await setUpQwertyKeyboard(); // device setup
+                console.log('testing');
                 await initializeSounds();
 
                 const manuallyConnectedDevice = await manuallyConnectV49(); // manually connection set up for now
@@ -363,7 +365,7 @@ const Play = () =>
                     {
                         await addNote(note);
 
-                        if (selectedSound === 'synth') {
+                        if (selectedSound === 'Synth') {
                             const synth = createSynth();
                             synth.triggerAttackRelease(Tone.Midi(noteInput).toFrequency(), "4n");
                         } else if (selectedSound === 'amsynth') {
@@ -372,7 +374,7 @@ const Play = () =>
                         } else if (selectedSound === 'monosynth') {
                             const monoSynth = createMonoSynth();
                             monoSynth.triggerAttackRelease(note, "4n");
-                        } else if (selectedSound === 'casio') {
+                        } else if (selectedSound === 'Casio Piano') {
                             createSampler(note);
                         } else if (selectedSound === 'bass') {
                             console.log('test!');
@@ -458,7 +460,6 @@ const Play = () =>
         Triggers audio output, converts MIDI note to music note, and adds note to notes played
         */
         keyboard.down(async (e) => {
-            console.log(e);
 
             const note = keyToNote[e.keyCode];
 
@@ -466,6 +467,7 @@ const Play = () =>
             {
                 await addNote(note);
                 createGuitarSampler(note, url);
+                
                 // const synth = new Tone.Synth().toDestination();
                 // synth.triggerAttackRelease(note, '4n');
                 // TODO: implement getChord()
@@ -524,20 +526,26 @@ const Play = () =>
     /*
         Selects instrument type based on user option
     */
-    const handleButtonClick = (instrument, location) => {
+    const handleSelectSound = (event) => {
+
+        // TODO: fix so location is passed here too
+
+        const instrument = event.target.value;
+        const location = null;
+
         console.log("Selected: " + instrument + " at " + location);
 
         if (location === "react" || !location) {
             if (instrument === 'Synth') {
-                setSelectedSound('synth');
+                setSelectedSound('Synth');
             } else if (instrument === 'AM Synth') {
-                setSelectedSound('amsynth');
+                setSelectedSound('AM Synth');
             } else if (instrument === 'Mono Synth') {
-                setSelectedSound('monosynth');
+                setSelectedSound('Mono Synth');
             } else if (instrument === 'Casio Piano') {
-                setSelectedSound('casio');
+                setSelectedSound('Casio Piano');
             } else if (instrument === 'Bass Guitar') {
-                setSelectedSound('bass');
+                setSelectedSound('Bass Guitar');
             } else {
                 console.log("No instrument found on front-end for selected instrument.");
             }
@@ -553,10 +561,12 @@ const Play = () =>
     - Starter code to display the chord being played (not used yet)
     - TODO: implement additional instruments, samples, and intervals
     */
-    /* const getChord = async (notes) =>
+    const getChord = async (notes) =>
     {
+        console.log(notes);
+        
         // only works for three note chords
-        if (chordNotes && chordNotes.length === 3) {
+        /*if (chordNotes && chordNotes.length === 3) {
             const root = currentChord[0];
             const note2 = currentChord[1];
             const note3 = currentChord[2];
@@ -597,8 +607,8 @@ const Play = () =>
             } else {
                 console.log("Other");
             }
-        }
-    } */
+        }*/
+    }
     
     /**
      * Retrieves all sounds from the database
@@ -702,8 +712,6 @@ const Play = () =>
         } catch (error) {
             console.log(error);
         }
-
-        
     }
 
     /**
@@ -712,13 +720,11 @@ const Play = () =>
      * @param {*} soundName 
      */
     const removeFavorite = async (soundName) => {
-        const token = Cookies.get('token');
     
-        try {
+        console.log('fix remove favorite!');
+        /* try {
             const response = await axios.delete(`http://localhost:3000/remove-favorite/${soundName}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+                token: Cookies.get('token')
             });
             
             console.log(response);
@@ -735,7 +741,7 @@ const Play = () =>
 
         } catch (error) {
             console.log(error);
-        }
+        } */
     }
 
     // renders user session and displays available sounds and notes played
@@ -744,7 +750,7 @@ const Play = () =>
             <div className="play-container play-header">
                 {isAuthenticated ? (
                     <div>
-                        <h1>Welcome, {firstName}!</h1>
+                        <h1>Welcome,&nbsp;{firstName}!</h1>
                     </div>
                 ) : (
                     <div>
@@ -753,50 +759,51 @@ const Play = () =>
                 )}
             </div>
             <div className="play-container play-content">
-                {isLoading ? (
-                    <p>Could not load sounds from database. Please refresh to try again.</p>
+            {isLoading ? (
+                    <>
+                        <p>Could not load sounds from database. Please refresh to try again.</p>
+                        <CircularProgress />
+                    </>
+                    
                 ) : (
-                    <Box sx={{ width: '100%', maxWidth: 260, bgColor: 'background.paper' }}>
-                        <FormControl>
-                            <FormLabel>Sounds</FormLabel>
-                            <RadioGroup
-                                aria-label="sounds"
-                                name="sound-group"
-                                defaultValue="synth"
-                                /*onChange={(e) => this.handleButtonClick1(e.target.value)}*/
+                  <div>
+                    <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+                        <InputLabel id="select-sound-label">Select Sound</InputLabel>
+                        <Select
+                            sx={{marginTop: '35px', width: '250px', height: '50px'}}
+                            labelId="select-sound-label"
+                            value={selectedSound}
+                            onChange={(event) => handleSelectSound(event)}
+                            label="Sound"
                             >
-                                <List
-                                    sx = {{
-                                        '& .MuiListItem-root': {
-                                        borderRadius: '8px',
-                                        backgroundColor: 'black',
-                                        marginBottom: '8px',
-                                        color: 'white'
-                                        },
-                                        '& .MuiRadio-root': {
-                                        color: 'white', // Radio button color
-                                        },
-                                        '& .MuiSvgIcon-root': {
-                                        stroke: 'white', // Star icon outline color
-                                        },
-                                    }}
-                                >
-                                    {soundObjects.map(sound => (
-                                        <SoundCard
-                                            key={sound.id}
-                                            id={sound.id}
-                                            name={sound.name}
-                                            location={sound.location}
-                                            isFavorite={sound.isFavorite}
-                                            isLoggedIn={isAuthenticated}
-                                            onSelect={(instrument, location) => handleButtonClick(instrument, location)}
-                                            addFavorite={addFavorite}
-                                            removeFavorite={removeFavorite} />
-                                    ))}
-                                </List> 
-                            </RadioGroup>
-                        </FormControl>
-                    </Box>
+                        {soundObjects.map((sound, index) => (
+                            <MenuItem key={index} value={sound.name}>
+                                    {sound.name} 
+                                    {isAuthenticated && (
+                                        <>
+                                            {sound.isFavorite ?
+                                                <IconButton
+                                                    color="white"
+                                                    onClick={addFavorite}>
+                                                    <StarIcon
+                                                        style={{ color: 'yellow' }}
+                                                    />
+                                                </IconButton>
+                                            : <IconButton
+                                                    color="white"
+                                                    onClick={removeFavorite}>
+                                                    <StarIcon
+                                                        style={{ color: 'primary'}}
+                                                    />
+                                                </IconButton>
+                                            }
+                                    </>    
+                                    )}
+                            </MenuItem>
+                        ))}
+                        </Select>
+                    </FormControl>
+                  </div>  
                 )}
             </div>
             <Piano notes={chordNotes}/>
@@ -829,5 +836,48 @@ const Play = () =>
         </div>
     )
 }
+
+/* <Box sx={{ width: '100%', maxWidth: 260, bgColor: 'background.paper' }}>
+                        <FormControl>
+                            <FormLabel>Sounds</FormLabel>
+                            <RadioGroup
+                                aria-label="sounds"
+                                name="sound-group"
+                                defaultValue="synth"
+                                /*onChange={(e) => this.handleButtonClick1(e.target.value)}*/
+                                /* >
+                                <List
+                                    sx = {{
+                                        '& .MuiListItem-root': {
+                                        borderRadius: '8px',
+                                        backgroundColor: 'black',
+                                        marginBottom: '8px',
+                                        color: 'white'
+                                        },
+                                        '& .MuiRadio-root': {
+                                        color: 'white', // Radio button color
+                                        },
+                                        '& .MuiSvgIcon-root': {
+                                        stroke: 'white', // Star icon outline color
+                                        },
+                                    }}
+                                >
+                                    {soundObjects.map(sound => (
+                                        <SoundCard
+                                            key={sound.id}
+                                            id={sound.id}
+                                            name={sound.name}
+                                            location={sound.location}
+                                            isFavorite={sound.isFavorite}
+                                            isLoggedIn={isAuthenticated}
+                                            onSelect={(instrument, location) => handleButtonClick(instrument, location)}
+                                            addFavorite={addFavorite}
+                                            removeFavorite={removeFavorite} />
+                                    ))}
+                                </List> 
+                            </RadioGroup>
+                        </FormControl>
+                    </Box> */
+                    
 
 export default Play;

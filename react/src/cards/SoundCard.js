@@ -1,61 +1,48 @@
-/* import React, { Component } from 'react';
-import { ListItem, ListItemIcon, FormControlLabel, Radio } from '@mui/material';
+import React, { Component } from 'react';
+import { ListItem, ListItemIcon, FormControlLabel, Radio, MenuItem } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
-import StarIcon from '@mui/icons-material/Star'; */
+import StarIcon from '@mui/icons-material/Star';
 
 /**
  * Defines a sound on user interface
  */
-/* class SoundCard extends Component {
+const SoundCard = (props) => {
 
     /**
      * Handles user sound selection
      * @param {*}  
      */
-    /* handleSelect = () => {
-        this.props.onSelect(this.props.name, this.props.location);
-    } */
+    const handleSelect = () => {
+        props.onSelect(props.name, props.location);
+    }
 
     /**
      * Handles user favorite selection (add/remove)
      * @param {*} 
      */
-    /* handleFavorite = () => {
-        if (this.props.isFavorite) { // if already favorite, remove
-            this.props.removeFavorite(this.props.name);
+    const handleFavorite = () => {
+        if (props.isFavorite) { // if already favorite, remove
+            props.removeFavorite(props.name);
         } else { // if not favorite, make favorite
-            this.props.addFavorite(this.props.name);
+            props.addFavorite(props.name);
         }
-    } */
+    }
 
     /**
      * Renders sound card by displaying radio and star icon
      * @returns 
      */
-    /* render() {
-        const { name, id, isLoggedIn, isFavorite } = this.props;
-
-        return (
-            <ListItem>
-                <FormControlLabel
-                    value={id}
-                    control={<Radio onClick={this.handleSelect}/>}
-                    label={name}
-                />
-                <ListItemIcon>
-                    {isLoggedIn && (
-                        <IconButton
-                            color="white"
-                            onClick={this.handleFavorite}>
-                                {isFavorite ? <StarIcon style={{ color: 'yellow' }} /> : <StarIcon />} {/* Render filled star if favorited, otherwise render empty star */ /* }
-                        </IconButton>
-                    )}
-                </ListItemIcon>
-            </ListItem> 
-            
+    return (
+            <MenuItem value={'hello'}>
+                {props.isLoggedIn && (
+                    <IconButton
+                        color="white"
+                        onClick={handleFavorite}>
+                            {props.isFavorite ? <StarIcon style={{ color: 'yellow' }} /> : <StarIcon />}
+                    </IconButton>
+                )}
+            </MenuItem> 
         );
     }
 
-}
-
-export default SoundCard; */
+export default SoundCard;

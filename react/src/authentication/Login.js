@@ -12,7 +12,7 @@ const Login = () =>
 {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [ /* firstName, */ setFirstName] = useState('');
+    const [ firstName, setFirstName] = useState('');
     const [submitted, setSubmitted] = useState(false);
     const [isFormValid, setIsFormValid] = useState(false);
     const [error, setError] = useState('');
@@ -69,7 +69,7 @@ const Login = () =>
 
         await axios.post(`http://localhost:3000/login`, loginCredentials)
         .then((result) => {
-            if (result.status === 200) {
+            if (result.data && result.data.status === 200) {
                 const token = result.data.token;
                 const name = result.data.firstName;
                 if (token && name) {
@@ -78,7 +78,7 @@ const Login = () =>
                     setFirstName(name);
                     navigate('/')
                 } else {
-                    setError("An error occurred. Please try again.")
+                    setError("An error occurred during the login. Please try again.")
                 }
             } else {
                 setError("An error occurred during login. Please try again!");
@@ -92,6 +92,7 @@ const Login = () =>
             } else if (error.response && error.response.status === 500) {
                 setError("A network error occurred. Please try again.");
             } else {
+                console.log('test');
                 setError("An unknown error occurred. Please try again.")
             }
         })
@@ -110,7 +111,7 @@ const Login = () =>
                         component="h1"
                         variant="h5"
                         sx={{ textAlign: 'center' }} >
-                            Log In
+                            Sign In
                         </Typography>
                 </Container>
                 <Box
@@ -124,7 +125,11 @@ const Login = () =>
                         alignItems: 'center',
                         }}
                 >
-                    {error && <Alert severity="error">{error}</Alert> }
+                    {error &&
+                        <Alert severity="error">
+                            {error}
+                        </Alert>
+                    }
                     <TextField
                         margin="normal"
                         required
@@ -166,15 +171,15 @@ const Login = () =>
                             }}
 
                         >
-                            Log In
+                            Sign In
                         </Button>
                     </Container>
                     <Typography>
-                        Don$apos;t have an account?
+                        Don&apos;t have an account?
                         <a
                             href="/register"
                             style={{
-                                textDecoration: 'none',
+                                textDecoration: 'underline',
                                 color: 'inherit',
                                 fontWeight: 'bold',
                                 padding: '5px'

@@ -53,14 +53,14 @@ const Navbar = () =>
                                     variant="outlined"
                                     onClick={handleLogout}
                                     >
-                                        Log Out
+                                        Sign Out
                                 </Button>
                             ) : (
                                 <Button
                                     variant="outlined"
                                     sx={{ marginLeft: 'auto' }}
                                 >
-                                    <a href="/login" style={{ textDecoration: 'none', color: 'white'}}>Login</a>
+                                    <a href="/login" style={{ textDecoration: 'none', color: 'white'}}>Sign In</a>
                                 </Button>
                             )}
                     </span>

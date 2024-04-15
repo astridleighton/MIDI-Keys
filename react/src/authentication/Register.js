@@ -229,11 +229,11 @@ const Register = () =>
                     <a
                         href="/login"
                         style={{
-                            textDecoration: 'none',
+                            textDecoration: 'underline',
                             color: 'inherit',
                             fontWeight: 'bold',
                             padding: '5px'
-                            }}>Log In</a>
+                            }}>Sign In</a>
                 </Typography>
             </Box>
             </Container>

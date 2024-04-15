@@ -40,7 +40,7 @@ app.get('/', (req, res) => {
 /*
 * Allows user to log in by validating password and token
 */
-app.post('/login', async function(req, res, next) {
+app.post('/login', async function(req, res) {
     const username = req.body.username;
     const password = req.body.password;
 
@@ -176,7 +176,7 @@ app.post('/add-favorite', async function(req, res) {
 app.delete('/remove-favorite/:sound', async (req, res) => {
 
     const sound = req.params.sound;
-    const token = req.headers.authorization.split(' ')[1]; // Extract token from Authorization header
+    const token = req.body.token; // Extract token from Authorization header
 
     try {
 

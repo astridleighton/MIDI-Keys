@@ -17,7 +17,6 @@ import './Play.scss'
  * Allows user to select between instruments
  * Displays notes played
  * TODO: display chord played, do not set default instrument
- * TODO: change note velocity
  */
 
 // TODO: pass in connected device
@@ -164,9 +163,62 @@ const Play = () =>
         }).toDestination();
       }
 
+       const createChoirSampler = (note, url) => {
+        const sampler = new Tone.Sampler({
+            urls: {
+            A3: "femalevoices_aa2_A3.mp3",
+            A4: "femalevoices_aa2_A4.mp3",
+            A5: "femalevoices_aa2_A5.mp3"
+        },
+	        baseUrl: url,
+            onload: () => {
+                sampler.triggerAttackRelease(note, 1);
+            }
+        }).toDestination();
+      }
+
+      const createEerieSynthSampler = (note, url) => {
+        const sampler = new Tone.Sampler({
+            urls: {
+            A3: "eerie_synth1.mp3",
+            A4: "eerie_synth2.mp3",
+            A5: "eerie_synth3.mp3"
+        },
+	        baseUrl: url,
+            onload: () => {
+                sampler.triggerAttackRelease(note, 1);
+            }
+        }).toDestination();
+      }
+      const createGuitarSampler = (note, url) => {
+        const sampler = new Tone.Sampler({
+            urls: {
+            A3: "guitar_Astring.mp3",
+            E2: "guitar_LowEstring1.mp3",
+            G4: "guitar_Gstring.mp3"
+        },
+	        baseUrl: url,
+            onload: () => {
+                sampler.triggerAttackRelease(note, 1);
+            }
+        }).toDestination();
+      }
+      const createKalimbaSampler = (note, url) => {
+        const sampler = new Tone.Sampler({
+            urls: {
+            Ab3: "Kalimba_1.mp3",
+            Ab4: "Kalimba_3.mp3"
+        },
+	        baseUrl: url,
+            onload: () => {
+                sampler.triggerAttackRelease(note, 1);
+            }
+        }).toDestination();
+      }
+
+
       /**
        * Creates an instance of the online sampler (used for online URLs)
-       * TODO: fix CORS error
        * @param {*} note 
        * @param {*} url 
        */
@@ -278,49 +330,6 @@ const Play = () =>
         });
       }
 
-      // TODO: put these all in the database
-      const createChoirSampler = (note) => {
-        const sampler = new Tone.Sampler({
-            urls: {
-            A3: "femalevoices_aa2_A3.mp3",
-            A4: "femalevoices_aa2_A4.mp3",
-            A5: "femalevoices_aa2_A5.mp3"
-        },
-	        baseUrl: "https://tonejs.github.io/audio/berklee/",
-            onload: () => {
-                sampler.triggerAttackRelease(note, 1);
-            }
-        }).toDestination();
-      }
-
-      const createEerieSynthSampler = (note) => {
-        const sampler = new Tone.Sampler({
-            urls: {
-            A3: "eerie_synth1.mp3",
-            A4: "eerie_synth2.mp3",
-            A5: "eerie_synth3.mp3"
-        },
-	        baseUrl: "https://tonejs.github.io/audio/berklee/",
-            onload: () => {
-                sampler.triggerAttackRelease(note, 1);
-            }
-        }).toDestination();
-      }
-      const createGuitarSampler = (note) => {
-        const sampler = new Tone.Sampler({
-            urls: {
-            A3: "guitar_Astring.mp3",
-            E2: "guitar_LowEstring1.mp3",
-            G4: "guitar_Gstring.mp3"
-        },
-	        baseUrl: "https://tonejs.github.io/audio/berklee/",
-            onload: () => {
-                sampler.triggerAttackRelease(note, 1);
-            }
-        }).toDestination();
-      }
-
-
       /**
        * Ensures sounds are loaded before receiving favorite sounds
        */
@@ -368,21 +377,31 @@ const Play = () =>
                         if (selectedSound === 'Synth') {
                             const synth = createSynth();
                             synth.triggerAttackRelease(Tone.Midi(noteInput).toFrequency(), "4n");
-                        } else if (selectedSound === 'amsynth') {
+                        } else if (selectedSound === 'AM Synth') {
                             const amSynth = createAMSynth();
                             amSynth.triggerAttackRelease(note, "4n");
-                        } else if (selectedSound === 'monosynth') {
+                        } else if (selectedSound === 'Mono Synth') {
                             const monoSynth = createMonoSynth();
                             monoSynth.triggerAttackRelease(note, "4n");
                         } else if (selectedSound === 'Casio Piano') {
                             createSampler(note);
-                        } else if (selectedSound === 'bass') {
-                            console.log('test!');
+                        } else if (selectedSound === 'Salamander') {
+                            // TODO: implement this
+                            // createSalamanderSampler(note, url);
+                        } else if (selectedSound === 'Choir') {
+                            createChoirSampler(note, url);
+                        } else if (selectedSound === 'Eerie Pad') {
+                            createEerieSynthSampler(note, url);
+                        } else if (selectedSound === 'Guitar') {
+                            createGuitarSampler(note, url);
+                        } else if (selectedSound === 'Kalimba') {
+                            createKalimbaSampler(note, url);
+                        } else if (selectedSound === 'Bass Guitar') {
+                            // TODO: ensure URL is passed
                             createOnlineBassSampler(note, url);
                         } else if (selectedSound === 'online') {
                             createOnlineSampler(note, url);
                         }
-                    
                     }
                     break;
                 case 128: // note off
@@ -427,7 +446,6 @@ const Play = () =>
         - Maps MIDI notes to music notes
         - Triggers audio output with keydown event
         - Stores current notes being played
-        TODO: determine if qwerty should always play
      */
     const setUpQwertyKeyboard = async() => {
 
@@ -528,7 +546,7 @@ const Play = () =>
     */
     const handleSelectSound = (event) => {
 
-        // TODO: fix so location is passed here too
+        // TODO: fix so source is passed here too
 
         const instrument = event.target.value;
         const location = null;
@@ -546,6 +564,16 @@ const Play = () =>
                 setSelectedSound('Casio Piano');
             } else if (instrument === 'Bass Guitar') {
                 setSelectedSound('Bass Guitar');
+            } else if (instrument === 'Salamander') {
+                setSelectedSound('Salamander');
+            } else if (instrument === 'Choir') {
+                setSelectedSound('Choir');
+            } else if (instrument === 'Eerie Pad') {
+                setSelectedSound('Eerie Pad');
+            }  else if (instrument === 'Guitar') {
+                setSelectedSound('Guitar');
+            } else if (instrument === 'Kalimba') {
+                setSelectedSound('Kalimba');
             } else {
                 console.log("No instrument found on front-end for selected instrument.");
             }
@@ -559,7 +587,6 @@ const Play = () =>
 
     /*
     - Starter code to display the chord being played (not used yet)
-    - TODO: implement additional instruments, samples, and intervals
     */
     const getChord = async (notes) =>
     {

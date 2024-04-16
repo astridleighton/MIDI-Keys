@@ -669,9 +669,9 @@ const Play = () =>
 
         try {
             const result = await axios.get('http://localhost:3000/all-favorites', {
-                headers:{
-                    Authorization: `Bearer ${token}`
-                }
+                    headers:{
+                        Authorization: `Bearer ${token}`
+                    }
                 });
             
                 if(result.data.length > 0) {
@@ -718,10 +718,15 @@ const Play = () =>
      */
     const addFavorite = async (soundName) => {
 
+        alert('In add favorite');
+
+        const token = Cookies.get('token');
+
         try {
-            const response = await axios.post('http://localhost:3000/add-favorite', {
-                token: Cookies.get('token'),
-                sound: soundName
+            const response = await axios.post(`http://localhost:3000/add-favorite/${soundName}`, {
+                headers:{
+                    Authorization: `Bearer ${token}`
+                }
             });
     
             console.log(response);
@@ -748,15 +753,20 @@ const Play = () =>
      */
     const removeFavorite = async (soundName) => {
     
-        console.log('fix remove favorite!');
-        /* try {
+        alert('In remove favorite');
+        const token = Cookies.get('token');
+
+        try {
             const response = await axios.delete(`http://localhost:3000/remove-favorite/${soundName}`, {
-                token: Cookies.get('token')
+                headers:{
+                    Authorization: `Bearer ${token}`
+                }
             });
             
             console.log(response);
             // Check if the sound is present in state and update its isFavorite property
             const updatedSoundObjects = soundObjects.map(sound => {
+                console.log('in updated sound objects...');
                 if (sound.name === soundName) {
                     return { ...sound, isFavorite: false };
                 }
@@ -768,7 +778,7 @@ const Play = () =>
 
         } catch (error) {
             console.log(error);
-        } */
+        }
     }
 
     // renders user session and displays available sounds and notes played
@@ -811,14 +821,15 @@ const Play = () =>
                                             {sound.isFavorite ?
                                                 <IconButton
                                                     color="white"
-                                                    onClick={addFavorite}>
+                                                    onClick={() => removeFavorite(sound.name)}>
                                                     <StarIcon
                                                         style={{ color: 'yellow' }}
                                                     />
                                                 </IconButton>
-                                            : <IconButton
+                                            : 
+                                                <IconButton
                                                     color="white"
-                                                    onClick={removeFavorite}>
+                                                    onClick={() => addFavorite(sound.name)}>
                                                     <StarIcon
                                                         style={{ color: 'primary'}}
                                                     />

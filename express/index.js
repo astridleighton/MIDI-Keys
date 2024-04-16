@@ -128,46 +128,44 @@ app.post('/register', async function(req, res, next) {
 /*
 * Allows user to add sound to his favorites tab
 */
-app.post('/add-favorite', async function(req, res) {
+app.post('/add-favorite/:sound', async function(req, res) {
 
-    const sound = req.body.sound;
-    const token = req.body.token;
+    if (req.headers.authorization && req.params.sound) {
+
+        const token = req.headers.authorization.split(' ')[1]; // Extract token from Authorization header
+        const sound = req.params.sound;
     
-    try {
-        
-        const username = await Security.getUserNameFromToken(token); // get username from token
+        try {
+            const username = await Security.getUserNameFromToken(token); // get username from token
 
-        if(username) { // if token is valid
-            const userID = await Database.getIDFromUser(connection, username);
-            const soundID = await Database.getIDFromSound(connection, sound);
+            if(username) { // if token is valid
+                const userID = await Database.getIDFromUser(connection, username);
+                const soundID = await Database.getIDFromSound(connection, sound);
 
-            const favoriteExists = await Database.findFavoriteByUserAndSound(connection, userID, soundID);
+                const favoriteExists = await Database.findFavoriteByUserAndSound(connection, userID, soundID);
 
-            if(favoriteExists.length === 0) {
+                if(favoriteExists.length === 0) {
 
-                const addFavorite = await Database.addFavorite(connection, userID, soundID);
+                    const addFavorite = await Database.addFavorite(connection, userID, soundID);
 
-                if (addFavorite) {
-                    res.status(200).send("Added favorite successfully.");
-                } else {
-                    res.status(401).json({ message: 'Add favorite failed.', status: 401 });
+                    if (addFavorite) {
+                        res.status(200).json({ message: 'Added favorite successfully.'});
+                    } else {
+                        res.status(401).json({ message: 'Add favorite failed.'});
+                    }
+                } else { // favorite already exists in database
+                    res.status(403).json({ message: 'Favorite already exists.'});
                 }
-            } else { // favorite already exists in database
-                
-                res.status(403).json({ message: 'Favorite already exists.', status: 403 });
-
+            } else {
+                res.status(401).json({ message: "Unauthorized to add favorite. Please log in." });
             }
-        } else {
-            res.status(401).send("Unauthorized to add favorite. Please log in.");
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'An error occurred while checking the username.' });
         }
-
-        
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'An error occurred while checking the username.' });
+    } else {
+        res.status(404).json({ message: 'Invalid input parameters. Please try again.'})
     }
-
 })
 
 /*
@@ -175,35 +173,40 @@ app.post('/add-favorite', async function(req, res) {
 */
 app.delete('/remove-favorite/:sound', async (req, res) => {
 
-    const sound = req.params.sound;
-    const token = req.body.token; // Extract token from Authorization header
+    if(req.headers.authorization) {
+        const sound = req.params.sound;
+        const token = req.headers.authorization.split(' ')[1]; // Extract token from Authorization header
 
-    try {
+        try {
 
-        const username = await Security.getUserNameFromToken(token); // get username from token
+            const username = await Security.getUserNameFromToken(token); // get username from token
 
-        console.log(username);
+            console.log(username);
 
-        if(username) {
+            if(username) {
 
-            const userID = await Database.getIDFromUser(connection, username);
-            const soundID = await Database.getIDFromSound(connection, sound);
-            const removeFavorite = await Database.removeFavorite(connection, userID, soundID);
+                const userID = await Database.getIDFromUser(connection, username);
+                const soundID = await Database.getIDFromSound(connection, sound);
+                const removeFavorite = await Database.removeFavorite(connection, userID, soundID);
 
-            if (removeFavorite) {
-                res.status(200).send("Removed favorite successfully.");
+                if (removeFavorite) {
+                    res.status(200).json({message: "Removed favorite successfully."});
+                } else {
+                    res.status(401).json({ message: 'Remove favorite failed.'});
+                }
             } else {
-                res.status(401).json({ message: 'Remove favorite failed.', status: 401 });
+                res.status(401).json({ message: "Unauthorized to remove favorite. Please log in."});
             }
-        } else {
-            res.status(401).send("Unauthorized to remove favorite. Please log in.");
-        }
 
-        
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'An error occurred while checking the username.' });
+            
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'An error occurred while checking the username.'});
+        }
+    } else {
+        res.status(404).json({ message: 'Invalid input parameters. Please try again.'})
     }
+    
 
 })
 
@@ -226,34 +229,37 @@ app.get('/all-sounds', async (req, res) => {
 */
 app.get('/all-favorites', async (req, res) => {
 
-    const token = req.headers.authorization.split(' ')[1]; // Extract token from Authorization header
-    console.log("Token: " + token);
+    if (req.headers.authorization) {
+        const token = req.headers.authorization.split(' ')[1]; // Extract token from Authorization header
+        console.log("Token: " + token);
 
-    const username = await Security.getUserNameFromToken(token); // get username from token
+        const username = await Security.getUserNameFromToken(token); // get username from token
 
-    console.log("Username: " + username);
+        console.log("Username: " + username);
 
-    const usernameCheck = await Database.findByUsername(connection, username); // checks if username exists
+        const usernameCheck = await Database.findByUsername(connection, username); // checks if username exists
 
-    if (usernameCheck.length === 0) {
-        res.status(403).send("Invalid token or username not found.");
-    } else {
-        try {
-            const userID = await Database.getIDFromUser(connection, username);
+        if (usernameCheck.length === 0) {
+            res.status(403).send("Invalid token or username not found.");
+        } else {
+            try {
+                const userID = await Database.getIDFromUser(connection, username);
 
-            const allFavorites = await Database.getAllFavoritesFromUser(connection, userID);
+                const allFavorites = await Database.getAllFavoritesFromUser(connection, userID);
 
-            if(allFavorites.length === 0) {
-                return res.status(404).json({ error: 'No favorites found for the user.' });
-            } else {
-                res.status(200).json(allFavorites);
+                if(allFavorites.length === 0) {
+                    return res.status(404).json({ error: 'No favorites found for the user.' });
+                } else {
+                    res.status(200).json(allFavorites);
+                }
+        
+            } catch (error) {
+                res.status(500).send("Unable to retrieve sounds from database.");
             }
-    
-        } catch (error) {
-            res.status(500).send("Unable to retrieve sounds from database.");
         }
+    } else {
+        res.status(403).send("Invalid token or username not found.");
     }
-
 })
 
 /*

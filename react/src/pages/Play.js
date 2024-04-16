@@ -761,12 +761,13 @@ const Play = () =>
      */
     const removeFavorite = async (soundName) => {
     
-        alert('In remove favorite');
         const token = Cookies.get('token');
+        alert('In remove favorite with token: ' + token + 'and sound: ' + soundName);
+
 
         try {
-            const response = await axios.delete(`http://localhost:3000/remove-favorite/${soundName}`, null, {
-                headers: {
+            const response = await axios.delete(`http://localhost:3000/remove-favorite/${soundName}`, {
+                headers:{
                     Authorization: `Bearer ${token}`
                 }
             });
@@ -774,7 +775,6 @@ const Play = () =>
             console.log(response);
             // Check if the sound is present in state and update its isFavorite property
             const updatedSoundObjects = soundObjects.map(sound => {
-                console.log('in updated sound objects...');
                 if (sound.name === soundName) {
                     return { ...sound, isFavorite: false };
                 }

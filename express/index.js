@@ -174,6 +174,7 @@ app.post('/add-favorite/:sound', async function(req, res) {
 app.delete('/remove-favorite/:sound', async (req, res) => {
 
     if(req.headers.authorization) {
+        console.log('has token');
         const sound = req.params.sound;
         const token = req.headers.authorization.split(' ')[1]; // Extract token from Authorization header
 

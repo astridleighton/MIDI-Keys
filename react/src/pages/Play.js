@@ -15,7 +15,6 @@ import './Play.scss'
  * Contains the Tone.JS instruments and database samples
  * Allows user to select between instruments
  * Displays notes played
- * TODO: display chord played, do not set default instrument
  */
 
 const Play = ({connectedDevice}) =>
@@ -24,19 +23,18 @@ const Play = ({connectedDevice}) =>
     const isAuthenticated = !!Cookies.get('token');
     const firstName = Cookies.get('name');
     const [selectedSound, setSelectedSound] = useState('Synth');
-    const [chordNotes, setChordNotes] = useState([undefined]);
+    const [chordNotes, setChordNotes] = useState([]);
     const [soundObjects, setSoundObjects] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [url, setURL] = useState('');
-    const [currentChord, setCurrentChord] = useState();
     const [notesEnabled, setNotesEnabled] = useState(false);
-    const [chordEnabled, setChordEnabled] = useState(false);
     console.log('test render');
 
     /**
        * Starts tone.JS and sets up MIDI input devices
        */
     useEffect (() => {
+
         const initTone = async() => {
             try {
                 Tone.start();
@@ -357,13 +355,6 @@ const Play = ({connectedDevice}) =>
         setNotesEnabled(!notesEnabled);
       }
 
-      /**
-       * Changes state based on chord toggle
-       */
-      const handleChordToggle = () => {
-        setChordEnabled(!chordEnabled);
-      }
-
     /**
      * Used to set up MIDI keyboard with note mappings, sounds, and MIDI events
      * @param {*} midiKeyboard 
@@ -596,58 +587,6 @@ const Play = ({connectedDevice}) =>
             setURL(location);
         }
     }
-
-    /*
-    - Starter code to display the chord being played (not used yet)
-    */
-    const getChord = async (notes) =>
-    {
-        console.log(notes);
-        
-        // only works for three note chords
-        /*if (chordNotes && chordNotes.length === 3) {
-            const root = currentChord[0];
-            const note2 = currentChord[1];
-            const note3 = currentChord[2];
-
-            console.log("Root: " + root);
-
-            const interval1 = note2 - root;
-            const interval2 = note3 - root;
-
-            if (interval1 === 4 && interval2 === 3) { // MAJOR
-                console.log("Major");
-            } else if (interval1 === 3 && interval2 === 4) { // MINOR
-                console.log("Minor");
-            } else if (interval1 === 4 && interval2 === 3 && note3 - note2 === 4) { // MAJ 7
-                console.log("Major 7th");
-            } else if (interval1 === 3 && interval2 === 4 && note3 - note2 === 3) { // MIN 7
-                console.log("Minor 7th");
-            } else if (interval1 === 4 && interval2 === 2) {
-                console.log("Major 6th");
-            } else if (interval1 === 3 && interval2 === 3) {
-                console.log("Minor 6th");
-            } else if (interval1 === 5 && interval2 === 2) {
-                console.log("Sus4");
-            } else if (interval1 === 2 && interval2 === 3) {
-                console.log("sus2");
-            } else if (interval1 === 4 && interval2 === 4) {
-                console.log("augmented");
-            } else if (interval1 === 3 && interval2 === 3) {
-                console.log("Diminished");
-            } else if (interval1 === 4 && interval2 === 3 && note3 - note2 === 6) {
-                console.log("Dominant 7th");
-            } else if (interval1 === 4 && interval2 === 3 && note3 - note2 === 8) {
-                console.log("Augmented 7th");
-            } else if (interval1 === 3 && interval2 === 3 && note3 - note2 === 6) {
-                console.log("Half-Diminished 7th");
-            } else if (interval1 === 3 && interval2 === 3 && note3 - note2 === 9) {
-                console.log("Diminished 7th");
-            } else {
-                console.log("Other");
-            }
-        }*/
-    }
     
     /**
      * Retrieves all sounds from the database
@@ -868,14 +807,7 @@ const Play = ({connectedDevice}) =>
                             )}
                         </div>
                     </div>
-                    <FormControlLabel
-                        control={<Switch />} label="Chord:"
-                        onChange={handleChordToggle}
-                    />
                 </FormGroup>
-                <div className="chord-content">
-                   {/* TODO: display chord here */} 
-                </div>
             </div>
         </div>
     )

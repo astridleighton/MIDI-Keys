@@ -339,7 +339,8 @@ const Play = () =>
             const sounds = await getAllSounds();
 
             // put favorites at the top of the list
-            sounds.sort((a, b) => {
+            // TODO: maybe fix?
+            /* sounds.sort((a, b) => {
                 if(a.isFavorite && !b.isFavorite) {
                     return -1;
                 }
@@ -347,7 +348,7 @@ const Play = () =>
                     return 1;
                 }
                 return 0;
-            })
+            }) */
 
             setSoundObjects(sounds);
         } catch (err) {
@@ -392,35 +393,7 @@ const Play = () =>
                     if(velocity > 0)
                     {
                         await addNote(note);
-
-                        if (selectedSound === 'Synth') {
-                            const synth = createSynth();
-                            synth.triggerAttackRelease(Tone.Midi(noteInput).toFrequency(), "4n");
-                        } else if (selectedSound === 'AM Synth') {
-                            const amSynth = createAMSynth();
-                            amSynth.triggerAttackRelease(note, "4n");
-                        } else if (selectedSound === 'Mono Synth') {
-                            const monoSynth = createMonoSynth();
-                            monoSynth.triggerAttackRelease(note, "4n");
-                        } else if (selectedSound === 'Casio Piano') {
-                            createSampler(note);
-                        } else if (selectedSound === 'Salamander') {
-                            // TODO: implement this
-                            // createSalamanderSampler(note, url);
-                        } else if (selectedSound === 'Choir') {
-                            createChoirSampler(note, url);
-                        } else if (selectedSound === 'Eerie Pad') {
-                            createEerieSynthSampler(note, url);
-                        } else if (selectedSound === 'Guitar') {
-                            createGuitarSampler(note, url);
-                        } else if (selectedSound === 'Kalimba') {
-                            createKalimbaSampler(note, url);
-                        } else if (selectedSound === 'Bass Guitar') {
-                            // TODO: ensure URL is passed
-                            createOnlineBassSampler(note, url);
-                        } else if (selectedSound === 'online') {
-                            createOnlineSampler(note, url);
-                        }
+                        await playSound(note);
                     }
                     break;
                 case 128: // note off
@@ -458,6 +431,40 @@ const Play = () =>
                 }
             };
             
+    }
+
+    const playSound = async(note) => {
+        switch (selectedSound) {
+            case 'Synth':
+                const synth = createSynth();
+                synth.triggerAttackRelease(note, "4n");
+                break;
+            case 'AM Synth':
+                const amSynth = createAMSynth();
+                amSynth.triggerAttackRelease(note, "4n");
+                break;
+            case 'Mono Synth':
+                const monoSynth = createMonoSynth();
+                monoSynth.triggerAttackRelease(note, "4n");
+                break;
+            case 'Casio Piano':
+                console.log('casio');
+                createSampler(note);
+                break;
+            case 'Salamander':
+                break;
+            case 'Bass Guitar':
+                break;
+            case 'Eerie Pad':
+                break;
+            case 'Guitar':
+                break;
+            case 'Kalimba':
+                break;
+            default:
+                console.log('Invalid instrument');
+                break;
+        }
     }
 
     /**
@@ -503,10 +510,7 @@ const Play = () =>
             if(note)
             {
                 await addNote(note);
-                createGuitarSampler(note, url);
-                
-                // const synth = new Tone.Synth().toDestination();
-                // synth.triggerAttackRelease(note, '4n');
+                await playSound(note);
                 // TODO: implement getChord()
             }
         });
@@ -568,12 +572,13 @@ const Play = () =>
         // TODO: fix so source is passed here too
 
         const instrument = event.target.value;
-        const location = null;
+        const location = 'react';
 
         console.log("Selected: " + instrument + " at " + location);
 
-        if (location === "react" || !location) {
+        if (location === "react") {
             if (instrument === 'Synth') {
+                console.log('Setting as synth');
                 setSelectedSound('Synth');
             } else if (instrument === 'AM Synth') {
                 setSelectedSound('AM Synth');
@@ -596,8 +601,6 @@ const Play = () =>
             } else {
                 console.log("No instrument found on front-end for selected instrument.");
             }
-        } else if (location === "") {
-            console.log("Could not load sample because URL is blank.");
         } else { // external sample
             setSelectedSound('online');
             setURL(location);

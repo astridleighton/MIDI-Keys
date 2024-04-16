@@ -49,10 +49,8 @@ const Play = () =>
                 Tone.start();
 
                 await Tone.setContext(new AudioContext({ sampleRate: 48000 })); // sets audio preferences
-                Tone.Master.volume.value = -6;
 
                 await setUpQwertyKeyboard(); // device setup
-                console.log('testing');
                 await initializeSounds();
 
                 const manuallyConnectedDevice = await manuallyConnectV49(); // manually connection set up for now
@@ -335,8 +333,29 @@ const Play = () =>
        */
       const initializeSounds = async () => {
         console.log("Getting all sounds and favorites.");
-        await getAllSounds();
-        await getAllFavorites();
+
+        try {
+            setIsLoading(true);
+            const sounds = await getAllSounds();
+
+            // put favorites at the top of the list
+            sounds.sort((a, b) => {
+                if(a.isFavorite && !b.isFavorite) {
+                    return -1;
+                }
+                if(!a.isFavorite && b.isFavorite) {
+                    return 1;
+                }
+                return 0;
+            })
+
+            setSoundObjects(sounds);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsLoading(false);
+        }
+
       }
 
       /**
@@ -644,18 +663,20 @@ const Play = () =>
         try {
             const result = await axios.get('http://localhost:3000/all-sounds');
 
+            console.log(result);
+
             if (result.status === 200) {
                 const sounds = result.data.map(sound => new Sound(sound.id, sound.name, sound.source, sound.isFavorite));
                 console.log(sounds);
-
-                setSoundObjects(sounds);
-                setIsLoading(false);
+                return getAllFavorites(sounds);
             } else {
                 console.log("Error");
+                return null;
             }
 
         } catch (error) {
             console.error("Could not get sounds from database.", error);
+            return null;
         }
     }
 
@@ -663,7 +684,7 @@ const Play = () =>
      * Retrieves all favorite sounds from the database
      * Only called when user is logged in with a valid token
      */
-    const getAllFavorites = async () => {
+    const getAllFavorites = async (sounds) => {
 
         const token = Cookies.get('token');
 
@@ -678,30 +699,17 @@ const Play = () =>
 
                     const favorites = result.data.map(sound => new Sound(sound.id, sound.name, sound.source));
 
-                    for(let i = 0; i < favorites.length; i++) {
+                    for(let i = 0; i < sounds.length; i++) {
+                        const matchingFavorite = favorites.find(favorite => favorite.id === sounds[i].id);
 
-                        for(let j = 0; j < soundObjects.length; j++) {
-
-                            if(favorites[i].id === soundObjects[j].id) {
-
-                                const updatedSoundObjects = [...soundObjects];
-
-                                updatedSoundObjects[j].isFavorite = true;
-
-                                setSoundObjects(updatedSoundObjects);
-                                break;
-
-                            }
-
+                        if(matchingFavorite) {
+                            sounds[i].isFavorite = true;
                         }
                     }
-
-                    console.log("favorites");
-                    console.log(soundObjects);
-
                 } else {
                     console.log("No favorites to show.");
                 }
+                return sounds;
         } catch (error) {
             if (error.status === 403 || error.status === 401) {
                 console.log("Unauthorized to load samples");
@@ -716,14 +724,13 @@ const Play = () =>
      * Only called if user is logged in with a valid token
      * @param {*} soundName 
      */
-    const addFavorite = async (soundName) => {
-
-        alert('In add favorite');
+    const addFavorite = async (sound) => {
 
         const token = Cookies.get('token');
+        alert('In add favorite with ' + sound + 'token: ' + token);
 
         try {
-            const response = await axios.post(`http://localhost:3000/add-favorite/${soundName}`, {
+            const response = await axios.post(`http://localhost:3000/add-favorite/${sound}`, null, {
                 headers:{
                     Authorization: `Bearer ${token}`
                 }
@@ -731,10 +738,11 @@ const Play = () =>
     
             console.log(response);
     
-            for (let i = 0; i < soundObjects.length; i++) {
-                if (soundObjects[i].name === soundName) {
+            for (let i = 0; i < soundObjects.length; i++) { // TODO: fix so state is updated correctly
+                if (soundObjects[i].name === sound) {
                     const updatedSoundObjects = [...soundObjects];
                     updatedSoundObjects[i].isFavorite = true;
+                    console.log('setting fav');
                     setSoundObjects(updatedSoundObjects);
                     break; // Once found, exit the loop
                 }
@@ -757,8 +765,8 @@ const Play = () =>
         const token = Cookies.get('token');
 
         try {
-            const response = await axios.delete(`http://localhost:3000/remove-favorite/${soundName}`, {
-                headers:{
+            const response = await axios.delete(`http://localhost:3000/remove-favorite/${soundName}`, null, {
+                headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
@@ -773,8 +781,8 @@ const Play = () =>
                 return sound;
             });
 
-        // Update state with the modified soundObjects array
-        setSoundObjects(updatedSoundObjects);
+            // Update state with the modified soundObjects array
+            setSoundObjects(updatedSoundObjects);
 
         } catch (error) {
             console.log(error);
@@ -813,7 +821,7 @@ const Play = () =>
                             onChange={(event) => handleSelectSound(event)}
                             label="Sound"
                             >
-                        {soundObjects.map((sound, index) => (
+                        {soundObjects && soundObjects.map((sound, index) => (
                             <MenuItem key={index} value={sound.name}>
                                     {sound.name} 
                                     {isAuthenticated && (
@@ -874,48 +882,6 @@ const Play = () =>
         </div>
     )
 }
-
-/* <Box sx={{ width: '100%', maxWidth: 260, bgColor: 'background.paper' }}>
-                        <FormControl>
-                            <FormLabel>Sounds</FormLabel>
-                            <RadioGroup
-                                aria-label="sounds"
-                                name="sound-group"
-                                defaultValue="synth"
-                                /*onChange={(e) => this.handleButtonClick1(e.target.value)}*/
-                                /* >
-                                <List
-                                    sx = {{
-                                        '& .MuiListItem-root': {
-                                        borderRadius: '8px',
-                                        backgroundColor: 'black',
-                                        marginBottom: '8px',
-                                        color: 'white'
-                                        },
-                                        '& .MuiRadio-root': {
-                                        color: 'white', // Radio button color
-                                        },
-                                        '& .MuiSvgIcon-root': {
-                                        stroke: 'white', // Star icon outline color
-                                        },
-                                    }}
-                                >
-                                    {soundObjects.map(sound => (
-                                        <SoundCard
-                                            key={sound.id}
-                                            id={sound.id}
-                                            name={sound.name}
-                                            location={sound.location}
-                                            isFavorite={sound.isFavorite}
-                                            isLoggedIn={isAuthenticated}
-                                            onSelect={(instrument, location) => handleButtonClick(instrument, location)}
-                                            addFavorite={addFavorite}
-                                            removeFavorite={removeFavorite} />
-                                    ))}
-                                </List> 
-                            </RadioGroup>
-                        </FormControl>
-                    </Box> */
-                    
+                   
 
 export default Play;

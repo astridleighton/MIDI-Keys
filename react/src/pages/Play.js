@@ -18,14 +18,8 @@ import './Play.scss'
  * TODO: display chord played, do not set default instrument
  */
 
-// TODO: pass in connected device
-const Play = () =>
+const Play = ({connectedDevice}) =>
 {
-    // TODO: move all drums into kit in future implementation
-        /* const drumKit = new Tone.Players({
-            "kick": "https://tonejs.github.io/audio/drum-samples/4OP-FM/snare.mp3",
-        }).toDestination(); */
-
     // state
     const isAuthenticated = !!Cookies.get('token');
     const firstName = Cookies.get('name');
@@ -52,28 +46,26 @@ const Play = () =>
                 await setUpQwertyKeyboard(); // device setup
                 await initializeSounds();
 
-                const manuallyConnectedDevice = await manuallyConnectV49(); // manually connection set up for now
-                if(manuallyConnectedDevice) {
-                    console.log('setting up MIDI keyboard');
-                    await setUpMIDIKeyboard(manuallyConnectedDevice);
+                if (connectedDevice === 'V49') { // TODO: fix so device can connect to others besides V49
+                    await connectMIDIInputDevice(connectedDevice)
+                    await setUpMIDIKeyboard(connectedDevice);
                 }
             } catch (error) {
                 console.error('Error setting up MIDI in your browser. Please reload and try again.', error);
-            }
-            
+            } 
         }
 
         initTone();
   }, [selectedSound]);
 
   /**
-   * Manual device connection to V49 (used for testing)
+   * Connects to MIDI device
    * @returns connected device
    */
-    const manuallyConnectV49 = async () => {
+    const connectMIDIInputDevice = async (deviceName) => {
         const midiAccess = await navigator.requestMIDIAccess();
         const inputs = Array.from(midiAccess.inputs.values());
-        const device = inputs.find(input => input.name === 'V49');
+        const device = inputs.find(input => input.name === deviceName);
         if (device) {
           return device;
         }

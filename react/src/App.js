@@ -19,7 +19,7 @@ const App = () => {
   // state
   const [fullName] = useState();
   const [connectedDevice, setConnectedDevice] = useState();
-  const [connectedDeviceName, setConnectedDeviceName] = useState('V49'); // TODO: change so this is no longer default
+  const [connectedDeviceName, setConnectedDeviceName] = useState(null); // TODO: change so connected device persists
   const [ /* midiState, */ setMIDIState] = useState(null);
   const [inputDevices, setInputDevices] = useState([]);
   // const [isAuthenticated, setIsAuthenticated] = useState();
@@ -118,7 +118,6 @@ const App = () => {
 
   // returns routes and basic view
   return (
-    // <MIDIContext.Provider value={{ connectedDevice, inputDevices }}>
       <div className="app-container d-flex flex-column" style={{ backgroundColor: '#f8f8f8', marginTop: '60px' }}>
             <Router>
                 <Navbar/>
@@ -134,7 +133,6 @@ const App = () => {
                 <Footer connectedDevice={connectedDeviceName} removeConnectedDevice={removeConnectedDevice} />
             </div>
         </div>
-    // </MIDIContext.Provider>
   )
 }
 

@@ -3,11 +3,14 @@
     flex-direction: column;
     align-items: center;
     margin-bottom: 50px;
+    background-color: #1e1e1e;
     
 
     .play-header {
         text-align: center;
         margin: 25px;
+        color: #FFF;
+        margin-top: '50px';
     }
 
     .play-content {
@@ -24,6 +27,7 @@
         text-align: center;
         border-radius: 20px;
         padding: 8px;
+        color: #FFF;
 
         .display-notes-container {
             display: flex;

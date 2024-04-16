@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react';
 import * as Tone from 'tone';
 import AudioKeys from 'audiokeys';
 import Cookies from 'js-cookie';
-import SoundCard from '../cards/SoundCard';
 import Sound from '../sound/Sound';
 import axios from 'axios';
 import { List, FormControl, FormLabel, RadioGroup, InputLabel, Box, FormControlLabel, Switch, FormGroup, CircularProgress, Select, MenuItem, Menu, IconButton } from '@mui/material';
@@ -475,8 +474,6 @@ const Play = () =>
      */
     const setUpQwertyKeyboard = async() => {
 
-        console.log('Setting up QWERTY keyboard');
-
         const keyboard = await createQwerty();
 
         // maps QWERTY keys to notes
@@ -570,6 +567,7 @@ const Play = () =>
     const handleSelectSound = (event) => {
 
         // TODO: fix so source is passed here too
+        console.log(event);
 
         const instrument = event.target.value;
         const location = 'react';
@@ -671,7 +669,12 @@ const Play = () =>
             if (result.status === 200) {
                 const sounds = result.data.map(sound => new Sound(sound.id, sound.name, sound.source, sound.isFavorite));
                 console.log(sounds);
-                return getAllFavorites(sounds);
+
+                if(isAuthenticated) {
+                    return getAllFavorites(sounds);
+                } else {
+                    return sounds;
+                }
             } else {
                 console.log("Error");
                 return null;
@@ -741,7 +744,7 @@ const Play = () =>
     
             console.log(response);
     
-            for (let i = 0; i < soundObjects.length; i++) { // TODO: fix so state is updated correctly
+            for (let i = 0; i < soundObjects.length; i++) {
                 if (soundObjects[i].name === sound) {
                     const updatedSoundObjects = [...soundObjects];
                     updatedSoundObjects[i].isFavorite = true;
@@ -816,9 +819,9 @@ const Play = () =>
                 ) : (
                   <div>
                     <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-                        <InputLabel id="select-sound-label">Select Sound</InputLabel>
+                        <InputLabel id="select-sound-label" sx={{color: 'white', fontSize: '20px'}}>Selected Sound</InputLabel>
                         <Select
-                            sx={{marginTop: '35px', width: '250px', height: '50px'}}
+                            sx={{marginTop: '35px', width: '250px', height: '50px', color: 'white'}}
                             labelId="select-sound-label"
                             value={selectedSound}
                             onChange={(event) => handleSelectSound(event)}

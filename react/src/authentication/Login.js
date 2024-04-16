@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { Button, Box, TextField, Typography, Container, Alert } from '@mui/material';
+import './Login.scss';
 
 /**
  * Allows user to log in to account
@@ -100,20 +101,11 @@ const Login = () =>
 
     // returns login view
     return (
-        <div>  
+        <div class="login-container">  
             <Container maxWidth="xs">
-                <Container
-                    sx={{
-                        mt: '50px',
-                        mb: '-30px'
-                    }}>
-                        <Typography
-                        component="h1"
-                        variant="h5"
-                        sx={{ textAlign: 'center' }} >
-                            Sign In
-                        </Typography>
-                </Container>
+                <div class="login-header">
+                    <h1>Sign In</h1>
+                </div>
                 <Box
                     component="form"
                     onSubmit={handleSubmit}
@@ -123,6 +115,7 @@ const Login = () =>
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
+                        color: 'white'
                         }}
                 >
                     {error &&
@@ -139,8 +132,14 @@ const Login = () =>
                         error={submitted && !username} // check if empty
                         helperText={submitted && !username ? 'Username is required ' : ''}
                         onChange={handleUsernameChange}
-                        autoFocus
+                        focused
                         autoComplete='off'
+                        variant="filled"
+                        sx={{
+                            '& input': {
+                                color: 'white'
+                            }
+                        }}
                     />
                     <TextField
                         margin="normal"
@@ -153,6 +152,13 @@ const Login = () =>
                         helperText={submitted && !password ? 'Password is required ' : ''}
                         onChange={handlePasswordChange}
                         autoComplete='off'
+                        variant='filled'
+                        focused
+                        sx={{
+                            '& input': {
+                                color: 'white'
+                            }
+                        }}
                     />
                     <Container
                         sx={{
@@ -182,7 +188,7 @@ const Login = () =>
                                 textDecoration: 'underline',
                                 color: 'inherit',
                                 fontWeight: 'bold',
-                                padding: '5px'
+                                padding: '5px',
                                 }}>Sign Up</a>
                     </Typography>
                 </Box>

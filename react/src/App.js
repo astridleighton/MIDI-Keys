@@ -119,7 +119,7 @@ const App = () => {
   // returns routes and basic view
   return (
     // <MIDIContext.Provider value={{ connectedDevice, inputDevices }}>
-      <div className="app-container d-flex flex-column" style={{ backgroundColor: '#f8f8f8' }}>
+      <div className="app-container d-flex flex-column" style={{ backgroundColor: '#f8f8f8', marginTop: '60px' }}>
             <Router>
                 <Navbar/>
                 <Routes>

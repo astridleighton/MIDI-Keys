@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Button, Box, TextField, Typography, Container, Alert } from '@mui/material';
+import './Register.scss';
 
 
 /**
@@ -136,23 +137,9 @@ const Register = () =>
      * Displays registration form
      */
     return(
-        <div>
-            <Container maxWidth="xs">
-                <Container
-                    sx={{
-                        mt: '50px',
-                        mb: '-30px'
-                    }}>
-                <Typography
-                component="h1"
-                variant="h5"
-                sx={{
-                    textAlign: 'center',
-                }}
-            >
-                Create An Account
-            </Typography>
-                </Container>
+        <div class="register-container">
+            <div class="register-header">
+                <h1>Create An Account</h1>
             <Box
                 component="form"
                 onSubmit={handleSubmit}
@@ -175,7 +162,12 @@ const Register = () =>
                 value={firstname}
                 onChange={handleFirstNameChange}
                 autoComplete="off"
-                autoFocus
+                focused
+                sx={{
+                    '& input': {
+                        color: 'white'
+                    }
+                }}
             />
             <TextField
                 margin="normal"
@@ -189,6 +181,12 @@ const Register = () =>
                 }
                 onChange={handleUsernameChange}
                 autoComplete="off"
+                focused
+                sx={{
+                    '& input': {
+                        color: 'white'
+                    }
+                }}
             />
             <TextField
                 margin="normal"
@@ -203,6 +201,12 @@ const Register = () =>
                 }
                 onChange={handlePasswordChange}
                 autoComplete="off"
+                focused
+                sx={{
+                    '& input': {
+                        color: 'white'
+                    }
+                }}
             />
             <Container
                 sx={{
@@ -236,7 +240,7 @@ const Register = () =>
                             }}>Sign In</a>
                 </Typography>
             </Box>
-            </Container>
+            </div>
         </div>
     )
 }

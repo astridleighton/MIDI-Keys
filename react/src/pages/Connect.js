@@ -42,7 +42,7 @@ const Connect = ({connectedDevice, updateConnectedDevice, midiInputDevices}) =>
         <h1 className="connect-title">Connect</h1>
       </div>
       <div className="connect-content">
-      <FormLabel>Select MIDI device from list:</FormLabel>
+      <FormLabel sx={{color: 'white', padding: '20px'}}>Select input MIDI device:</FormLabel>
         <RadioGroup
           aria-label="devices"
           name="device-group"
@@ -58,7 +58,7 @@ const Connect = ({connectedDevice, updateConnectedDevice, midiInputDevices}) =>
                     color: 'white'
                   },
                   '& .MuiRadio-root': {
-                    color: 'white', // Radio button color
+                    color: 'grey', // Radio button color
                   }
               }}
             >
@@ -87,7 +87,7 @@ const Connect = ({connectedDevice, updateConnectedDevice, midiInputDevices}) =>
                         backgroundColor: 'grey',
                         color: 'white',
                         padding: '10px',
-                        margin: '15px',
+                        margin: '15px'
                     }}
                 >
                   Connect

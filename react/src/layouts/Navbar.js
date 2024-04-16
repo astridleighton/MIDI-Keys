@@ -26,26 +26,26 @@ const Navbar = () =>
     // shows navigation link and user authentication status
     return(
         <div>
-            <AppBar position="static" color="primary" sx={{ backgroundColor: '#000000' }}>
+            <AppBar color="primary" sx={{ backgroundColor: '#000000', position: 'fixed' }}>
                 <Toolbar>
                     <PianoIcon/>
-                    <Typography variant="h6" sx={{ my: 2 }}>
+                    <Typography variant="h5" sx={{ my: 2, marginRight: '20px' }}>
                         MIDI Keys
                     </Typography>
                     <Button
                         variant="outline"
                     >
-                        <a href="/" style={{ textDecoration: 'none', color: 'inherit'}}>Play</a>
+                        <a href="/" style={{ textDecoration: 'none', color: 'inherit', fontSize: '18px'}}>Play</a>
                     </Button>
                     <Button
                         variant="outline"
                     >
-                        <a href="/connect" style={{ textDecoration: 'none', color: 'inherit'}}>Connect</a>
+                        <a href="/connect" style={{ textDecoration: 'none', color: 'inherit', fontSize: '18px'}}>Connect</a>
                     </Button>
                     <Button
                         variant="outline"
                     >
-                        <a href="/about" style={{ textDecoration: 'none', color: 'inherit'}}>About</a>
+                        <a href="/about" style={{ textDecoration: 'none', color: 'inherit', fontSize: '18px'}}>About</a>
                     </Button>
                     <span style={{ marginLeft: 'auto' }}>
                         {isAuthenticated ? (

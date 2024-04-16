@@ -1,6 +1,6 @@
 import React from 'react';
-import { AppBar, Toolbar, Button } from '@mui/material';
-
+import { BottomNavigation, Toolbar, Button } from '@mui/material';
+import './Footer.scss';
 /**
  * Displays connected device and allows user to remove it
  */
@@ -16,26 +16,27 @@ const Footer = ({ connectedDevice, removeConnectedDevice }) =>
     // displays footer view and shows connected device
     return(
         <div>
-            { /*<AppBar style= {{ position: 'fixed', bottom: 0}}>
+            <BottomNavigation sx= {{ position: 'fixed', width: '100%', bottom: 0}} class="footer">
                 <Toolbar>
                 <div className="container text-center p-3">
                         <span className="text-light">
                             {connectedDevice ? (
-                                <span>Connected Device:&nbsp;{connectedDevice}&nbsp;
+                                <span class="connectedDevice">Connected Device:&nbsp;{connectedDevice}&nbsp;
                                 <Button
                                     variant="outlined"
                                     onClick={removeDevice}
+                                    sx={{marginLeft: '10px'}}
                                 >
                                     Disconnect
                                 </Button>
                                 </span>
                             ) : (
-                                <span>No device connected.</span>
+                                <div className="connectedDevice">No device connected.</div>
                             )}
                         </span>
                     </div>
                 </Toolbar>
-                            </AppBar> */ }
+            </BottomNavigation>
         </div>
     ) 
 }

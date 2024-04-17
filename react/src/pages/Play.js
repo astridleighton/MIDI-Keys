@@ -4,7 +4,7 @@ import AudioKeys from 'audiokeys';
 import Cookies from 'js-cookie';
 import Sound from '../sound/Sound';
 import axios from 'axios';
-import { List, FormControl, FormLabel, RadioGroup, InputLabel, Box, FormControlLabel, Switch, FormGroup, CircularProgress, Select, MenuItem, Menu, IconButton } from '@mui/material';
+import { List, FormControl, FormLabel, RadioGroup, InputLabel, Box, Alert, FormControlLabel, Switch, FormGroup, CircularProgress, Select, MenuItem, Menu, IconButton } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import Piano from './Piano';
 
@@ -17,12 +17,12 @@ import './Play.scss'
  * Displays notes played
  */
 
-const Play = ({connectedDevice}) =>
+const Play = ({connectedDevice, errorMessage}) =>
 {
     // state
     const isAuthenticated = !!Cookies.get('token');
     const firstName = Cookies.get('name');
-    const [selectedSound, setSelectedSound] = useState('Synth');
+    const [selectedSound, setSelectedSound] = useState();
     const [chordNotes, setChordNotes] = useState([]);
     const [soundObjects, setSoundObjects] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -44,10 +44,11 @@ const Play = ({connectedDevice}) =>
                 await setUpQwertyKeyboard(); // device setup
                 await initializeSounds();
 
-                if (connectedDevice === 'V49') { // TODO: fix so device can connect to others besides V49
-                    await connectMIDIInputDevice(connectedDevice)
-                    await setUpMIDIKeyboard(connectedDevice);
-                }
+                connectedDevice = 'MPKmini2'; // TODO: fix so this does not overwrite
+                
+                const connectedDevice2 = await connectMIDIInputDevice(connectedDevice)
+                await setUpMIDIKeyboard(connectedDevice2);
+                
             } catch (error) {
                 console.error('Error setting up MIDI in your browser. Please reload and try again.', error);
             } 
@@ -327,8 +328,7 @@ const Play = ({connectedDevice}) =>
             setIsLoading(true);
             const sounds = await getAllSounds();
 
-            // put favorites at the top of the list
-            // TODO: maybe fix?
+            // TODO: put favorites at the top of the list -- maybe fix?
             /* sounds.sort((a, b) => {
                 if(a.isFavorite && !b.isFavorite) {
                     return -1;
@@ -369,7 +369,7 @@ const Play = ({connectedDevice}) =>
             const velocity = event.data[2];
             const note = await midiToNote(noteInput);
 
-            switch (command)
+                switch (command)
             {
                 case 144: // note on
                     if(velocity > 0)
@@ -411,40 +411,39 @@ const Play = ({connectedDevice}) =>
                     * drums: 36 - 37 - 38 - 39
                     */
                 }
-            };
-            
+            };    
     }
 
     const playSound = async(note) => {
         switch (selectedSound) {
             case 'Synth':
-                const synth = createSynth();
+                const synth = await createSynth();
                 synth.triggerAttackRelease(note, "4n");
                 break;
             case 'AM Synth':
-                const amSynth = createAMSynth();
+                const amSynth = await createAMSynth();
                 amSynth.triggerAttackRelease(note, "4n");
                 break;
             case 'Mono Synth':
-                const monoSynth = createMonoSynth();
+                const monoSynth = await createMonoSynth();
                 monoSynth.triggerAttackRelease(note, "4n");
                 break;
             case 'Casio Piano':
                 console.log('casio');
-                createSampler(note);
+                await createSampler(note);
                 break;
             case 'Salamander':
                 break;
             case 'Bass Guitar':
                 break;
             case 'Eerie Pad':
+                await createEerieSynthSampler(note, url);
                 break;
             case 'Guitar':
                 break;
             case 'Kalimba':
                 break;
             default:
-                console.log('Invalid instrument');
                 break;
         }
     }
@@ -549,42 +548,47 @@ const Play = ({connectedDevice}) =>
     */
     const handleSelectSound = (event) => {
 
-        // TODO: fix so source is passed here too
-        console.log(event);
-
         const instrument = event.target.value;
-        const location = 'react';
+        let location;
+
+        soundObjects.forEach((sound) => {
+            if(sound.name === instrument) {
+                location = sound.location;
+            }
+        })
 
         console.log("Selected: " + instrument + " at " + location);
 
-        if (location === "react") {
+        if (location === "react" || location) {
             if (instrument === 'Synth') {
                 console.log('Setting as synth');
-                setSelectedSound('Synth');
+                setSelectedSound(instrument);
             } else if (instrument === 'AM Synth') {
-                setSelectedSound('AM Synth');
+                setSelectedSound(instrument);
             } else if (instrument === 'Mono Synth') {
-                setSelectedSound('Mono Synth');
+                setSelectedSound(instrument);
             } else if (instrument === 'Casio Piano') {
-                setSelectedSound('Casio Piano');
-            } else if (instrument === 'Bass Guitar') {
-                setSelectedSound('Bass Guitar');
+                setSelectedSound(instrument);
             } else if (instrument === 'Salamander') {
-                setSelectedSound('Salamander');
+                setSelectedSound(instrument);
+                setURL(location);
             } else if (instrument === 'Choir') {
-                setSelectedSound('Choir');
+                setSelectedSound(instrument);
+                setURL(location);
             } else if (instrument === 'Eerie Pad') {
-                setSelectedSound('Eerie Pad');
+                setSelectedSound(instrument);
+                setURL(location);
             }  else if (instrument === 'Guitar') {
-                setSelectedSound('Guitar');
+                setSelectedSound(instrument);
+                setURL(location);
             } else if (instrument === 'Kalimba') {
-                setSelectedSound('Kalimba');
+                setSelectedSound(instrument);
+                setURL(location);
             } else {
-                console.log("No instrument found on front-end for selected instrument.");
+                console.log("Error! Could not set selected instrument.");
             }
         } else { // external sample
-            setSelectedSound('online');
-            setURL(location);
+            console.log('Error! Could not set selected instrument.');
         }
     }
     
@@ -729,6 +733,8 @@ const Play = ({connectedDevice}) =>
     // renders user session and displays available sounds and notes played
     return(
         <div className="play-container">
+            {errorMessage && 
+                <Alert severity="error">Error!</Alert>}
             <div className="play-container play-header">
                 {isAuthenticated ? (
                     <div>
@@ -746,7 +752,6 @@ const Play = ({connectedDevice}) =>
                         <p>Could not load sounds from database. Please refresh to try again.</p>
                         <CircularProgress />
                     </>
-                    
                 ) : (
                   <div>
                     <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>

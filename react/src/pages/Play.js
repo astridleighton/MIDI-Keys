@@ -28,7 +28,7 @@ const Play = ({connectedDevice, errorMessage}) =>
     const [isLoading, setIsLoading] = useState(true);
     const [url, setURL] = useState('');
     const [notesEnabled, setNotesEnabled] = useState(false);
-    console.log('test render');
+    console.log('play render');
 
     /**
        * Starts tone.JS and sets up MIDI input devices
@@ -39,7 +39,7 @@ const Play = ({connectedDevice, errorMessage}) =>
             try {
                 Tone.start();
 
-                await Tone.setContext(new AudioContext({ sampleRate: 48000 })); // sets audio preferences
+                await Tone.setContext(new AudioContext({ sampleRate: 41000 })); // sets audio preferences
 
                 await setUpQwertyKeyboard(); // device setup
                 await initializeSounds();
@@ -364,54 +364,61 @@ const Play = ({connectedDevice, errorMessage}) =>
         console.log('Setting up MIDI keyboard');
         midiKeyboard.onmidimessage =  async (event) =>
         {
+            event.preventDefault();
             const command = event.data[0];
             const noteInput = event.data[1];
             const velocity = event.data[2];
             const note = await midiToNote(noteInput);
 
-                switch (command)
+            switch (command)
             {
                 case 144: // note on
                     if(velocity > 0)
                     {
-                        await addNote(note);
-                        await playSound(note);
+                        console.log('MIDI EVENT PLAY! ' + noteInput);
+                        // determine if drums or keys
+                        if (noteInput >= 60) {
+                            await addNote(note);
+                            await playSound(note);
+                        } else {
+                            switch (noteInput) {
+                                case 48:
+                                    createKickPlayer();
+                                    break;
+                                case 49:
+                                    createSnarePlayer();
+                                    break;
+                                case 50:
+                                    createTom1Player();
+                                    break;
+                                case 51:
+                                    createTom2Player();
+                                    break;
+                                case 44:
+                                    createTom3Player();
+                                    break;
+                                case 45:
+                                    createHiHatPlayer();
+                                    break;
+                                case 46:
+                                    createBongo1Player();
+                                    break;
+                                case 47:
+                                    createBongo2Player();
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
                     }
                     break;
                 case 128: // note off
-                    await removeNote(note);
-                    break;
-                case 153: // drum pads
-                    if (noteInput === 49) {
-                        createKickPlayer();
-                    } else if (noteInput === 41) {
-                        createSnarePlayer();
-                    } else if (noteInput === 42) {
-                        createTom1Player();
-                    } else if (noteInput === 46) {
-                        createTom2Player();
-                    } else if (noteInput === 36) {
-                        createTom3Player();
-                    } else if (noteInput === 37) {
-                        createHiHatPlayer();
-                    } else if (noteInput === 38) {
-                        createBongo1Player();
-                    } else if (noteInput === 39) {
-                        createBongo2Player();
-                    }
+                    await removeNote(note);                
                     break;
                 default:
                     break;
-
-                    /* COMMANDS:
-                    * command 224 = pitch wheel, 176 = mod wheel
-                    * 153/137 - pads
-                    * 176 - buttons 
-                    * drums: 49 - 41 - 42 - 46
-                    * drums: 36 - 37 - 38 - 39
-                    */
                 }
-            };    
+            }    
     }
 
     const playSound = async(note) => {
@@ -433,15 +440,16 @@ const Play = ({connectedDevice, errorMessage}) =>
                 await createSampler(note);
                 break;
             case 'Salamander':
-                break;
-            case 'Bass Guitar':
+                await createOnlineSampler(note, url);
                 break;
             case 'Eerie Pad':
                 await createEerieSynthSampler(note, url);
                 break;
             case 'Guitar':
+                await createGuitarSampler(note, url);
                 break;
             case 'Kalimba':
+                await createKalimbaSampler(note, url);
                 break;
             default:
                 break;

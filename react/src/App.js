@@ -9,6 +9,8 @@ import About from './pages/About';
 import Login from './authentication/Login';
 import Register from './authentication/Register';
 import Footer from './layouts/Footer';
+import Cookies from 'js-cookie';
+import { ToastContainer, toast } from 'react-toastify';
 
 /**
  * Main component used to handle Tone.js, MIDI device connections, and routing
@@ -19,10 +21,11 @@ const App = () => {
   // state
   const [fullName] = useState();
   const [connectedDevice, setConnectedDevice] = useState();
-  const [connectedDeviceName, setConnectedDeviceName] = useState(null); // TODO: change so connected device persists
+  const [connectedDeviceName, setConnectedDeviceName] = useState(); // TODO: change so connected device persists
   const [ /* midiState, */ setMIDIState] = useState(null);
   const [inputDevices, setInputDevices] = useState([]);
   // const [isAuthenticated, setIsAuthenticated] = useState();
+  const [errorMessage, setErrorMessage] = useState();
 
   /*
   * Runs when component mounts, sets up MIDI access and lists MIDI devices
@@ -45,24 +48,6 @@ const App = () => {
 
     setUpMIDI();
 
-    /**
-     * Handles MIDI event (connect, disconnect)
-     * TODO: need to refactor so state runs properly and page reloads in a better way
-     * TODO: fix event type and handle disconnect
-     * @param {*} event MIDI change
-     */
-    const handleStateChange = async (event) => {
-      event.preventDefault();
-      console.log("MIDI event");
-      window.location.reload();
-      alert('MIDI status changed. Reloading page.');
-      if(event.type === 'disconnected') {
-        console.log('Disconnected');
-      } else {
-        setMIDIState(event);
-      }
-    }
-
     // cleanup when component unmounts
     return () => {
       navigator.requestMIDIAccess().then((midiAccess) => {
@@ -73,6 +58,23 @@ const App = () => {
     };
 
   }, []);
+
+   /**
+     * Handles MIDI event (connect, disconnect)
+     * @param {*} event MIDI change
+     */
+   const handleStateChange = async (event) => {
+    event.preventDefault();
+    if(event.port.state === 'disconnected') {
+      alert('MIDI device disconnected.');
+      window.location.reload();
+    } else if (event.port.state === 'connected') {
+      alert('MIDI device connected.');
+      window.location.reload();
+      // setMIDIState(event);
+    }
+  }
+
   
 
   /**
@@ -84,6 +86,10 @@ const App = () => {
     const inputs = Array.from(midiAccess.inputs.values());
     inputs.forEach(input => {
       console.log(input);
+      if(connectedDevice === 'MPKmini2') {
+        setConnectedDevice(input);
+        setConnectedDeviceName(input.name);
+      }
     });
     setInputDevices(inputs);
     return inputs;
@@ -122,7 +128,7 @@ const App = () => {
             <Router>
                 <Navbar/>
                 <Routes>
-                    <Route exact path="/" element={<Play fullName={fullName} connectedDevice={connectedDevice} />} />
+                    <Route exact path="/play" element={<Play fullName={fullName} connectedDevice={connectedDevice} errorMessage={errorMessage} />} />
                     <Route exact path="/connect" element={<Connect connectedDevice={connectedDevice} updateConnectedDevice={updateConnectedDevice} midiInputDevices={inputDevices} />} />
                     <Route exact path="/about" element={<About />} />
                     <Route exact path="/login" element={<Login />} />

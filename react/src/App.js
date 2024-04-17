@@ -10,7 +10,7 @@ import Login from './authentication/Login';
 import Register from './authentication/Register';
 import Footer from './layouts/Footer';
 import Cookies from 'js-cookie';
-import { ToastContainer, toast } from 'react-toastify';
+import {toast, Toaster} from 'react-hot-toast';
 
 /**
  * Main component used to handle Tone.js, MIDI device connections, and routing
@@ -22,10 +22,10 @@ const App = () => {
   const [fullName] = useState();
   const [connectedDevice, setConnectedDevice] = useState();
   const [connectedDeviceName, setConnectedDeviceName] = useState(); // TODO: change so connected device persists
-  const [ /* midiState, */ setMIDIState] = useState(null);
   const [inputDevices, setInputDevices] = useState([]);
   // const [isAuthenticated, setIsAuthenticated] = useState();
   const [errorMessage, setErrorMessage] = useState();
+  const [midiStateChanged, setMidiStateChanged] = useState(false);
 
   /*
   * Runs when component mounts, sets up MIDI access and lists MIDI devices
@@ -37,9 +37,9 @@ const App = () => {
      */
     const setUpMIDI = async () => {
       try {
+        console.log('in try!');
           const midiAccess = await navigator.requestMIDIAccess();
           midiAccess.addEventListener("statechange", handleStateChange);
-          // setMIDIState(midiAccess); TODO: fix!
           await listMIDIInputs(midiAccess);
       } catch (error) {
         console.error('MIDI Access failed: ', error);
@@ -57,7 +57,7 @@ const App = () => {
       })
     };
 
-  }, []);
+  }, [midiStateChanged]);
 
    /**
      * Handles MIDI event (connect, disconnect)
@@ -66,16 +66,16 @@ const App = () => {
    const handleStateChange = async (event) => {
     event.preventDefault();
     if(event.port.state === 'disconnected') {
-      alert('MIDI device disconnected.');
-      window.location.reload();
+      toast.dismiss();
+      toast.error('MIDI device disconnected.');
+      setMidiStateChanged(true);
     } else if (event.port.state === 'connected') {
-      alert('MIDI device connected.');
+      toast.dismiss();
+      toast.success('MIDI device connected.');
+      setMidiStateChanged(true);
       window.location.reload();
-      // setMIDIState(event);
     }
   }
-
-  
 
   /**
    * Lists MIDI inputs and adds to state
@@ -125,10 +125,11 @@ const App = () => {
   // returns routes and basic view
   return (
       <div className="app-container d-flex flex-column" style={{ backgroundColor: '#f8f8f8', marginTop: '60px' }}>
+        <Toaster/>
             <Router>
                 <Navbar/>
                 <Routes>
-                    <Route exact path="/play" element={<Play fullName={fullName} connectedDevice={connectedDevice} errorMessage={errorMessage} />} />
+                    <Route exact path="/" element={<Play fullName={fullName} connectedDevice={connectedDevice} errorMessage={errorMessage} />} />
                     <Route exact path="/connect" element={<Connect connectedDevice={connectedDevice} updateConnectedDevice={updateConnectedDevice} midiInputDevices={inputDevices} />} />
                     <Route exact path="/about" element={<About />} />
                     <Route exact path="/login" element={<Login />} />

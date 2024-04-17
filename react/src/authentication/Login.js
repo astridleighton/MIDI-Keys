@@ -1,9 +1,10 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { Button, Box, TextField, Typography, Container, Alert } from '@mui/material';
 import './Login.scss';
+import { MidiContext } from '../MidiContext';
 
 /**
  * Allows user to log in to account
@@ -18,6 +19,8 @@ const Login = () =>
     const [isFormValid, setIsFormValid] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
+
+    const {setCurrentUser} = useContext(MidiContext);
     
     /**
      * Updates username
@@ -77,7 +80,8 @@ const Login = () =>
                     Cookies.set('token', token, { expires: 1 });
                     Cookies.set('name', name, {expires: 1 });
                     setFirstName(name);
-                    navigate('/')
+                    setCurrentUser(name);
+                    navigate('/');
                 } else {
                     setError("An error occurred during the login. Please try again.")
                 }

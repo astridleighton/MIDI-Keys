@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.scss';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { MidiProvider } from './MidiContext';
 
 /* Application: MIDI Keys Web Application
 * Developed by: Astrid Leighton
@@ -14,7 +15,9 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 // renders application at App.js parent component
 root.render(
   //<React.StrictMode>
-    <App />
+  <MidiProvider>
+      <App />
+  </MidiProvider>
   //</React.StrictMode>
   ,
   document.getElementById('root')

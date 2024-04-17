@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import './Navbar.scss';
 import Cookies from 'js-cookie';
 import { AppBar, Button, Typography, Toolbar } from '@mui/material';
 import PianoIcon from '@mui/icons-material/Piano';
+import { MidiContext } from '../MidiContext';
 
 /**
  * Displays navigation bar for site navigation
@@ -11,7 +12,20 @@ const Navbar = () =>
 {
 
     // checks if user has been authenticated
-    let isAuthenticated = !!Cookies.get('token');
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const { currentUser } = useContext(MidiContext);
+
+    // TODO: rely on cookie update or info from login?
+
+    useEffect(() => {
+        console.log('use effect navbar');
+
+        if(currentUser) {
+            setIsAuthenticated(true);
+        } else {
+            setIsAuthenticated(false);
+        }
+    }, [currentUser])
 
     /**
      * Logs the user out and reloads the page

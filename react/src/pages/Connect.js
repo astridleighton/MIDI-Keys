@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import { Button, List,  FormLabel, RadioGroup, ListItem, Radio, FormControlLabel } from '@mui/material';
+import { MidiContext} from '../MidiContext';
 
 import './Connect.scss'
 
@@ -13,12 +14,12 @@ import './Connect.scss'
  * @param {*} param
  * @returns 
  */
-const Connect = ({connectedDevice, updateConnectedDevice, midiInputDevices}) =>
+const Connect = ({updateConnectedDevice, midiInputDevices}) =>
 {
 
   // state
   const [selectedDevice, setSelectedDevice] = useState(null);
-  // const connectedDeviceName = connectedDevice;
+  const connectedDevice = useContext(MidiContext);
 
   /**
    * Updates state based on selected device
@@ -32,7 +33,9 @@ const Connect = ({connectedDevice, updateConnectedDevice, midiInputDevices}) =>
    * Connects to selected device using prop function from App
    */
   const handleDeviceConnect = () => {
-    updateConnectedDevice(selectedDevice);
+    console.log('selected: ' + selectedDevice);
+    // TODO: fix here!
+    // updateConnectedDevice(selectedDevice);
   }
 
   // returns connect view

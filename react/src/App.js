@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from 'react';
+import { React, useState, useEffect, useContext } from 'react';
 import { Route, Routes, BrowserRouter as Router} from 'react-router-dom';
 import './App.css';
 import Connect from './pages/Connect';
@@ -11,6 +11,7 @@ import Register from './authentication/Register';
 import Footer from './layouts/Footer';
 import Cookies from 'js-cookie';
 import {toast, Toaster} from 'react-hot-toast';
+import { MidiContext } from './MidiContext';
 
 /**
  * Main component used to handle Tone.js, MIDI device connections, and routing
@@ -20,12 +21,13 @@ const App = () => {
   
   // state
   const [fullName] = useState();
-  const [connectedDevice, setConnectedDevice] = useState();
+  // const [connectedDevice, setConnectedDevice] = useState();
   const [connectedDeviceName, setConnectedDeviceName] = useState(); // TODO: change so connected device persists
   const [inputDevices, setInputDevices] = useState([]);
-  // const [isAuthenticated, setIsAuthenticated] = useState();
   const [errorMessage, setErrorMessage] = useState();
   const [midiStateChanged, setMidiStateChanged] = useState(false);
+
+  const { currentUser, setConnectedDevice, connectedDevice } = useContext(MidiContext);
 
   /*
   * Runs when component mounts, sets up MIDI access and lists MIDI devices
@@ -37,7 +39,7 @@ const App = () => {
      */
     const setUpMIDI = async () => {
       try {
-        console.log('in try!');
+        console.log('current user' + currentUser);
           const midiAccess = await navigator.requestMIDIAccess();
           midiAccess.addEventListener("statechange", handleStateChange);
           await listMIDIInputs(midiAccess);

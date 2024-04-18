@@ -9,7 +9,6 @@ import About from './pages/About';
 import Login from './authentication/Login';
 import Register from './authentication/Register';
 import Footer from './layouts/Footer';
-import Cookies from 'js-cookie';
 import {toast, Toaster} from 'react-hot-toast';
 import { MidiContext } from './MidiContext';
 
@@ -19,9 +18,7 @@ import { MidiContext } from './MidiContext';
  */
 const App = () => {
   
-  // state
   const [fullName] = useState();
-  // const [connectedDevice, setConnectedDevice] = useState();
   const [connectedDeviceName, setConnectedDeviceName] = useState(); // TODO: change so connected device persists
   const [inputDevices, setInputDevices] = useState([]);
   const [errorMessage, setErrorMessage] = useState();
@@ -104,8 +101,8 @@ const App = () => {
    */
   const updateConnectedDevice = async (device) => {
     console.log(`Connected device: ${device.name}`);
-    setConnectedDevice(device);
-    setConnectedDeviceName(device.name);
+    // TODO: change so connected device changes -- set to keyboard for now
+    // setConnectedDevice(device.name);
   }
 
   /**

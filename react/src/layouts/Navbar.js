@@ -4,22 +4,19 @@ import Cookies from 'js-cookie';
 import { AppBar, Button, Typography, Toolbar } from '@mui/material';
 import PianoIcon from '@mui/icons-material/Piano';
 import { MidiContext } from '../MidiContext';
+import {toast, Toaster} from 'react-hot-toast';
 
 /**
- * Displays navigation bar for site navigation
+ * Displays navigation bar with basic site links
  */
 const Navbar = () =>
 {
 
-    // checks if user has been authenticated
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const { currentUser } = useContext(MidiContext);
+    const { currentUser, setCurrentUser } = useContext(MidiContext);
 
-    // TODO: rely on cookie update or info from login?
-
+    // updates page based on auth status
     useEffect(() => {
-        console.log('use effect navbar');
-
         if(currentUser) {
             setIsAuthenticated(true);
         } else {
@@ -29,12 +26,12 @@ const Navbar = () =>
 
     /**
      * Logs the user out and reloads the page
-     * TODO: add in useEffect or handle reload better
      */
     const handleLogout = () => {
         Cookies.remove('token');
         Cookies.remove('name');
-        window.location.reload();
+        setCurrentUser(null);
+        toast.success('Sign out successful.');
     }
     
     // shows navigation link and user authentication status

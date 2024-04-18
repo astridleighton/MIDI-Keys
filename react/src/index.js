@@ -7,7 +7,7 @@ import { MidiProvider } from './MidiContext';
 
 /* Application: MIDI Keys Web Application
 * Developed by: Astrid Leighton
-* Latest update: March 23rd, 2023
+* Latest update: April 18th, 2023
 * Start-up: navigate to react directory, type "npm start" (ensure express back-end is working by navigating to express dir and typing "node index.js")*/
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

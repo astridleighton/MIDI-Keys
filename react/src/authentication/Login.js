@@ -5,16 +5,16 @@ import Cookies from 'js-cookie';
 import { Button, Box, TextField, Typography, Container, Alert } from '@mui/material';
 import './Login.scss';
 import { MidiContext } from '../MidiContext';
+import {toast, Toaster} from 'react-hot-toast';
 
 /**
  * Allows user to log in to account
- * Future implementation: move authentication logic to new file
  */
 const Login = () =>
 {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [ firstName, setFirstName] = useState('');
+    const [firstName, setFirstName] = useState('');
     const [submitted, setSubmitted] = useState(false);
     const [isFormValid, setIsFormValid] = useState(false);
     const [error, setError] = useState('');
@@ -47,12 +47,10 @@ const Login = () =>
      * @param {*} event 
      */
     const handleSubmit = async (event) => {
-
         if (event) {
             event.preventDefault();
         }
         setSubmitted(true);
-
         try {
             await processLogin({username, password});
         } catch (error) {
@@ -70,7 +68,6 @@ const Login = () =>
      * @param {*} loginCredentials 
      */
     const processLogin = async (loginCredentials) => {
-
         await axios.post(`http://localhost:3000/login`, loginCredentials)
         .then((result) => {
             if (result.data && result.data.status === 200) {
@@ -82,6 +79,7 @@ const Login = () =>
                     setFirstName(name);
                     setCurrentUser(name);
                     navigate('/');
+                    toast.success('Login successful.');
                 } else {
                     setError("An error occurred during the login. Please try again.")
                 }

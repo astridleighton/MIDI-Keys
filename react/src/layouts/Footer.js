@@ -1,7 +1,8 @@
-import React, {useEffect, useContext} from 'react';
+import React, { useContext } from 'react';
 import { BottomNavigation, Toolbar, Button } from '@mui/material';
 import './Footer.scss';
 import { MidiContext} from '../MidiContext';
+
 /**
  * Displays connected device and allows user to remove it
  */

@@ -1,18 +1,25 @@
 import React, {useEffect} from 'react';
 import './Piano.scss';
 
+/**
+ * Defines the on-screen keyboard view with black and white keys
+ * @param {*} notes 
+ * @returns piano view
+ */
 const Piano = ({ notes }) => {
 
     useEffect(() => {
         // re-renders when notes is updated
     }, [notes]);
 
+    // determines if a note is played to render component with specified key
     const isKeyPlayed = (key) => {
         if(notes) {
             return notes.includes(key);
         }
     }
 
+    // piano view
     return (
         <div className="piano-container">
             <div className="piano-content">

@@ -1,23 +1,21 @@
 import React, {useState, useContext} from 'react';
 import { Button, List,  FormLabel, RadioGroup, ListItem, Radio, FormControlLabel } from '@mui/material';
 import { MidiContext} from '../MidiContext';
+import {toast, Toaster} from 'react-hot-toast';
 
 import './Connect.scss'
 
 /**
  * Allows the user to connect to a selected device
- * NOTE: Automatically connects to QWERTY keyboard?
  */
 /**
  * Allows the user to view available MIDI devices and connect to a selected device
- * TODO: add connect device as default value
  * @param {*} param
  * @returns 
  */
 const Connect = ({updateConnectedDevice, midiInputDevices}) =>
 {
 
-  // state
   const [selectedDevice, setSelectedDevice] = useState(null);
   const connectedDevice = useContext(MidiContext);
 
@@ -33,9 +31,8 @@ const Connect = ({updateConnectedDevice, midiInputDevices}) =>
    * Connects to selected device using prop function from App
    */
   const handleDeviceConnect = () => {
-    console.log('selected: ' + selectedDevice);
-    // TODO: fix here!
-    // updateConnectedDevice(selectedDevice);
+    updateConnectedDevice(selectedDevice);
+    toast.success('Updated connected device.');
   }
 
   // returns connect view

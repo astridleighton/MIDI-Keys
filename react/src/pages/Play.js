@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import * as Tone from 'tone';
 import AudioKeys from 'audiokeys';
 import Cookies from 'js-cookie';
@@ -7,6 +7,7 @@ import axios from 'axios';
 import { List, FormControl, FormLabel, RadioGroup, InputLabel, Box, Alert, FormControlLabel, Switch, FormGroup, CircularProgress, Select, MenuItem, Menu, IconButton } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import Piano from './Piano';
+import { MidiContext } from '../MidiContext';
 
 import './Play.scss'
 
@@ -19,32 +20,54 @@ import './Play.scss'
 
 const Play = ({connectedDevice, errorMessage}) =>
 {
+    const { selectedSound, setSelectedSound } = useContext(MidiContext);
+
     // state
     const isAuthenticated = !!Cookies.get('token');
     const firstName = Cookies.get('name');
-    const [selectedSound, setSelectedSound] = useState();
     const [chordNotes, setChordNotes] = useState([]);
     const [soundObjects, setSoundObjects] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [url, setURL] = useState('');
     const [notesEnabled, setNotesEnabled] = useState(false);
-    console.log('play render');
+    const [qwertyKeyboard, setQwertyKeyboard] = useState();
+
+    const keyToNote = {
+        65: 'C4', // A
+        87: 'Db4', // W
+        83: 'D4', // S
+        69: 'Eb4', // E
+        68: 'E4', // D
+        70: 'F4', // F
+        84: 'Gb4', // T
+        71: 'G4', // G
+        89: 'Ab4', // Y
+        72: 'A4', // H
+        85: 'Bb4', // U
+        74: 'B4', // J
+        75: 'C5', // K
+        79: 'Db5', // O
+        76: 'D5', // L
+        80: 'Eb5', // P
+        59: 'E5' // ;
+    };
 
     /**
        * Starts tone.JS and sets up MIDI input devices
        */
     useEffect (() => {
-
         const initTone = async() => {
             try {
                 Tone.start();
 
                 await Tone.setContext(new AudioContext({ sampleRate: 41000 })); // sets audio preferences
 
-                await setUpQwertyKeyboard(); // device setup
+                const keyboard = await createQwerty();
+                await setUpQwertyKeyboard(keyboard); // device setup
+                
                 await initializeSounds();
 
-                connectedDevice = 'MPKmini2'; // TODO: fix so this does not overwrite
+                connectedDevice = 'MPKmini2';
                 
                 const connectedDevice2 = await connectMIDIInputDevice(connectedDevice)
                 await setUpMIDIKeyboard(connectedDevice2);
@@ -56,6 +79,10 @@ const Play = ({connectedDevice, errorMessage}) =>
 
         initTone();
   }, [selectedSound]);
+
+  useEffect(() => {
+
+  })
 
   /**
    * Connects to MIDI device
@@ -134,23 +161,10 @@ const Play = ({connectedDevice, errorMessage}) =>
       }
 
       /**
-       * Creates an instance of the online bass sampler
+       * Creates an instance of the choir sampler
        * @param {*} note 
        * @param {*} url 
        */
-      const createOnlineBassSampler = (note, url) => {
-        const sampler = new Tone.Sampler({
-            urls: {
-            A1: "As1.mp3",
-            A2: "As2.mp3",
-        },
-	        baseUrl: url,
-            onload: () => {
-                sampler.triggerAttackRelease(note, 0.8);
-            }
-        }).toDestination();
-      }
-
        const createChoirSampler = (note, url) => {
         const sampler = new Tone.Sampler({
             urls: {
@@ -165,6 +179,11 @@ const Play = ({connectedDevice, errorMessage}) =>
         }).toDestination();
       }
 
+      /**
+       * Creates an instance of the eerie sampler
+       * @param {*} note 
+       * @param {*} url 
+       */
       const createEerieSynthSampler = (note, url) => {
         const sampler = new Tone.Sampler({
             urls: {
@@ -178,6 +197,12 @@ const Play = ({connectedDevice, errorMessage}) =>
             }
         }).toDestination();
       }
+
+      /**
+       * Creates an instance of the guitar sampler
+       * @param {*} note 
+       * @param {*} url 
+       */
       const createGuitarSampler = (note, url) => {
         const sampler = new Tone.Sampler({
             urls: {
@@ -191,6 +216,12 @@ const Play = ({connectedDevice, errorMessage}) =>
             }
         }).toDestination();
       }
+
+      /**
+       * Creates an instance of the kalimba sampler
+       * @param {*} note 
+       * @param {*} url 
+       */
       const createKalimbaSampler = (note, url) => {
         const sampler = new Tone.Sampler({
             urls: {
@@ -203,7 +234,6 @@ const Play = ({connectedDevice, errorMessage}) =>
             }
         }).toDestination();
       }
-
 
       /**
        * Creates an instance of the online sampler (used for online URLs)
@@ -327,18 +357,6 @@ const Play = ({connectedDevice, errorMessage}) =>
         try {
             setIsLoading(true);
             const sounds = await getAllSounds();
-
-            // TODO: put favorites at the top of the list -- maybe fix?
-            /* sounds.sort((a, b) => {
-                if(a.isFavorite && !b.isFavorite) {
-                    return -1;
-                }
-                if(!a.isFavorite && b.isFavorite) {
-                    return 1;
-                }
-                return 0;
-            }) */
-
             setSoundObjects(sounds);
         } catch (err) {
             console.error(err);
@@ -418,9 +436,14 @@ const Play = ({connectedDevice, errorMessage}) =>
                 default:
                     break;
                 }
-            }    
+            }   
+            
     }
 
+    /**
+     * Chooses appropriate sample baesd on note
+     * @param {*} note 
+     */
     const playSound = async(note) => {
         switch (selectedSound) {
             case 'Synth':
@@ -436,7 +459,6 @@ const Play = ({connectedDevice, errorMessage}) =>
                 monoSynth.triggerAttackRelease(note, "4n");
                 break;
             case 'Casio Piano':
-                console.log('casio');
                 await createSampler(note);
                 break;
             case 'Salamander':
@@ -447,6 +469,9 @@ const Play = ({connectedDevice, errorMessage}) =>
                 break;
             case 'Guitar':
                 await createGuitarSampler(note, url);
+                break;
+            case 'Choir':
+                await createChoirSampler(note, url);
                 break;
             case 'Kalimba':
                 await createKalimbaSampler(note, url);
@@ -462,30 +487,7 @@ const Play = ({connectedDevice, errorMessage}) =>
         - Triggers audio output with keydown event
         - Stores current notes being played
      */
-    const setUpQwertyKeyboard = async() => {
-
-        const keyboard = await createQwerty();
-
-        // maps QWERTY keys to notes
-        const keyToNote = {
-            65: 'C4', // A
-            87: 'Db4', // W
-            83: 'D4', // S
-            69: 'Eb4', // E
-            68: 'E4', // D
-            70: 'F4', // F
-            84: 'Gb4', // T
-            71: 'G4', // G
-            89: 'Ab4', // Y
-            72: 'A4', // H
-            85: 'Bb4', // U
-            74: 'B4', // J
-            75: 'C5', // K
-            79: 'Db5', // O
-            76: 'D5', // L
-            80: 'Eb5', // P
-            59: 'E5' // ;
-        };
+    const setUpQwertyKeyboard = async(keyboard) => {
 
         /*
         Triggers audio output, converts MIDI note to music note, and adds note to notes played
@@ -498,7 +500,6 @@ const Play = ({connectedDevice, errorMessage}) =>
             {
                 await addNote(note);
                 await playSound(note);
-                // TODO: implement getChord()
             }
         });
 
@@ -506,12 +507,8 @@ const Play = ({connectedDevice, errorMessage}) =>
         Stops audio output and removes note from notes played
     */
         keyboard.up(async(e) => {
-            console.log(e);
-
             const note = keyToNote[e.keyCode];
             await removeNote(note);
-
-            
         })
         }
 
@@ -565,11 +562,8 @@ const Play = ({connectedDevice, errorMessage}) =>
             }
         })
 
-        console.log("Selected: " + instrument + " at " + location);
-
         if (location === "react" || location) {
             if (instrument === 'Synth') {
-                console.log('Setting as synth');
                 setSelectedSound(instrument);
             } else if (instrument === 'AM Synth') {
                 setSelectedSound(instrument);
@@ -676,8 +670,6 @@ const Play = ({connectedDevice, errorMessage}) =>
     const addFavorite = async (sound) => {
 
         const token = Cookies.get('token');
-        alert('In add favorite with ' + sound + 'token: ' + token);
-
         try {
             const response = await axios.post(`http://localhost:3000/add-favorite/${sound}`, null, {
                 headers:{
@@ -711,8 +703,6 @@ const Play = ({connectedDevice, errorMessage}) =>
     const removeFavorite = async (soundName) => {
     
         const token = Cookies.get('token');
-        alert('In remove favorite with token: ' + token + 'and sound: ' + soundName);
-
 
         try {
             const response = await axios.delete(`http://localhost:3000/remove-favorite/${soundName}`, {

@@ -1,12 +1,13 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import * as Tone from 'tone';
 import AudioKeys from 'audiokeys';
 import Cookies from 'js-cookie';
-import SoundCard from '../cards/SoundCard';
 import Sound from '../sound/Sound';
 import axios from 'axios';
-import { ListItem, List, FormControl, FormLabel, RadioGroup, FromControlLabel, ListItemButton, ListItemText, ListItemIcon, Radio, Box, FormControlLabel, Switch, FormGroup } from '@mui/material';
+import { List, FormControl, FormLabel, RadioGroup, InputLabel, Box, Alert, FormControlLabel, Switch, FormGroup, CircularProgress, Select, MenuItem, Menu, IconButton } from '@mui/material';
+import StarIcon from '@mui/icons-material/Star';
 import Piano from './Piano';
+import { MidiContext } from '../MidiContext';
 
 import './Play.scss'
 
@@ -15,41 +16,37 @@ import './Play.scss'
  * Contains the Tone.JS instruments and database samples
  * Allows user to select between instruments
  * Displays notes played
- * TODO: display chord played, do not set default instrument
- * TODO: change note velocity
  */
+
 const Play = ({connectedDevice}) =>
 {
-    // TODO: move all drums into kit in future implementation
-        /*const drumKit = new Tone.Players({
-            "kick": "https://tonejs.github.io/audio/drum-samples/4OP-FM/snare.mp3",
-        }).toDestination();*/
+    const { selectedSound, setSelectedSound } = useContext(MidiContext);
 
-    // state
     const isAuthenticated = !!Cookies.get('token');
     const firstName = Cookies.get('name');
-
-    const [synths, setSynths] = useState({});
-    const [amSynths, setAmSynths] = useState({});
-    const [monoSynths, setMonoSynths] = useState({});
-    const [casioSamples, setCasioSamples] = useState({});
-    const [synthTest] = useState(new Tone.Synth().toDestination());
-    
-    const [useQwerty, setUseQwerty] = useState(true);
-
-    const [hiHatPlayer] = useState(new Tone.Player("https://tonejs.github.io/audio/drum-samples/4OP-FM/hihat.mp3").toDestination());
-    const [bongoSnarePlayer] = useState(new Tone.Player("https://tonejs.github.io/audio/drum-samples/Bongos/snare.mp3").toDestination());
-    const [bongoTomPlayer] = useState(new Tone.Player("https://tonejs.github.io/audio/drum-samples/Bongos/tom1.mp3").toDestination());
-
-    const [selectedSound, setSelectedSound] = useState('');
-    const [chordNotes, setChordNotes] = useState([undefined]);
+    const [chordNotes, setChordNotes] = useState([]);
     const [soundObjects, setSoundObjects] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [url, setURL] = useState('');
-    const [midiDevices, setMIDIDevices] = useState([]);
-    const [currentChord, setCurrentChord] = useState('');
     const [notesEnabled, setNotesEnabled] = useState(false);
-    const [chordEnabled, setChordEnabled] = useState(false);
+
+    // maps QWERTY to note values
+    const keyToNote = {
+        65: 'C4', // A
+        87: 'Db4', // W
+        83: 'D4', // S
+        69: 'Eb4', // E
+        68: 'E4', // D
+        70: 'F4', // F
+        84: 'Gb4', // T
+        71: 'G4', // G
+        89: 'Ab4', // Y
+        72: 'A4', // H
+        85: 'Bb4', // U
+        74: 'B4', // J
+        75: 'C5', // K
+        79: 'Db5' // O
+    };
 
     /**
        * Starts tone.JS and sets up MIDI input devices
@@ -59,34 +56,36 @@ const Play = ({connectedDevice}) =>
             try {
                 Tone.start();
 
-                await Tone.setContext(new AudioContext({ sampleRate: 48000 })); // sets audio preferences
-                Tone.Master.volume.value = -6;
+                await Tone.setContext(new AudioContext({ sampleRate: 41000 })); // sets audio preferences
 
-                await setUpQwertyKeyboard(); // device setup
+                const keyboard = await createQwerty();
+                await setUpQwertyKeyboard(keyboard); // device setup
+                
                 await initializeSounds();
-
-                const manuallyConnectedDevice = await manuallyConnectV49(); // manually connection set up for now
-                if(manuallyConnectedDevice) {
-                    console.log('setting up MIDI keyboard');
-                    await setUpMIDIKeyboard(manuallyConnectedDevice);
-                }
+                
+                const connectedDevice2 = await connectMIDIInputDevice(connectedDevice)
+                await setUpMIDIKeyboard(connectedDevice2);
+                
             } catch (error) {
                 console.error('Error setting up MIDI in your browser. Please reload and try again.', error);
-            }
-            
+            } 
         }
 
         initTone();
   }, [selectedSound]);
 
+  useEffect(() => {
+
+  })
+
   /**
-   * Manual device connection to V49 (used for testing)
+   * Connects to MIDI device
    * @returns connected device
    */
-    const manuallyConnectV49 = async () => {
+    const connectMIDIInputDevice = async (deviceName) => {
         const midiAccess = await navigator.requestMIDIAccess();
         const inputs = Array.from(midiAccess.inputs.values());
-        const device = inputs.find(input => input.name === 'V49');
+        const device = inputs.find(input => input.name === deviceName);
         if (device) {
           return device;
         }
@@ -150,32 +149,88 @@ const Play = ({connectedDevice}) =>
         },
 	        baseUrl: "https://tonejs.github.io/audio/casio/",
             onload: () => {
-                casio.triggerAttackRelease(note, 0.8);
+                casio.triggerAttackRelease(note, 1);
             }
         }).toDestination();
       }
 
       /**
-       * Creates an instance of the online bass sampler
+       * Creates an instance of the choir sampler
        * @param {*} note 
        * @param {*} url 
        */
-      const createOnlineBassSampler = (note, url) => {
+       const createChoirSampler = (note, url) => {
         const sampler = new Tone.Sampler({
             urls: {
-            A1: "As1.mp3",
-            A2: "As2.mp3",
+            A3: "femalevoices_aa2_A3.mp3",
+            A4: "femalevoices_aa2_A4.mp3",
+            A5: "femalevoices_aa2_A5.mp3"
         },
 	        baseUrl: url,
             onload: () => {
-                sampler.triggerAttackRelease(note, 0.8);
+                sampler.triggerAttackRelease(note, 1);
+            }
+        }).toDestination();
+      }
+
+      /**
+       * Creates an instance of the eerie sampler
+       * @param {*} note 
+       * @param {*} url 
+       */
+      const createEerieSynthSampler = (note, url) => {
+        const sampler = new Tone.Sampler({
+            urls: {
+            A3: "eerie_synth1.mp3",
+            A4: "eerie_synth2.mp3",
+            A5: "eerie_synth3.mp3"
+        },
+	        baseUrl: url,
+            onload: () => {
+                sampler.triggerAttackRelease(note, 1);
+            }
+        }).toDestination();
+      }
+
+      /**
+       * Creates an instance of the guitar sampler
+       * @param {*} note 
+       * @param {*} url 
+       */
+      const createGuitarSampler = (note, url) => {
+        const sampler = new Tone.Sampler({
+            urls: {
+            A3: "guitar_Astring.mp3",
+            E2: "guitar_LowEstring1.mp3",
+            G4: "guitar_Gstring.mp3"
+        },
+	        baseUrl: url,
+            onload: () => {
+                sampler.triggerAttackRelease(note, 1);
+            }
+        }).toDestination();
+      }
+
+      /**
+       * Creates an instance of the kalimba sampler
+       * @param {*} note 
+       * @param {*} url 
+       */
+      const createKalimbaSampler = (note, url) => {
+        const sampler = new Tone.Sampler({
+            urls: {
+            Ab3: "Kalimba_1.mp3",
+            Ab4: "Kalimba_3.mp3"
+        },
+	        baseUrl: url,
+            onload: () => {
+                sampler.triggerAttackRelease(note, 1);
             }
         }).toDestination();
       }
 
       /**
        * Creates an instance of the online sampler (used for online URLs)
-       * TODO: fix CORS error
        * @param {*} note 
        * @param {*} url 
        */
@@ -292,8 +347,17 @@ const Play = ({connectedDevice}) =>
        */
       const initializeSounds = async () => {
         console.log("Getting all sounds and favorites.");
-        await getAllSounds();
-        await getAllFavorites();
+
+        try {
+            setIsLoading(true);
+            const sounds = await getAllSounds();
+            setSoundObjects(sounds);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsLoading(false);
+        }
+
       }
 
       /**
@@ -301,13 +365,6 @@ const Play = ({connectedDevice}) =>
        */
       const handleNotesToggle = () => {
         setNotesEnabled(!notesEnabled);
-      }
-
-      /**
-       * Changes state based on chord toggle
-       */
-      const handleChordToggle = () => {
-        setChordEnabled(!chordEnabled);
       }
 
     /**
@@ -319,6 +376,7 @@ const Play = ({connectedDevice}) =>
         console.log('Setting up MIDI keyboard');
         midiKeyboard.onmidimessage =  async (event) =>
         {
+            event.preventDefault();
             const command = event.data[0];
             const noteInput = event.data[1];
             const velocity = event.data[2];
@@ -329,63 +387,91 @@ const Play = ({connectedDevice}) =>
                 case 144: // note on
                     if(velocity > 0)
                     {
-                        await addNote(note);
-
-                        if (selectedSound === 'synth') {
-                            const synth = createSynth();
-                            synth.triggerAttackRelease(Tone.Midi(noteInput).toFrequency(), "4n");
-                        } else if (selectedSound === 'amsynth') {
-                            const amSynth = createAMSynth();
-                            amSynth.triggerAttackRelease(note, "4n");
-                        } else if (selectedSound === 'monosynth') {
-                            const monoSynth = createMonoSynth();
-                            monoSynth.triggerAttackRelease(note, "4n");
-                        } else if (selectedSound === 'casio') {
-                            createSampler(note);
-                        } else if (selectedSound === 'bass') {
-                            console.log('test!');
-                            createOnlineBassSampler(note, url);
-                        } else if (selectedSound === 'online') {
-                            createOnlineSampler(note, url);
+                        // determine if drums or keys
+                        if (noteInput >= 60) {
+                            await addNote(note);
+                            await playSound(note);
+                        } else {
+                            switch (noteInput) {
+                                case 48:
+                                    createKickPlayer();
+                                    break;
+                                case 49:
+                                    createSnarePlayer();
+                                    break;
+                                case 50:
+                                    createTom1Player();
+                                    break;
+                                case 51:
+                                    createTom2Player();
+                                    break;
+                                case 44:
+                                    createTom3Player();
+                                    break;
+                                case 45:
+                                    createHiHatPlayer();
+                                    break;
+                                case 46:
+                                    createBongo1Player();
+                                    break;
+                                case 47:
+                                    createBongo2Player();
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
-                    
                     }
                     break;
                 case 128: // note off
-                    await removeNote(note);
-                    break;
-                case 153: // drum pads
-                    if (noteInput === 49) {
-                        createKickPlayer();
-                    } else if (noteInput === 41) {
-                        createSnarePlayer();
-                    } else if (noteInput === 42) {
-                        createTom1Player();
-                    } else if (noteInput === 46) {
-                        createTom2Player();
-                    } else if (noteInput === 36) {
-                        createTom3Player();
-                    } else if (noteInput === 37) {
-                        createHiHatPlayer();
-                    } else if (noteInput === 38) {
-                        createBongo1Player();
-                    } else if (noteInput === 39) {
-                        createBongo2Player();
-                    }
+                    await removeNote(note);   
                     break;
                 default:
                     break;
-
-                    /* COMMANDS:
-                    * command 224 = pitch wheel, 176 = mod wheel
-                    * 153/137 - pads
-                    * 176 - buttons 
-                    * drums: 49 - 41 - 42 - 46
-                    * drums: 36 - 37 - 38 - 39
-                    */
                 }
-            };
+            }   
             
+    }
+
+    /**
+     * Chooses appropriate sample baesd on note
+     * @param {*} note 
+     */
+    const playSound = async(note) => {
+        switch (selectedSound) {
+            case 'Synth':
+                const synth = await createSynth();
+                synth.triggerAttackRelease(note, "4n");
+                break;
+            case 'AM Synth':
+                const amSynth = await createAMSynth();
+                amSynth.triggerAttackRelease(note, "4n");
+                break;
+            case 'Mono Synth':
+                const monoSynth = await createMonoSynth();
+                monoSynth.triggerAttackRelease(note, "4n");
+                break;
+            case 'Casio Piano':
+                await createSampler(note);
+                break;
+            case 'Salamander':
+                await createOnlineSampler(note, url);
+                break;
+            case 'Eerie Pad':
+                await createEerieSynthSampler(note, url);
+                break;
+            case 'Guitar':
+                await createGuitarSampler(note, url);
+                break;
+            case 'Choir':
+                await createChoirSampler(note, url);
+                break;
+            case 'Kalimba':
+                await createKalimbaSampler(note, url);
+                break;
+            default:
+                break;
+        }
     }
 
     /**
@@ -393,49 +479,20 @@ const Play = ({connectedDevice}) =>
         - Maps MIDI notes to music notes
         - Triggers audio output with keydown event
         - Stores current notes being played
-        TODO: determine if qwerty should always play
      */
-    const setUpQwertyKeyboard = async() => {
-
-        console.log('Setting up QWERTY keyboard');
-
-        const keyboard = await createQwerty();
-
-        // maps QWERTY keys to notes
-        const keyToNote = {
-            65: 'C4', // A
-            87: 'Db4', // W
-            83: 'D4', // S
-            69: 'Eb4', // E
-            68: 'E4', // D
-            70: 'F4', // F
-            84: 'Gb4', // T
-            71: 'G4', // G
-            89: 'Ab4', // Y
-            72: 'A4', // H
-            85: 'Bb4', // U
-            74: 'B4', // J
-            75: 'C5', // K
-            79: 'Db5', // O
-            76: 'D5', // L
-            80: 'Eb5', // P
-            59: 'E5' // ;
-        };
+    const setUpQwertyKeyboard = async(keyboard) => {
 
         /*
         Triggers audio output, converts MIDI note to music note, and adds note to notes played
         */
         keyboard.down(async (e) => {
-            console.log(e);
 
             const note = keyToNote[e.keyCode];
 
             if(note)
             {
-                const notes = await addNote(note);
-                const synth = new Tone.Synth().toDestination();
-                synth.triggerAttackRelease(note, '4n');
-                // TODO: implement getChord()
+                await addNote(note);
+                await playSound(note);
             }
         });
 
@@ -443,12 +500,8 @@ const Play = ({connectedDevice}) =>
         Stops audio output and removes note from notes played
     */
         keyboard.up(async(e) => {
-            console.log(e);
-
             const note = keyToNote[e.keyCode];
             await removeNote(note);
-
-            
         })
         }
 
@@ -459,7 +512,7 @@ const Play = ({connectedDevice}) =>
     const midiToNote = async (midiInput) =>
     {
         const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
-        const octave = Math.floor(midiInput / 12) -1;
+        const octave = Math.floor(midiInput / 12) - 1;
         const noteIndex = midiInput % 12;
 
         const noteName = noteNames[noteIndex];
@@ -491,81 +544,48 @@ const Play = ({connectedDevice}) =>
     /*
         Selects instrument type based on user option
     */
-    const handleButtonClick = (instrument, location, e) => {
-        console.log("Selected: " + instrument + " at " + location);
+    const handleSelectSound = (event) => {
 
-        if(location === "react" || !location) {
-            if(instrument === 'Synth') {
-                setSelectedSound('synth');
-            } else if (instrument === 'AM Synth') {
-                setSelectedSound('amsynth');
-            } else if (instrument === 'Mono Synth') {
-                setSelectedSound('monosynth');
-            } else if (instrument === 'Casio Piano') {
-                setSelectedSound('casio');
-            } else if (instrument === 'Bass Guitar') {
-                setSelectedSound('bass');
-            } else {
-                console.log("No instrument found on front-end for selected instrument.");
+        const instrument = event.target.value;
+        let location;
+
+        soundObjects.forEach((sound) => {
+            if(sound.name === instrument) {
+                location = sound.location;
             }
-        } else if (location === "") {
-            console.log("Could not load sample because URL is blank.");
+        })
+
+        if (location === "react" || location) {
+            if (instrument === 'Synth') {
+                setSelectedSound(instrument);
+            } else if (instrument === 'AM Synth') {
+                setSelectedSound(instrument);
+            } else if (instrument === 'Mono Synth') {
+                setSelectedSound(instrument);
+            } else if (instrument === 'Casio Piano') {
+                setSelectedSound(instrument);
+            } else if (instrument === 'Salamander') {
+                setSelectedSound(instrument);
+                setURL(location);
+            } else if (instrument === 'Choir') {
+                setSelectedSound(instrument);
+                setURL(location);
+            } else if (instrument === 'Eerie Pad') {
+                setSelectedSound(instrument);
+                setURL(location);
+            }  else if (instrument === 'Guitar') {
+                setSelectedSound(instrument);
+                setURL(location);
+            } else if (instrument === 'Kalimba') {
+                setSelectedSound(instrument);
+                setURL(location);
+            } else {
+                console.log("Error! Could not set selected instrument.");
+            }
         } else { // external sample
-            setSelectedSound('online');
-            setURL(location);
+            console.log('Error! Could not set selected instrument.');
         }
     }
-
-    /*
-    - Starter code to display the chord being played (not used yet)
-    - TODO: implement additional instruments, samples, and intervals
-    */
-    const getChord = async (notes) =>
-    {
-        // only works for three note chords
-        if (chordNotes && chordNotes.length === 3) {
-            const root = currentChord[0];
-            const note2 = currentChord[1];
-            const note3 = currentChord[2];
-
-            console.log("Root: " + root);
-
-            const interval1 = note2 - root;
-            const interval2 = note3 - root;
-
-            if (interval1 === 4 && interval2 === 3) { // MAJOR
-                console.log("Major");
-            } else if (interval1 === 3 && interval2 === 4) { // MINOR
-                console.log("Minor");
-            } else if (interval1 === 4 && interval2 === 3 && note3 - note2 === 4) { // MAJ 7
-                console.log("Major 7th");
-            } else if (interval1 === 3 && interval2 === 4 && note3 - note2 === 3) { // MIN 7
-                console.log("Minor 7th");
-            } else if (interval1 === 4 && interval2 === 2) {
-                console.log("Major 6th");
-            } else if (interval1 === 3 && interval2 === 3) {
-                console.log("Minor 6th");
-            } else if (interval1 === 5 && interval2 === 2) {
-                console.log("Sus4");
-            } else if (interval1 === 2 && interval2 === 3) {
-                console.log("sus2");
-            } else if (interval1 === 4 && interval2 === 4) {
-                console.log("augmented");
-            } else if (interval1 === 3 && interval2 === 3) {
-                console.log("Diminished");
-            } else if (interval1 === 4 && interval2 === 3 && note3 - note2 === 6) {
-                console.log("Dominant 7th");
-            } else if (interval1 === 4 && interval2 === 3 && note3 - note2 === 8) {
-                console.log("Augmented 7th");
-            } else if (interval1 === 3 && interval2 === 3 && note3 - note2 === 6) {
-                console.log("Half-Diminished 7th");
-            } else if (interval1 === 3 && interval2 === 3 && note3 - note2 === 9) {
-                console.log("Diminished 7th");
-            } else {
-                console.log("Other");
-            }
-        }
-    }  
     
     /**
      * Retrieves all sounds from the database
@@ -574,18 +594,25 @@ const Play = ({connectedDevice}) =>
         try {
             const result = await axios.get('http://localhost:3000/all-sounds');
 
+            console.log(result);
+
             if (result.status === 200) {
                 const sounds = result.data.map(sound => new Sound(sound.id, sound.name, sound.source, sound.isFavorite));
                 console.log(sounds);
 
-                setSoundObjects(sounds);
-                setIsLoading(false);
+                if(isAuthenticated) {
+                    return getAllFavorites(sounds);
+                } else {
+                    return sounds;
+                }
             } else {
                 console.log("Error");
+                return null;
             }
 
         } catch (error) {
             console.error("Could not get sounds from database.", error);
+            return null;
         }
     }
 
@@ -593,50 +620,36 @@ const Play = ({connectedDevice}) =>
      * Retrieves all favorite sounds from the database
      * Only called when user is logged in with a valid token
      */
-    const getAllFavorites = async () => {
+    const getAllFavorites = async (sounds) => {
 
         const token = Cookies.get('token');
 
         try {
             const result = await axios.get('http://localhost:3000/all-favorites', {
-                headers:{
-                    Authorization: `Bearer ${token}`
-                }
+                    headers:{
+                        Authorization: `Bearer ${token}`
+                    }
                 });
             
                 if(result.data.length > 0) {
 
                     const favorites = result.data.map(sound => new Sound(sound.id, sound.name, sound.source));
 
-                    for(let i = 0; i < favorites.length; i++) {
+                    for(let i = 0; i < sounds.length; i++) {
+                        const matchingFavorite = favorites.find(favorite => favorite.id === sounds[i].id);
 
-                        for(let j = 0; j < soundObjects.length; j++) {
-
-                            if(favorites[i].id === soundObjects[j].id) {
-
-                                const updatedSoundObjects = [...soundObjects];
-
-                                updatedSoundObjects[j].isFavorite = true;
-
-                                setSoundObjects(updatedSoundObjects);
-                                break;
-
-                            }
-
+                        if(matchingFavorite) {
+                            sounds[i].isFavorite = true;
                         }
                     }
-
-                    console.log("favorites");
-                    console.log(soundObjects);
-
-                } else {
-                    console.log("No favorites to show.");
                 }
+                return sounds;
         } catch (error) {
             if (error.status === 403 || error.status === 401) {
                 console.log("Unauthorized to load samples");
             } else {
-                console.log("An error occurred in loading favorites.")
+                console.log("No favorites to show.");
+                return sounds;
             }
         }
     }
@@ -646,20 +659,23 @@ const Play = ({connectedDevice}) =>
      * Only called if user is logged in with a valid token
      * @param {*} soundName 
      */
-    const addFavorite = async (soundName) => {
+    const addFavorite = async (sound) => {
 
+        const token = Cookies.get('token');
         try {
-            const response = await axios.post('http://localhost:3000/add-favorite', {
-                token: Cookies.get('token'),
-                sound: soundName
+            const response = await axios.post(`http://localhost:3000/add-favorite/${sound}`, null, {
+                headers:{
+                    Authorization: `Bearer ${token}`
+                }
             });
     
             console.log(response);
     
             for (let i = 0; i < soundObjects.length; i++) {
-                if (soundObjects[i].name === soundName) {
+                if (soundObjects[i].name === sound) {
                     const updatedSoundObjects = [...soundObjects];
                     updatedSoundObjects[i].isFavorite = true;
+                    console.log('setting fav');
                     setSoundObjects(updatedSoundObjects);
                     break; // Once found, exit the loop
                 }
@@ -669,8 +685,6 @@ const Play = ({connectedDevice}) =>
         } catch (error) {
             console.log(error);
         }
-
-        
     }
 
     /**
@@ -679,11 +693,12 @@ const Play = ({connectedDevice}) =>
      * @param {*} soundName 
      */
     const removeFavorite = async (soundName) => {
-        const token = Cookies.get('token');
     
+        const token = Cookies.get('token');
+
         try {
             const response = await axios.delete(`http://localhost:3000/remove-favorite/${soundName}`, {
-                headers: {
+                headers:{
                     Authorization: `Bearer ${token}`
                 }
             });
@@ -697,8 +712,8 @@ const Play = ({connectedDevice}) =>
                 return sound;
             });
 
-        // Update state with the modified soundObjects array
-        setSoundObjects(updatedSoundObjects);
+            // Update state with the modified soundObjects array
+            setSoundObjects(updatedSoundObjects);
 
         } catch (error) {
             console.log(error);
@@ -711,7 +726,7 @@ const Play = ({connectedDevice}) =>
             <div className="play-container play-header">
                 {isAuthenticated ? (
                     <div>
-                        <h1>Welcome, {firstName}!</h1>
+                        <h1>Welcome,&nbsp;{firstName}!</h1>
                     </div>
                 ) : (
                     <div>
@@ -720,50 +735,51 @@ const Play = ({connectedDevice}) =>
                 )}
             </div>
             <div className="play-container play-content">
-                {isLoading ? (
-                    <p>Could not load sounds from database. Please refresh to try again.</p>
+            {isLoading ? (
+                    <>
+                        <p>Could not load sounds from database. Please refresh to try again.</p>
+                        <CircularProgress />
+                    </>
                 ) : (
-                    <Box sx={{ width: '100%', maxWidth: 260, bgColor: 'background.paper' }}>
-                        <FormControl>
-                            <FormLabel>Sounds</FormLabel>
-                            <RadioGroup
-                                aria-label="sounds"
-                                name="sound-group"
-                                defaultValue="synth"
-                                /*onChange={(e) => this.handleButtonClick1(e.target.value)}*/
+                  <div>
+                    <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+                        <InputLabel id="select-sound-label" sx={{color: 'white', fontSize: '20px'}}>Selected Sound</InputLabel>
+                        <Select
+                            sx={{marginTop: '35px', width: '250px', height: '50px', color: 'white'}}
+                            labelId="select-sound-label"
+                            value={selectedSound}
+                            onChange={(event) => handleSelectSound(event)}
+                            label="Sound"
                             >
-                                <List
-                                    sx = {{
-                                        '& .MuiListItem-root': {
-                                        borderRadius: '8px',
-                                        backgroundColor: 'black',
-                                        marginBottom: '8px',
-                                        color: 'white'
-                                        },
-                                        '& .MuiRadio-root': {
-                                        color: 'white', // Radio button color
-                                        },
-                                        '& .MuiSvgIcon-root': {
-                                        stroke: 'white', // Star icon outline color
-                                        },
-                                    }}
-                                >
-                                    {soundObjects.map(sound => (
-                                        <SoundCard
-                                            key={sound.id}
-                                            id={sound.id}
-                                            name={sound.name}
-                                            location={sound.location}
-                                            isFavorite={sound.isFavorite}
-                                            isLoggedIn={isAuthenticated}
-                                            onSelect={(instrument, location) => handleButtonClick(instrument, location)}
-                                            addFavorite={addFavorite}
-                                            removeFavorite={removeFavorite} />
-                                    ))}
-                                </List> 
-                            </RadioGroup>
-                        </FormControl>
-                    </Box>
+                        {soundObjects && soundObjects.map((sound, index) => (
+                            <MenuItem key={index} value={sound.name}>
+                                    {sound.name} 
+                                    {isAuthenticated && (
+                                        <>
+                                            {sound.isFavorite ?
+                                                <IconButton
+                                                    color="white"
+                                                    onClick={() => removeFavorite(sound.name)}>
+                                                    <StarIcon
+                                                        style={{ color: 'yellow' }}
+                                                    />
+                                                </IconButton>
+                                            : 
+                                                <IconButton
+                                                    color="white"
+                                                    onClick={() => addFavorite(sound.name)}>
+                                                    <StarIcon
+                                                        style={{ color: 'primary'}}
+                                                    />
+                                                </IconButton>
+                                            }
+                                    </>    
+                                    )}
+                            </MenuItem>
+                        ))}
+                        </Select>
+                    </FormControl>
+                  </div>  
                 )}
             </div>
             <Piano notes={chordNotes}/>
@@ -784,17 +800,11 @@ const Play = ({connectedDevice}) =>
                             )}
                         </div>
                     </div>
-                    <FormControlLabel
-                        control={<Switch />} label="Chord:"
-                        onChange={handleChordToggle}
-                    />
                 </FormGroup>
-                <div className="chord-content">
-                   {/* TODO: display chord here */} 
-                </div>
             </div>
         </div>
     )
 }
+                   
 
 export default Play;

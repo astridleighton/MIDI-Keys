@@ -12,13 +12,16 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "audiokeys": "^0.1.1",
-    "axios": "^1.5.1",
+    "axios": "^1.6.8",
     "bootstrap": "^5.3.2",
     "js-cookie": "^3.0.5",
     "react": "^18.2.0",
     "react-bootstrap": "^2.9.1",
     "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.4.1",
     "react-router-dom": "^6.20.1",
+    "react-toastify": "^10.0.5",
+    "sass": "^1.74.1",
     "tone": "^14.7.77",
     "web-vitals": "^2.1.4",
     "webmidi": "^3.1.5"
@@ -48,6 +51,10 @@
     ]
   },
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.34.1",
+    "globals": "^15.0.0",
     "react-scripts": "^5.0.1"
   }
 }

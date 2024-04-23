@@ -1,49 +1,62 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import './Navbar.scss';
 import Cookies from 'js-cookie';
-import { AppBar, Button, TextField, Typography, Container, CssBaseline, Avatar, Grid, Toolbar } from '@mui/material';
+import { AppBar, Button, Typography, Toolbar } from '@mui/material';
+import PianoIcon from '@mui/icons-material/Piano';
+import { MidiContext } from '../MidiContext';
+import {toast, Toaster} from 'react-hot-toast';
 
 /**
- * Displays navigation bar for site navigation
+ * Displays navigation bar with basic site links
  */
 const Navbar = () =>
 {
 
-    // checks if user has been authenticated
-    let isAuthenticated = !!Cookies.get('token');
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const { currentUser, setCurrentUser } = useContext(MidiContext);
+
+    // updates page based on auth status
+    useEffect(() => {
+        if(currentUser) {
+            setIsAuthenticated(true);
+        } else {
+            setIsAuthenticated(false);
+        }
+    }, [currentUser])
 
     /**
      * Logs the user out and reloads the page
-     * TODO: add in useEffect or handle reload better
      */
     const handleLogout = () => {
         Cookies.remove('token');
         Cookies.remove('name');
-        window.location.reload();
+        setCurrentUser(null);
+        toast.success('Sign out successful.');
     }
     
     // shows navigation link and user authentication status
     return(
         <div>
-            <AppBar position="static" color="primary" sx={{ backgroundColor: '#000000' }}>
+            <AppBar color="primary" sx={{ backgroundColor: '#000000', position: 'fixed' }}>
                 <Toolbar>
-                    <Typography variant="h6" sx={{ my: 2 }}>
+                    <PianoIcon/>
+                    <Typography variant="h5" sx={{ my: 2, marginRight: '20px' }}>
                         MIDI Keys
                     </Typography>
                     <Button
                         variant="outline"
                     >
-                        <a href="/" style={{ textDecoration: 'none', color: 'inherit'}}>Play</a>
+                        <a href="/" style={{ textDecoration: 'none', color: 'inherit', fontSize: '18px'}}>Play</a>
                     </Button>
                     <Button
                         variant="outline"
                     >
-                        <a href="/connect" style={{ textDecoration: 'none', color: 'inherit'}}>Connect</a>
+                        <a href="/connect" style={{ textDecoration: 'none', color: 'inherit', fontSize: '18px'}}>Connect</a>
                     </Button>
                     <Button
                         variant="outline"
                     >
-                        <a href="/about" style={{ textDecoration: 'none', color: 'inherit'}}>About</a>
+                        <a href="/about" style={{ textDecoration: 'none', color: 'inherit', fontSize: '18px'}}>About</a>
                     </Button>
                     <span style={{ marginLeft: 'auto' }}>
                         {isAuthenticated ? (
@@ -51,14 +64,14 @@ const Navbar = () =>
                                     variant="outlined"
                                     onClick={handleLogout}
                                     >
-                                        Log Out
+                                        Sign Out
                                 </Button>
                             ) : (
                                 <Button
                                     variant="outlined"
                                     sx={{ marginLeft: 'auto' }}
                                 >
-                                    <a href="/login" style={{ textDecoration: 'none', color: 'white'}}>Login</a>
+                                    <a href="/login" style={{ textDecoration: 'none', color: 'white'}}>Sign In</a>
                                 </Button>
                             )}
                     </span>

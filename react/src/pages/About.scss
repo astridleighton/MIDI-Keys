@@ -4,6 +4,9 @@
     align-items: center;
     flex-direction: column;
     margin-bottom: 50px;
+    background-color: #1e1e1e;
+    color: #FFF;
+
 
     .about-header {
         width: 100%;
@@ -11,6 +14,7 @@
         margin-top: 30px;
         display: flex;
         justify-content: center;
+        color: #FFF;
 
         .about-title {
             font-size: 45px;
@@ -18,8 +22,13 @@
     } 
 
     .about-content {
-        margin-left: 120px;
-        margin-right: 120px;
-        font-size: 20px;
+        margin-left: 300px;
+        margin-right: 300px;
+        padding: 20px;
+        font-size: 25px;
+    }
+
+    h3, p {
+        padding: 10px;
     }
 }

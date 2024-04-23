@@ -1,5 +1,5 @@
-import { React, useState, useEffect, useContext, createContext } from 'react';
-import { Route, Link, Routes, BrowserRouter as Router} from 'react-router-dom';
+import { React, useState, useEffect, useContext } from 'react';
+import { Route, Routes, BrowserRouter as Router} from 'react-router-dom';
 import './App.css';
 import Connect from './pages/Connect';
 import Play from './pages/Play';
@@ -9,6 +9,8 @@ import About from './pages/About';
 import Login from './authentication/Login';
 import Register from './authentication/Register';
 import Footer from './layouts/Footer';
+import {toast, Toaster} from 'react-hot-toast';
+import { MidiContext } from './MidiContext';
 
 /**
  * Main component used to handle Tone.js, MIDI device connections, and routing
@@ -16,13 +18,12 @@ import Footer from './layouts/Footer';
  */
 const App = () => {
   
-  // state
-  const [fullName, setFullName] = useState("");
-  const [connectedDevice, setConnectedDevice] = useState();
-  const [connectedDeviceName, setConnectedDeviceName] = useState('V49'); // TODO: change so this is no longer default
-  const [midiState, setMIDIState] = useState(null);
+  const [fullName] = useState();
+  const [connectedDeviceName, setConnectedDeviceName] = useState();
   const [inputDevices, setInputDevices] = useState([]);
-  const [isAuthenticated, setIsAuthenticated] = useState();
+  const [midiStateChanged, setMidiStateChanged] = useState(false);
+
+  const { setConnectedDevice, connectedDevice } = useContext(MidiContext);
 
   /*
   * Runs when component mounts, sets up MIDI access and lists MIDI devices
@@ -36,7 +37,6 @@ const App = () => {
       try {
           const midiAccess = await navigator.requestMIDIAccess();
           midiAccess.addEventListener("statechange", handleStateChange);
-          setMIDIState(midiAccess);
           await listMIDIInputs(midiAccess);
       } catch (error) {
         console.error('MIDI Access failed: ', error);
@@ -44,24 +44,6 @@ const App = () => {
     }
 
     setUpMIDI();
-
-    /**
-     * Handles MIDI event (connect, disconnect)
-     * TODO: need to refactor so state runs properly and page reloads in a better way
-     * TODO: fix event type and handle disconnect
-     * @param {*} event MIDI change
-     */
-    const handleStateChange = async (event) => {
-      event.preventDefault();
-      console.log("MIDI event");
-      window.location.reload();
-      alert('MIDI status changed. Reloading page.');
-      if(event.type === 'disconnected') {
-        console.log('Disconnected');
-      } else {
-        setMIDIState(event);
-      }
-    }
 
     // cleanup when component unmounts
     return () => {
@@ -72,8 +54,25 @@ const App = () => {
       })
     };
 
-  }, []);
-  
+  }, [midiStateChanged]);
+
+   /**
+     * Handles MIDI event (connect, disconnect)
+     * @param {*} event MIDI change
+     */
+   const handleStateChange = async (event) => {
+    event.preventDefault();
+    if(event.port.state === 'disconnected') {
+      toast.dismiss();
+      toast.error('MIDI device disconnected.');
+      setMidiStateChanged(true);
+    } else if (event.port.state === 'connected') {
+      toast.dismiss();
+      toast.success('MIDI device connected.');
+      setMidiStateChanged(true);
+      window.location.reload();
+    }
+  }
 
   /**
    * Lists MIDI inputs and adds to state
@@ -91,13 +90,10 @@ const App = () => {
 
   /**
    * Changes connected device and updates state
-   * TODO: need to update Tone.js connection using Tone.transport.set()
    * @param {*} device MIDI device to connect
    */
   const updateConnectedDevice = async (device) => {
     console.log(`Connected device: ${device.name}`);
-    setConnectedDevice(device);
-    setConnectedDeviceName(device.name);
   }
 
   /**
@@ -107,14 +103,19 @@ const App = () => {
   const removeConnectedDevice = () => {
     setConnectedDevice(undefined);
     setConnectedDeviceName(null);
-    console.log(`Disconnecting device: ${connectedDevice.name}`);
+
+    if(connectedDevice) {
+      console.log(`Disconnecting device: ${connectedDevice.name}`);
+    } else {
+      console.log('Disconnecting device.');
+    }
     Tone.Transport.set({ midi: null });
   }
 
   // returns routes and basic view
   return (
-    // <MIDIContext.Provider value={{ connectedDevice, inputDevices }}>
-      <div className="app-container d-flex flex-column" style={{ backgroundColor: '#f8f8f8' }}>
+      <div className="app-container d-flex flex-column" style={{ backgroundColor: '#f8f8f8', marginTop: '60px' }}>
+        <Toaster/>
             <Router>
                 <Navbar/>
                 <Routes>
@@ -129,7 +130,6 @@ const App = () => {
                 <Footer connectedDevice={connectedDeviceName} removeConnectedDevice={removeConnectedDevice} />
             </div>
         </div>
-    // </MIDIContext.Provider>
   )
 }
 

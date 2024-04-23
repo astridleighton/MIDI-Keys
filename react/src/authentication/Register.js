@@ -1,21 +1,19 @@
 import React, {useState} from 'react';
 import axios from 'axios';
-import * as Tone from 'tone';
-import { withRouter, Link, useNavigate, Redirect } from 'react-router-dom';
-import { Button, Box, TextField, Typography, Container, CssBaseline, Avatar, Grid, Alert } from '@mui/material';
-
+import { useNavigate } from 'react-router-dom';
+import { Button, Box, TextField, Typography, Container, Alert } from '@mui/material';
+import './Register.scss';
+import {toast, Toaster} from 'react-hot-toast';
 
 /**
  * Allows user to create an account
- * Future improvements: moving authentication logic to auth class
  */
 const Register = () =>
 {
     const [firstname, setFirstName] = useState(null);
     const [username, setUsername] = useState(null);
     const [password, setPassword] = useState(null);
-    const [submitted, setSubmitted] = useState("");
-    const [firstNameMessage, setFirstNameMessage] = useState("");
+    const [firstNameMessage, /* setFirstNameMessage */ ] = useState("");
     const [usernameMessage, setUsernameMessage] = useState("");
     const [passwordMessage, setPasswordMessage] = useState("");
     const [isFormValid, setIsFormValid] = useState(false);
@@ -64,8 +62,6 @@ const Register = () =>
 
         const usernameValid = await validateUsername(username);
         const passwordValid = await validatePassword(password);
-
-        console.log('Firstname: ' + firstname);
 
         if(usernameValid && passwordValid) {
             try {
@@ -121,7 +117,7 @@ const Register = () =>
         await axios.post(`http://localhost:3000/register`, registerCredentials)
         .then((result) => {
             console.log(result);
-            alert("Account created successfully. Please log in to access your account.");
+            toast.success('Registration successful. Please log in with your current credentials.');
             navigate('/login')
         }).catch((error) => {
             if(error.response.status === 403) {
@@ -138,107 +134,113 @@ const Register = () =>
      * Displays registration form
      */
     return(
-        <div>
+        <div class="register-container">
             <Container maxWidth="xs">
+            <div class="register-header">
+                <h1>Create An Account</h1>
+            </div>
+                <Box
+                    component="form"
+                    onSubmit={handleSubmit}
+                    noValidate
+                    sx={{
+                        marginTop: 8,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center'
+                        }}
+                >
+                    {error && <Alert severity="error">{error}</Alert>}
+                <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    label="First Name"
+                    error={firstNameMessage} // check if empty
+                    helperText={firstNameMessage}
+                    value={firstname}
+                    onChange={handleFirstNameChange}
+                    autoComplete="off"
+                    focused
+                    sx={{
+                        '& input': {
+                            color: 'white'
+                        }
+                    }}
+                />
+                <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    label="Username"
+                    value={username}
+                    error={usernameMessage} // check if empty
+                    helperText={
+                        usernameMessage
+                    }
+                    onChange={handleUsernameChange}
+                    autoComplete="off"
+                    focused
+                    sx={{
+                        '& input': {
+                            color: 'white'
+                        }
+                    }}
+                />
+                <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    label="Password"
+                    type="password"
+                    value={password}
+                    error={passwordMessage} // check if empty
+                    helperText={
+                        passwordMessage // Show password message if provided
+                    }
+                    onChange={handlePasswordChange}
+                    autoComplete="off"
+                    focused
+                    sx={{
+                        '& input': {
+                            color: 'white'
+                        }
+                    }}
+                />
                 <Container
                     sx={{
-                        mt: '50px',
-                        mb: '-30px'
+                        margin: '20px'
                     }}>
-                <Typography
-                component="h1"
-                variant="h5"
-                sx={{
-                    textAlign: 'center',
-                }}
-            >
-                Create An Account
-            </Typography>
-                </Container>
-            <Box
-                component="form"
-                onSubmit={handleSubmit}
-                noValidate
-                sx={{
-                    marginTop: 8,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
+                <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    onClick={handleSubmit}
+                    disabled={!isFormValid}
+                    sx={{
+                        backgroundColor: 'black',
+                        color: 'white',
+                        padding: '10px',
                     }}
-            >
-                {error && <Alert severity="error">{error}</Alert>}
-            <TextField
-                margin="normal"
-                required
-                fullWidth
-                label="First Name"
-                error={firstNameMessage} // check if empty
-                helperText={firstNameMessage}
-                value={firstname}
-                onChange={handleFirstNameChange}
-                autoComplete="off"
-                autoFocus
-            />
-            <TextField
-                margin="normal"
-                required
-                fullWidth
-                label="Username"
-                value={username}
-                error={usernameMessage} // check if empty
-                helperText={
-                    usernameMessage
-                }
-                onChange={handleUsernameChange}
-                autoComplete="off"
-            />
-            <TextField
-                margin="normal"
-                required
-                fullWidth
-                label="Password"
-                type="password"
-                value={password}
-                error={passwordMessage} // check if empty
-                helperText={
-                    passwordMessage // Show password message if provided
-                }
-                onChange={handlePasswordChange}
-                autoComplete="off"
-            />
-            <Container
-                sx={{
-                    margin: '20px'
-                }}>
-            <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                onClick={handleSubmit}
-                disabled={!isFormValid}
-                sx={{
-                    backgroundColor: 'black',
-                    color: 'white',
-                    padding: '10px'
-                }}
 
-            >
-                Register
-            </Button>
+                >
+                    Register
+                </Button>
+                </Container>
+                    <Typography>
+                        Already have an account?
+                        <a
+                            href="/login"
+                            style={{
+                                textDecoration: 'underline',
+                                color: 'inherit',
+                                fontWeight: 'bold',
+                                padding: '5px'
+                                }}>Sign In</a>
+                    </Typography>
+                </Box>
             </Container>
-                <Typography>
-                    Already have an account?
-                    <a
-                        href="/login"
-                        style={{
-                            textDecoration: 'none',
-                            color: 'inherit',
-                            fontWeight: 'bold',
-                            padding: '5px'
-                            }}>Log In</a>
-                </Typography>
-            </Box>
-            </Container>
+            
         </div>
     )
 }

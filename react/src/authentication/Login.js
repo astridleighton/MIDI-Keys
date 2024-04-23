@@ -1,12 +1,14 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useContext} from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { Button, Box, TextField, Typography, Container, Alert } from '@mui/material';
+import './Login.scss';
+import { MidiContext } from '../MidiContext';
+import {toast, Toaster} from 'react-hot-toast';
 
 /**
  * Allows user to log in to account
- * Future implementation: move authentication logic to new file
  */
 const Login = () =>
 {
@@ -17,6 +19,8 @@ const Login = () =>
     const [isFormValid, setIsFormValid] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
+
+    const {currentUser, setCurrentUser} = useContext(MidiContext);
     
     /**
      * Updates username
@@ -43,12 +47,10 @@ const Login = () =>
      * @param {*} event 
      */
     const handleSubmit = async (event) => {
-
         if (event) {
             event.preventDefault();
         }
         setSubmitted(true);
-
         try {
             await processLogin({username, password});
         } catch (error) {
@@ -66,19 +68,20 @@ const Login = () =>
      * @param {*} loginCredentials 
      */
     const processLogin = async (loginCredentials) => {
-
         await axios.post(`http://localhost:3000/login`, loginCredentials)
         .then((result) => {
-            if (result.status === 200) {
+            if (result.data && result.data.status === 200) {
                 const token = result.data.token;
                 const name = result.data.firstName;
                 if (token && name) {
                     Cookies.set('token', token, { expires: 1 });
                     Cookies.set('name', name, {expires: 1 });
                     setFirstName(name);
-                    navigate('/')
+                    setCurrentUser(name);
+                    navigate('/');
+                    toast.success('Login successful.');
                 } else {
-                    setError("An error occurred. Please try again.")
+                    setError("An error occurred during the login. Please try again.")
                 }
             } else {
                 setError("An error occurred during login. Please try again!");
@@ -92,6 +95,7 @@ const Login = () =>
             } else if (error.response && error.response.status === 500) {
                 setError("A network error occurred. Please try again.");
             } else {
+                console.log('test');
                 setError("An unknown error occurred. Please try again.")
             }
         })
@@ -99,20 +103,11 @@ const Login = () =>
 
     // returns login view
     return (
-        <div>  
+        <div class="login-container">  
             <Container maxWidth="xs">
-                <Container
-                    sx={{
-                        mt: '50px',
-                        mb: '-30px'
-                    }}>
-                        <Typography
-                        component="h1"
-                        variant="h5"
-                        sx={{ textAlign: 'center' }} >
-                            Log In
-                        </Typography>
-                </Container>
+                <div class="login-header">
+                    <h1>Sign In</h1>
+                </div>
                 <Box
                     component="form"
                     onSubmit={handleSubmit}
@@ -122,9 +117,14 @@ const Login = () =>
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
+                        color: 'white'
                         }}
                 >
-                    {error && <Alert severity="error">{error}</Alert> }
+                    {error &&
+                        <Alert severity="error">
+                            {error}
+                        </Alert>
+                    }
                     <TextField
                         margin="normal"
                         required
@@ -134,8 +134,14 @@ const Login = () =>
                         error={submitted && !username} // check if empty
                         helperText={submitted && !username ? 'Username is required ' : ''}
                         onChange={handleUsernameChange}
-                        autoFocus
+                        focused
                         autoComplete='off'
+                        variant="filled"
+                        sx={{
+                            '& input': {
+                                color: 'white'
+                            }
+                        }}
                     />
                     <TextField
                         margin="normal"
@@ -148,6 +154,13 @@ const Login = () =>
                         helperText={submitted && !password ? 'Password is required ' : ''}
                         onChange={handlePasswordChange}
                         autoComplete='off'
+                        variant='filled'
+                        focused
+                        sx={{
+                            '& input': {
+                                color: 'white'
+                            }
+                        }}
                     />
                     <Container
                         sx={{
@@ -166,18 +179,18 @@ const Login = () =>
                             }}
 
                         >
-                            Log In
+                            Sign In
                         </Button>
                     </Container>
                     <Typography>
-                        Don't have an account?
+                        Don&apos;t have an account?
                         <a
                             href="/register"
                             style={{
-                                textDecoration: 'none',
+                                textDecoration: 'underline',
                                 color: 'inherit',
                                 fontWeight: 'bold',
-                                padding: '5px'
+                                padding: '5px',
                                 }}>Sign Up</a>
                     </Typography>
                 </Box>

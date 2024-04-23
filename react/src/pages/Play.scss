@@ -3,28 +3,28 @@
     flex-direction: column;
     align-items: center;
     margin-bottom: 50px;
+    background-color: #1e1e1e;
     
 
     .play-header {
         text-align: center;
         margin: 25px;
-    }
-
-    .play-content {
-        // TODO: add styling
+        color: #FFF;
+        margin-top: '50px';
     }
 
     .chord-container {
         background-color: #575757;
-        width: 200px;
-        height: 150px;
+        width: 250px;
+        height: 115px;
         position: fixed;
         bottom: 0;
         right: 0;
         text-align: center;
         border-radius: 20px;
         padding: 8px;
-
+        color: #FFF;
+        
         .display-notes-container {
             display: flex;
             align-items: center;

@@ -1,24 +1,23 @@
-import React, {useState} from 'react';
-import { Button, List, FormControl, FormLabel, RadioGroup, ListItem, Radio, Box, FormControlLabel } from '@mui/material';
+import React, {useState, useContext} from 'react';
+import { Button, List,  FormLabel, RadioGroup, ListItem, Radio, FormControlLabel } from '@mui/material';
+import { MidiContext} from '../MidiContext';
+import {toast, Toaster} from 'react-hot-toast';
 
 import './Connect.scss'
 
 /**
  * Allows the user to connect to a selected device
- * NOTE: Automatically connects to QWERTY keyboard?
  */
 /**
  * Allows the user to view available MIDI devices and connect to a selected device
- * TODO: add connect device as default value
- * @param {*} param0 
+ * @param {*} param
  * @returns 
  */
-const Connect = ({connectedDevice, updateConnectedDevice, midiInputDevices}) =>
+const Connect = ({updateConnectedDevice, midiInputDevices}) =>
 {
 
-  // state
   const [selectedDevice, setSelectedDevice] = useState(null);
-  const connectedDeviceName = connectedDevice;
+  const connectedDevice = useContext(MidiContext);
 
   /**
    * Updates state based on selected device
@@ -33,6 +32,7 @@ const Connect = ({connectedDevice, updateConnectedDevice, midiInputDevices}) =>
    */
   const handleDeviceConnect = () => {
     updateConnectedDevice(selectedDevice);
+    toast.success('Updated connected device.');
   }
 
   // returns connect view
@@ -42,7 +42,7 @@ const Connect = ({connectedDevice, updateConnectedDevice, midiInputDevices}) =>
         <h1 className="connect-title">Connect</h1>
       </div>
       <div className="connect-content">
-      <FormLabel>Select MIDI device from list:</FormLabel>
+      <FormLabel sx={{color: 'white', padding: '20px'}}>Select input MIDI device:</FormLabel>
         <RadioGroup
           aria-label="devices"
           name="device-group"
@@ -58,7 +58,7 @@ const Connect = ({connectedDevice, updateConnectedDevice, midiInputDevices}) =>
                     color: 'white'
                   },
                   '& .MuiRadio-root': {
-                    color: 'white', // Radio button color
+                    color: 'grey', // Radio button color
                   }
               }}
             >
@@ -87,7 +87,7 @@ const Connect = ({connectedDevice, updateConnectedDevice, midiInputDevices}) =>
                         backgroundColor: 'grey',
                         color: 'white',
                         padding: '10px',
-                        margin: '15px',
+                        margin: '15px'
                     }}
                 >
                   Connect

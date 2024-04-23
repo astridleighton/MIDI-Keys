@@ -3,12 +3,14 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    background-color: #1e1e1e;
 
     .connect-header {
         width: 100%;
-        margin: 15px;
+        margin: 25px;
         display: flex;
         justify-content: center;
+        color: white;
 
         .connect-title {
             font-size: 45px;
@@ -16,6 +18,6 @@
     }
 
     .connect-content {
-        // TODO: add content
+        width: 20%;
     }
 }

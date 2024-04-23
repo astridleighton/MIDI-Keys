@@ -25,7 +25,7 @@ const Footer = ({ removeConnectedDevice }) =>
                 <div className="container text-center p-3">
                         <span className="text-light">
                             {connectedDevice ? (
-                                <span class="connectedDevice">Connected Device:&nbsp;{connectedDevice}&nbsp;
+                                <span class="connectedDevice">Connected Device:&nbsp;V49 Keyboard&nbsp;
                                 <Button
                                     variant="outlined"
                                     onClick={removeDevice}

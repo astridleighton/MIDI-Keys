@@ -20,7 +20,7 @@ const Login = () =>
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const {setCurrentUser} = useContext(MidiContext);
+    const {currentUser, setCurrentUser} = useContext(MidiContext);
     
     /**
      * Updates username

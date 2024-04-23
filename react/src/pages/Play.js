@@ -18,11 +18,10 @@ import './Play.scss'
  * Displays notes played
  */
 
-const Play = ({connectedDevice, errorMessage}) =>
+const Play = ({connectedDevice}) =>
 {
     const { selectedSound, setSelectedSound } = useContext(MidiContext);
 
-    // state
     const isAuthenticated = !!Cookies.get('token');
     const firstName = Cookies.get('name');
     const [chordNotes, setChordNotes] = useState([]);
@@ -30,8 +29,8 @@ const Play = ({connectedDevice, errorMessage}) =>
     const [isLoading, setIsLoading] = useState(true);
     const [url, setURL] = useState('');
     const [notesEnabled, setNotesEnabled] = useState(false);
-    const [qwertyKeyboard, setQwertyKeyboard] = useState();
 
+    // maps QWERTY to note values
     const keyToNote = {
         65: 'C4', // A
         87: 'Db4', // W
@@ -46,10 +45,7 @@ const Play = ({connectedDevice, errorMessage}) =>
         85: 'Bb4', // U
         74: 'B4', // J
         75: 'C5', // K
-        79: 'Db5', // O
-        76: 'D5', // L
-        80: 'Eb5', // P
-        59: 'E5' // ;
+        79: 'Db5' // O
     };
 
     /**
@@ -66,8 +62,6 @@ const Play = ({connectedDevice, errorMessage}) =>
                 await setUpQwertyKeyboard(keyboard); // device setup
                 
                 await initializeSounds();
-
-                connectedDevice = 'MPKmini2';
                 
                 const connectedDevice2 = await connectMIDIInputDevice(connectedDevice)
                 await setUpMIDIKeyboard(connectedDevice2);
@@ -155,7 +149,7 @@ const Play = ({connectedDevice, errorMessage}) =>
         },
 	        baseUrl: "https://tonejs.github.io/audio/casio/",
             onload: () => {
-                casio.triggerAttackRelease(note, 0.8);
+                casio.triggerAttackRelease(note, 1);
             }
         }).toDestination();
       }
@@ -393,7 +387,6 @@ const Play = ({connectedDevice, errorMessage}) =>
                 case 144: // note on
                     if(velocity > 0)
                     {
-                        console.log('MIDI EVENT PLAY! ' + noteInput);
                         // determine if drums or keys
                         if (noteInput >= 60) {
                             await addNote(note);
@@ -431,7 +424,7 @@ const Play = ({connectedDevice, errorMessage}) =>
                     }
                     break;
                 case 128: // note off
-                    await removeNote(note);                
+                    await removeNote(note);   
                     break;
                 default:
                     break;
@@ -519,7 +512,7 @@ const Play = ({connectedDevice, errorMessage}) =>
     const midiToNote = async (midiInput) =>
     {
         const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
-        const octave = Math.floor(midiInput / 12) -1;
+        const octave = Math.floor(midiInput / 12) - 1;
         const noteIndex = midiInput % 12;
 
         const noteName = noteNames[noteIndex];
@@ -649,15 +642,14 @@ const Play = ({connectedDevice, errorMessage}) =>
                             sounds[i].isFavorite = true;
                         }
                     }
-                } else {
-                    console.log("No favorites to show.");
                 }
                 return sounds;
         } catch (error) {
             if (error.status === 403 || error.status === 401) {
                 console.log("Unauthorized to load samples");
             } else {
-                console.log("An error occurred in loading favorites.")
+                console.log("No favorites to show.");
+                return sounds;
             }
         }
     }
@@ -731,8 +723,6 @@ const Play = ({connectedDevice, errorMessage}) =>
     // renders user session and displays available sounds and notes played
     return(
         <div className="play-container">
-            {errorMessage && 
-                <Alert severity="error">Error!</Alert>}
             <div className="play-container play-header">
                 {isAuthenticated ? (
                     <div>

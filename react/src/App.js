@@ -19,12 +19,11 @@ import { MidiContext } from './MidiContext';
 const App = () => {
   
   const [fullName] = useState();
-  const [connectedDeviceName, setConnectedDeviceName] = useState(); // TODO: change so connected device persists
+  const [connectedDeviceName, setConnectedDeviceName] = useState();
   const [inputDevices, setInputDevices] = useState([]);
-  const [errorMessage, setErrorMessage] = useState();
   const [midiStateChanged, setMidiStateChanged] = useState(false);
 
-  const { currentUser, setConnectedDevice, connectedDevice } = useContext(MidiContext);
+  const { setConnectedDevice, connectedDevice } = useContext(MidiContext);
 
   /*
   * Runs when component mounts, sets up MIDI access and lists MIDI devices
@@ -36,7 +35,6 @@ const App = () => {
      */
     const setUpMIDI = async () => {
       try {
-        console.log('current user' + currentUser);
           const midiAccess = await navigator.requestMIDIAccess();
           midiAccess.addEventListener("statechange", handleStateChange);
           await listMIDIInputs(midiAccess);
@@ -85,10 +83,6 @@ const App = () => {
     const inputs = Array.from(midiAccess.inputs.values());
     inputs.forEach(input => {
       console.log(input);
-      if(connectedDevice === 'MPKmini2') {
-        setConnectedDevice(input);
-        setConnectedDeviceName(input.name);
-      }
     });
     setInputDevices(inputs);
     return inputs;
@@ -96,13 +90,10 @@ const App = () => {
 
   /**
    * Changes connected device and updates state
-   * TODO: need to update Tone.js connection using Tone.transport.set()
    * @param {*} device MIDI device to connect
    */
   const updateConnectedDevice = async (device) => {
     console.log(`Connected device: ${device.name}`);
-    // TODO: change so connected device changes -- set to keyboard for now
-    // setConnectedDevice(device.name);
   }
 
   /**
@@ -128,7 +119,7 @@ const App = () => {
             <Router>
                 <Navbar/>
                 <Routes>
-                    <Route exact path="/" element={<Play fullName={fullName} connectedDevice={connectedDevice} errorMessage={errorMessage} />} />
+                    <Route exact path="/" element={<Play fullName={fullName} connectedDevice={connectedDevice} />} />
                     <Route exact path="/connect" element={<Connect connectedDevice={connectedDevice} updateConnectedDevice={updateConnectedDevice} midiInputDevices={inputDevices} />} />
                     <Route exact path="/about" element={<About />} />
                     <Route exact path="/login" element={<Login />} />

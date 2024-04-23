@@ -9,9 +9,9 @@ const MidiContext = createContext();
  */
 const MidiProvider = ({ children }) => {
 
-    const [connectedDevice, setConnectedDevice] = useState('MPkmini2');
+    const [connectedDevice, setConnectedDevice] = useState();
     const [currentUser, setCurrentUser] = useState(null);
-    const [selectedSound, setSelectedSound] = useState();
+    const [selectedSound, setSelectedSound] = useState(null);
 
 
     // export values

@@ -1,4 +1,3 @@
-// import React, { Component } from 'react';
 
 /**
  * Defines a sound object

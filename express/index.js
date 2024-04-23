@@ -1,4 +1,3 @@
-//const { DAO } = require('./lib/app/database/dao.js');
 const express = require('express');
 const app = express();
 const cors = require('cors');
@@ -44,7 +43,7 @@ app.post('/login', async function(req, res) {
     const username = req.body.username;
     const password = req.body.password;
 
-    // create JWT token
+    // create JWT
     const payload = {
         username: username,
     }
@@ -169,7 +168,7 @@ app.post('/add-favorite/:sound', async function(req, res) {
 })
 
 /*
-* Allows user to remove sound from his favorites tab (INCOMPLETE)
+* Allows user to remove sound from his favorites tab
 */
 app.delete('/remove-favorite/:sound', async (req, res) => {
 

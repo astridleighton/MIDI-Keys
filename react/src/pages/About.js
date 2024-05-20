@@ -1,48 +1,12 @@
-import React from 'react';
-
-import './About.scss'
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const jsx_runtime_1 = require("react/jsx-runtime");
+require("./About.scss");
 /**
  * Displays basic website information
  */
-const About = () =>
-{
-
+const About = () => {
     // returns about view
-    return(
-        <div>
-           <div className='about-container'>
-            <div className='about-header'>
-                <h1 className='about-title'>About</h1>
-            </div>
-            <div className='about-content'>
-            <p>
-                <strong>MIDI Keys</strong> is a simple MIDI-based online synthesizer. MIDI keys allows you to learn how to use your MIDI controller to make music.
-            </p>
-            <h3 sx={{paddingLeft: '20px'}}>How To Use</h3>
-            <ol>
-                <li>Plug in your MIDI device or use your built in computer keyboard.</li>
-                <li>Navigate to the CONNECT page.</li>
-                <li>Select your device from the list and click "connect."</li>
-                <li>Navigate to the PLAY page.</li>
-                <li>Select a sound from the list of samples.</li>
-                <li>Create your own music.</li>
-            </ol>
-            <p>
-            &emsp;&emsp;MIDI stands for Musical Instrument Digital Interface. It is one of the most widely-used tools in the music industry today. Although it can be complex to learn, it is an important tool in allowing musical instruments, computers, and hardware to communicate. MIDI is a protocol used to pass information from one device to another, such as musical notes, velocity, and pitch. And this is just the beginning.
-            </p>
-            <h3>Development</h3>
-                    <p>
-                    &emsp;MIDI Keys in the final stage of development, although it will receive further updates in the future. 
-                    </p>
-                    <ul>
-                        <li style={{display: 'flex', justifyContent: 'center', fontSize: '20px',}}>Designed and developed by:&nbsp;<a href="https://github.com/astridleighton" alt="link to developer's GitHub">Astrid Leighton</a></li>
-                    </ul>
-            </div>
-    </div>
-        </div>
-        
-    )
-}
-
-export default About;
+    return ((0, jsx_runtime_1.jsx)("div", { children: (0, jsx_runtime_1.jsxs)("div", { className: 'about-container', children: [(0, jsx_runtime_1.jsx)("div", { className: 'about-header', children: (0, jsx_runtime_1.jsx)("h1", { className: 'about-title', children: "About" }) }), (0, jsx_runtime_1.jsxs)("div", { className: 'about-content', children: [(0, jsx_runtime_1.jsxs)("p", { children: [(0, jsx_runtime_1.jsx)("strong", { children: "MIDI Keys" }), " is a simple MIDI-based online synthesizer. MIDI keys allows you to learn how to use your MIDI controller to make music."] }), (0, jsx_runtime_1.jsx)("h3", { style: { paddingLeft: '20px' }, children: "How To Use" }), (0, jsx_runtime_1.jsxs)("ol", { children: [(0, jsx_runtime_1.jsx)("li", { children: "Plug in your MIDI device or use your built in computer keyboard." }), (0, jsx_runtime_1.jsx)("li", { children: "Navigate to the CONNECT page." }), (0, jsx_runtime_1.jsx)("li", { children: "Select your device from the list and click \"connect.\"" }), (0, jsx_runtime_1.jsx)("li", { children: "Navigate to the PLAY page." }), (0, jsx_runtime_1.jsx)("li", { children: "Select a sound from the list of samples." }), (0, jsx_runtime_1.jsx)("li", { children: "Create your own music." })] }), (0, jsx_runtime_1.jsx)("p", { children: "\u2003\u2003MIDI stands for Musical Instrument Digital Interface. It is one of the most widely-used tools in the music industry today. Although it can be complex to learn, it is an important tool in allowing musical instruments, computers, and hardware to communicate. MIDI is a protocol used to pass information from one device to another, such as musical notes, velocity, and pitch. And this is just the beginning." }), (0, jsx_runtime_1.jsx)("h3", { children: "Development" }), (0, jsx_runtime_1.jsx)("p", { children: "\u2003MIDI Keys in the final stage of development, although it will receive further updates in the future." }), (0, jsx_runtime_1.jsx)("ul", { children: (0, jsx_runtime_1.jsxs)("li", { style: { display: 'flex', justifyContent: 'center', fontSize: '20px' }, children: ["Designed and developed by:\u00A0", (0, jsx_runtime_1.jsx)("a", { href: "https://github.com/astridleighton", children: "Astrid Leighton" })] }) })] })] }) }));
+};
+exports.default = About;

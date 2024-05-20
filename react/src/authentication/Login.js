@@ -1,37 +1,47 @@
-import React, {useState, useContext} from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import Cookies from 'js-cookie';
-import { Button, Box, TextField, Typography, Container, Alert } from '@mui/material';
-import './Login.scss';
-import { MidiContext } from '../MidiContext';
-import {toast, Toaster} from 'react-hot-toast';
-
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const jsx_runtime_1 = require("react/jsx-runtime");
+const react_1 = require("react");
+const react_router_dom_1 = require("react-router-dom");
+const axios_1 = __importDefault(require("axios"));
+const js_cookie_1 = __importDefault(require("js-cookie"));
+const material_1 = require("@mui/material");
+require("./Login.scss");
+const MidiContext_1 = require("../MidiContext");
+const react_hot_toast_1 = require("react-hot-toast");
 /**
  * Allows user to log in to account
  */
-const Login = () =>
-{
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [firstName, setFirstName] = useState('');
-    const [submitted, setSubmitted] = useState(false);
-    const [isFormValid, setIsFormValid] = useState(false);
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
-
-    const {currentUser, setCurrentUser} = useContext(MidiContext);
-    
+const Login = () => {
+    const [username, setUsername] = (0, react_1.useState)(null);
+    const [password, setPassword] = (0, react_1.useState)(null);
+    const [firstName, setFirstName] = (0, react_1.useState)(null);
+    const [submitted, setSubmitted] = (0, react_1.useState)(false);
+    const [isFormValid, setIsFormValid] = (0, react_1.useState)(false);
+    const [error, setError] = (0, react_1.useState)('');
+    const navigate = (0, react_router_dom_1.useNavigate)();
+    const midiContext = (0, react_1.useContext)(MidiContext_1.MidiContext);
     /**
      * Updates username
-     * @param {*} event 
+     * @param {*} event
      */
     const handleUsernameChange = (event) => {
         event.preventDefault();
         const newUsername = event.target.value;
         setUsername(newUsername);
-    }
-
+    };
     /**
      * Updates password and allows login if values are not blank
      */
@@ -40,163 +50,97 @@ const Login = () =>
         const newPassword = event.target.value;
         setPassword(newPassword);
         setIsFormValid(username !== '' && newPassword !== null);
-    }
-
+    };
     /**
      * Passes login credentials to login function
-     * @param {*} event 
+     * @param {*} event
      */
-    const handleSubmit = async (event) => {
+    const handleSubmit = (event) => __awaiter(void 0, void 0, void 0, function* () {
         if (event) {
             event.preventDefault();
         }
         setSubmitted(true);
         try {
-            await processLogin({username, password});
-        } catch (error) {
+            yield processLogin({ username, password });
+        }
+        catch (error) {
             console.log("Login failed:", error);
-        } finally {
-            setUsername('');
-            setPassword('');
+        }
+        finally {
+            setUsername(null);
+            setPassword(null);
             setIsFormValid(false);
         }
-    };
-
+    });
     /**
      * Sends login credentials to the back-end
      * Sets sessions cookies
-     * @param {*} loginCredentials 
+     * @param {*} loginCredentials
      */
-    const processLogin = async (loginCredentials) => {
-        await axios.post(`http://localhost:3000/login`, loginCredentials)
-        .then((result) => {
+    const processLogin = (loginCredentials) => __awaiter(void 0, void 0, void 0, function* () {
+        yield axios_1.default.post(`http://localhost:3000/login`, loginCredentials)
+            .then((result) => {
             if (result.data && result.data.status === 200) {
                 const token = result.data.token;
                 const name = result.data.firstName;
-                if (token && name) {
-                    Cookies.set('token', token, { expires: 1 });
-                    Cookies.set('name', name, {expires: 1 });
+                if (token && name && midiContext) {
+                    js_cookie_1.default.set('token', token, { expires: 1 });
+                    js_cookie_1.default.set('name', name, { expires: 1 });
                     setFirstName(name);
-                    setCurrentUser(name);
+                    midiContext.setCurrentUser(name);
                     navigate('/');
-                    toast.success('Login successful.');
-                } else {
-                    setError("An error occurred during the login. Please try again.")
+                    react_hot_toast_1.toast.success('Login successful.');
                 }
-            } else {
+                else {
+                    setError("An error occurred during the login. Please try again.");
+                }
+            }
+            else {
                 setError("An error occurred during login. Please try again!");
             }
         }).catch((error) => {
             if (error.response && error.response.status === 401) {
-                setError("Invalid login credentials. Please try again.")
+                setError("Invalid login credentials. Please try again.");
                 setUsername(null);
                 setPassword(null);
                 setSubmitted(false);
-            } else if (error.response && error.response.status === 500) {
-                setError("A network error occurred. Please try again.");
-            } else {
-                console.log('test');
-                setError("An unknown error occurred. Please try again.")
             }
-        })
-    }
-
+            else if (error.response && error.response.status === 500) {
+                setError("A network error occurred. Please try again.");
+            }
+            else {
+                console.log('test');
+                setError("An unknown error occurred. Please try again.");
+            }
+        });
+    });
     // returns login view
-    return (
-        <div class="login-container">  
-            <Container maxWidth="xs">
-                <div class="login-header">
-                    <h1>Sign In</h1>
-                </div>
-                <Box
-                    component="form"
-                    onSubmit={handleSubmit}
-                    noValidate
-                    sx={{
+    return ((0, jsx_runtime_1.jsx)("div", { className: "login-container", children: (0, jsx_runtime_1.jsxs)(material_1.Container, { maxWidth: "xs", children: [(0, jsx_runtime_1.jsx)("div", { className: "login-header", children: (0, jsx_runtime_1.jsx)("h1", { children: "Sign In" }) }), (0, jsx_runtime_1.jsxs)(material_1.Box, { component: "form", onSubmit: handleSubmit, noValidate: true, sx: {
                         marginTop: 8,
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
                         color: 'white'
-                        }}
-                >
-                    {error &&
-                        <Alert severity="error">
-                            {error}
-                        </Alert>
-                    }
-                    <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        label="Username"
-                        value={username}
-                        error={submitted && !username} // check if empty
-                        helperText={submitted && !username ? 'Username is required ' : ''}
-                        onChange={handleUsernameChange}
-                        focused
-                        autoComplete='off'
-                        variant="filled"
-                        sx={{
-                            '& input': {
-                                color: 'white'
-                            }
-                        }}
-                    />
-                    <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        label="Password"
-                        type="password"
-                        value={password}
-                        error={submitted && !password} // check if empty
-                        helperText={submitted && !password ? 'Password is required ' : ''}
-                        onChange={handlePasswordChange}
-                        autoComplete='off'
-                        variant='filled'
-                        focused
-                        sx={{
-                            '& input': {
-                                color: 'white'
-                            }
-                        }}
-                    />
-                    <Container
-                        sx={{
-                            margin: '20px'
-                        }}>
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            onClick={handleSubmit}
-                            disabled = {!isFormValid}
-                            sx={{
-                                backgroundColor: 'black',
-                                color: 'white',
-                                padding: '10px'
-                            }}
-
-                        >
-                            Sign In
-                        </Button>
-                    </Container>
-                    <Typography>
-                        Don&apos;t have an account?
-                        <a
-                            href="/register"
-                            style={{
-                                textDecoration: 'underline',
-                                color: 'inherit',
-                                fontWeight: 'bold',
-                                padding: '5px',
-                                }}>Sign Up</a>
-                    </Typography>
-                </Box>
-            </Container>    
-        </div>
-    )
-}
-
-export default Login;
+                    }, children: [error &&
+                            (0, jsx_runtime_1.jsx)(material_1.Alert, { severity: "error", children: error }), (0, jsx_runtime_1.jsx)(material_1.TextField, { margin: "normal", required: true, fullWidth: true, label: "Username", value: username, error: submitted && !username, helperText: submitted && !username ? 'Username is required ' : '', onChange: handleUsernameChange, focused: true, autoComplete: 'off', variant: "filled", sx: {
+                                '& input': {
+                                    color: 'white'
+                                }
+                            } }), (0, jsx_runtime_1.jsx)(material_1.TextField, { margin: "normal", required: true, fullWidth: true, label: "Password", type: "password", value: password, error: submitted && !password, helperText: submitted && !password ? 'Password is required ' : '', onChange: handlePasswordChange, autoComplete: 'off', variant: 'filled', focused: true, sx: {
+                                '& input': {
+                                    color: 'white'
+                                }
+                            } }), (0, jsx_runtime_1.jsx)(material_1.Container, { sx: {
+                                margin: '20px'
+                            }, children: (0, jsx_runtime_1.jsx)(material_1.Button, { type: "submit", fullWidth: true, variant: "contained", onClick: handleSubmit, disabled: !isFormValid, sx: {
+                                    backgroundColor: 'black',
+                                    color: 'white',
+                                    padding: '10px'
+                                }, children: "Sign In" }) }), (0, jsx_runtime_1.jsxs)(material_1.Typography, { children: ["Don't have an account?", (0, jsx_runtime_1.jsx)("a", { href: "/register", style: {
+                                        textDecoration: 'underline',
+                                        color: 'inherit',
+                                        fontWeight: 'bold',
+                                        padding: '5px',
+                                    }, children: "Sign Up" })] })] })] }) }));
+};
+exports.default = Login;

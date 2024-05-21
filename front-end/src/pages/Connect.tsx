@@ -1,7 +1,7 @@
 import React, {useState, useContext} from 'react';
 import { Button, List,  FormLabel, RadioGroup, ListItem, Radio, FormControlLabel } from '@mui/material';
 import { MidiContext} from '../MidiContext';
-import {toast, Toaster} from 'react-hot-toast';
+// import {toast, Toaster} from 'react-hot-toast';
 
 import './Connect.scss'
 
@@ -15,7 +15,6 @@ import './Connect.scss'
  */
 const Connect = ({updateConnectedDevice, midiInputDevices}) =>
 {
-
   const [selectedDevice, setSelectedDevice] = useState(null);
   const connectedDevice = useContext(MidiContext);
 
@@ -32,7 +31,7 @@ const Connect = ({updateConnectedDevice, midiInputDevices}) =>
    */
   const handleDeviceConnect = () => {
     updateConnectedDevice(selectedDevice);
-    toast.success('Updated connected device.');
+    // toast.success('Updated connected device.');
   }
 
   // returns connect view

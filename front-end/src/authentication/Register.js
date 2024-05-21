@@ -18,7 +18,7 @@ const axios_1 = __importDefault(require("axios"));
 const react_router_dom_1 = require("react-router-dom");
 const material_1 = require("@mui/material");
 require("./Register.scss");
-const react_hot_toast_1 = require("react-hot-toast");
+// import {toast, Toaster} from 'react-hot-toast';
 /**
  * Allows user to create an account
  */
@@ -124,7 +124,7 @@ const Register = () => {
         yield axios_1.default.post(`http://localhost:3000/register`, registerCredentials)
             .then((result) => {
             console.log(result);
-            react_hot_toast_1.toast.success('Registration successful. Please log in with your current credentials.');
+            // toast.success('Registration successful. Please log in with your current credentials.');
             navigate('/login');
         }).catch((error) => {
             if (error.response.status === 403) {

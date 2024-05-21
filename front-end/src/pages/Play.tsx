@@ -24,7 +24,7 @@ type Sound = {
  * Displays notes played
  */
 
-const Play = ({connectedDevice}) =>
+const Play = () =>
 {
     const midiContext = useContext(MidiContext);
     const isAuthenticated = !!Cookies.get('token');
@@ -35,7 +35,7 @@ const Play = ({connectedDevice}) =>
     const [url, setURL] = useState<string | null>(null);
     const [notesEnabled, setNotesEnabled] = useState<boolean>(false);
     const [selectedSound, setSelectedSound] = useState<string | null>(null);
-
+    const connectedDevice = midiContext?.connectedDevice;
 
     // maps QWERTY to note values
     const keyToNote = {

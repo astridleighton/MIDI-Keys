@@ -10,7 +10,7 @@ const js_cookie_1 = __importDefault(require("js-cookie"));
 const material_1 = require("@mui/material");
 const Piano_1 = __importDefault(require("@mui/icons-material/Piano"));
 const MidiContext_1 = require("../MidiContext");
-const react_hot_toast_1 = require("react-hot-toast");
+// import {toast, Toaster} from 'react-hot-toast';
 /**
  * Displays navigation bar with basic site links
  */
@@ -34,7 +34,7 @@ const Navbar = () => {
             js_cookie_1.default.remove('token');
             js_cookie_1.default.remove('name');
             midiContext.setCurrentUser(null);
-            react_hot_toast_1.toast.success('Sign out successful.');
+            // toast.success('Sign out successful.');
         }
     };
     // shows navigation link and user authentication status

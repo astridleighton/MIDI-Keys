@@ -4,7 +4,7 @@ const jsx_runtime_1 = require("react/jsx-runtime");
 const react_1 = require("react");
 const material_1 = require("@mui/material");
 const MidiContext_1 = require("../MidiContext");
-const react_hot_toast_1 = require("react-hot-toast");
+// import {toast, Toaster} from 'react-hot-toast';
 require("./Connect.scss");
 /**
  * Allows the user to connect to a selected device
@@ -29,7 +29,7 @@ const Connect = ({ updateConnectedDevice, midiInputDevices }) => {
      */
     const handleDeviceConnect = () => {
         updateConnectedDevice(selectedDevice);
-        react_hot_toast_1.toast.success('Updated connected device.');
+        // toast.success('Updated connected device.');
     };
     // returns connect view
     return ((0, jsx_runtime_1.jsxs)("div", { className: "connect-container", children: [(0, jsx_runtime_1.jsx)("div", { className: "connect-header", children: (0, jsx_runtime_1.jsx)("h1", { className: "connect-title", children: "Connect" }) }), (0, jsx_runtime_1.jsxs)("div", { className: "connect-content", children: [(0, jsx_runtime_1.jsx)(material_1.FormLabel, { sx: { color: 'white', padding: '20px' }, children: "Select input MIDI device:" }), (0, jsx_runtime_1.jsxs)(material_1.RadioGroup, { "aria-label": "devices", name: "device-group", defaultValue: connectedDevice, onChange: (e) => handleDeviceSelect(midiInputDevices[e.target.value]), children: [(0, jsx_runtime_1.jsx)(material_1.List, { sx: {

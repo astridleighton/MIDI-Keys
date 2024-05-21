@@ -4,7 +4,7 @@ import Cookies from 'js-cookie';
 import { AppBar, Button, Typography, Toolbar } from '@mui/material';
 import PianoIcon from '@mui/icons-material/Piano';
 import { MidiContext } from '../MidiContext';
-import {toast, Toaster} from 'react-hot-toast';
+// import {toast, Toaster} from 'react-hot-toast';
 
 /**
  * Displays navigation bar with basic site links
@@ -32,7 +32,7 @@ const Navbar = () =>
             Cookies.remove('token');
             Cookies.remove('name');
             midiContext.setCurrentUser(null);
-            toast.success('Sign out successful.');
+            // toast.success('Sign out successful.');
         }
     }
     

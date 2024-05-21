@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Button, Box, TextField, Typography, Container, Alert } from '@mui/material';
 import './Register.scss';
-import {toast, Toaster} from 'react-hot-toast';
+// import {toast, Toaster} from 'react-hot-toast';
 
 /**
  * Allows user to create an account
@@ -117,7 +117,7 @@ const Register = () =>
         await axios.post(`http://localhost:3000/register`, registerCredentials)
         .then((result) => {
             console.log(result);
-            toast.success('Registration successful. Please log in with your current credentials.');
+            // toast.success('Registration successful. Please log in with your current credentials.');
             navigate('/login')
         }).catch((error) => {
             if(error.response.status === 403) {

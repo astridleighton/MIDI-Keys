@@ -52,7 +52,7 @@ require("./Play.scss");
  * Allows user to select between instruments
  * Displays notes played
  */
-const Play = ({ connectedDevice }) => {
+const Play = () => {
     const midiContext = (0, react_1.useContext)(MidiContext_1.MidiContext);
     const isAuthenticated = !!js_cookie_1.default.get('token');
     const firstName = js_cookie_1.default.get('name');
@@ -62,6 +62,7 @@ const Play = ({ connectedDevice }) => {
     const [url, setURL] = (0, react_1.useState)(null);
     const [notesEnabled, setNotesEnabled] = (0, react_1.useState)(false);
     const [selectedSound, setSelectedSound] = (0, react_1.useState)(null);
+    const connectedDevice = midiContext === null || midiContext === void 0 ? void 0 : midiContext.connectedDevice;
     // maps QWERTY to note values
     const keyToNote = {
         65: 'C4', // A

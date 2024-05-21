@@ -20,7 +20,7 @@ const js_cookie_1 = __importDefault(require("js-cookie"));
 const material_1 = require("@mui/material");
 require("./Login.scss");
 const MidiContext_1 = require("../MidiContext");
-const react_hot_toast_1 = require("react-hot-toast");
+// import {toast, Toaster} from 'react-hot-toast';
 /**
  * Allows user to log in to account
  */
@@ -89,7 +89,7 @@ const Login = () => {
                     setFirstName(name);
                     midiContext.setCurrentUser(name);
                     navigate('/');
-                    react_hot_toast_1.toast.success('Login successful.');
+                    // toast.success('Login successful.');
                 }
                 else {
                     setError("An error occurred during the login. Please try again.");

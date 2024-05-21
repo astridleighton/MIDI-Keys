@@ -1,27 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -42,23 +19,21 @@ require("./App.css");
 const Connect_1 = __importDefault(require("./pages/Connect"));
 const Play_1 = __importDefault(require("./pages/Play"));
 const Navbar_1 = __importDefault(require("./layouts/Navbar"));
-const Tone = __importStar(require("tone"));
 const About_1 = __importDefault(require("./pages/About"));
 const Login_1 = __importDefault(require("./authentication/Login"));
 const Register_1 = __importDefault(require("./authentication/Register"));
 const Footer_1 = __importDefault(require("./layouts/Footer"));
-const react_hot_toast_1 = require("react-hot-toast");
 const MidiContext_1 = require("./MidiContext");
 /**
  * Main component used to handle Tone.js, MIDI device connections, and routing
  * @returns routes
  */
 const App = () => {
-    const [fullName] = (0, react_1.useState)();
+    const [fullName] = (0, react_1.useState)(null);
     const [connectedDeviceName, setConnectedDeviceName] = (0, react_1.useState)();
     const [inputDevices, setInputDevices] = (0, react_1.useState)([]);
     const [midiStateChanged, setMidiStateChanged] = (0, react_1.useState)(false);
-    const { setConnectedDevice, connectedDevice } = (0, react_1.useContext)(MidiContext_1.MidiContext);
+    const midiContext = (0, react_1.useContext)(MidiContext_1.MidiContext);
     /*
     * Runs when component mounts, sets up MIDI access and lists MIDI devices
     */
@@ -93,13 +68,13 @@ const App = () => {
     const handleStateChange = (event) => __awaiter(void 0, void 0, void 0, function* () {
         event.preventDefault();
         if (event.port.state === 'disconnected') {
-            react_hot_toast_1.toast.dismiss();
-            react_hot_toast_1.toast.error('MIDI device disconnected.');
+            /* toast.dismiss();
+            toast.error('MIDI device disconnected.'); */
             setMidiStateChanged(true);
         }
         else if (event.port.state === 'connected') {
-            react_hot_toast_1.toast.dismiss();
-            react_hot_toast_1.toast.success('MIDI device connected.');
+            /* toast.dismiss();
+            toast.success('MIDI device connected.'); */
             setMidiStateChanged(true);
             window.location.reload();
         }
@@ -129,17 +104,12 @@ const App = () => {
      * Removes Tone.js input device
      */
     const removeConnectedDevice = () => {
-        setConnectedDevice(undefined);
+        midiContext === null || midiContext === void 0 ? void 0 : midiContext.setConnectedDevice(null);
         setConnectedDeviceName(null);
-        if (connectedDevice) {
-            console.log(`Disconnecting device: ${connectedDevice.name}`);
-        }
-        else {
-            console.log('Disconnecting device.');
-        }
-        Tone.Transport.set({ midi: null });
+        console.log('Disconnecting device.');
+        // Tone.Transport.set({ midi: null });
     };
     // returns routes and basic view
-    return ((0, jsx_runtime_1.jsxs)("div", { className: "app-container d-flex flex-column", style: { backgroundColor: '#f8f8f8', marginTop: '60px' }, children: [(0, jsx_runtime_1.jsx)(react_hot_toast_1.Toaster, {}), (0, jsx_runtime_1.jsxs)(react_router_dom_1.BrowserRouter, { children: [(0, jsx_runtime_1.jsx)(Navbar_1.default, {}), (0, jsx_runtime_1.jsxs)(react_router_dom_1.Routes, { children: [(0, jsx_runtime_1.jsx)(react_router_dom_1.Route, { exact: true, path: "/", element: (0, jsx_runtime_1.jsx)(Play_1.default, { fullName: fullName, connectedDevice: connectedDevice }) }), (0, jsx_runtime_1.jsx)(react_router_dom_1.Route, { exact: true, path: "/connect", element: (0, jsx_runtime_1.jsx)(Connect_1.default, { connectedDevice: connectedDevice, updateConnectedDevice: updateConnectedDevice, midiInputDevices: inputDevices }) }), (0, jsx_runtime_1.jsx)(react_router_dom_1.Route, { exact: true, path: "/about", element: (0, jsx_runtime_1.jsx)(About_1.default, {}) }), (0, jsx_runtime_1.jsx)(react_router_dom_1.Route, { exact: true, path: "/login", element: (0, jsx_runtime_1.jsx)(Login_1.default, {}) }), (0, jsx_runtime_1.jsx)(react_router_dom_1.Route, { exact: true, path: "/register", element: (0, jsx_runtime_1.jsx)(Register_1.default, {}) })] })] }), (0, jsx_runtime_1.jsx)("div", { className: "fixed-bottom", children: (0, jsx_runtime_1.jsx)(Footer_1.default, { connectedDevice: connectedDeviceName, removeConnectedDevice: removeConnectedDevice }) })] }));
+    return ((0, jsx_runtime_1.jsxs)("div", { className: "app-container d-flex flex-column", style: { backgroundColor: '#f8f8f8', marginTop: '60px' }, children: [(0, jsx_runtime_1.jsxs)(react_router_dom_1.BrowserRouter, { children: [(0, jsx_runtime_1.jsx)(Navbar_1.default, {}), (0, jsx_runtime_1.jsxs)(react_router_dom_1.Routes, { children: [(0, jsx_runtime_1.jsx)(react_router_dom_1.Route, { path: "/", element: (0, jsx_runtime_1.jsx)(Play_1.default, {}) }), (0, jsx_runtime_1.jsx)(react_router_dom_1.Route, { path: "/connect", element: (0, jsx_runtime_1.jsx)(Connect_1.default, { updateConnectedDevice: updateConnectedDevice, midiInputDevices: inputDevices }) }), (0, jsx_runtime_1.jsx)(react_router_dom_1.Route, { path: "/about", element: (0, jsx_runtime_1.jsx)(About_1.default, {}) }), (0, jsx_runtime_1.jsx)(react_router_dom_1.Route, { path: "/login", element: (0, jsx_runtime_1.jsx)(Login_1.default, {}) }), (0, jsx_runtime_1.jsx)(react_router_dom_1.Route, { path: "/register", element: (0, jsx_runtime_1.jsx)(Register_1.default, {}) })] })] }), (0, jsx_runtime_1.jsx)("div", { className: "fixed-bottom", children: (0, jsx_runtime_1.jsx)(Footer_1.default, { removeConnectedDevice: removeConnectedDevice }) })] }));
 };
 exports.default = App;

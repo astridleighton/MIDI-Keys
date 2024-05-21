@@ -1,4 +1,4 @@
-import { React, useState, useEffect, useContext } from 'react';
+import react, { useState, useEffect, useContext } from 'react';
 import { Route, Routes, BrowserRouter as Router} from 'react-router-dom';
 import './App.css';
 import Connect from './pages/Connect';
@@ -12,18 +12,24 @@ import Footer from './layouts/Footer';
 import {toast, Toaster} from 'react-hot-toast';
 import { MidiContext } from './MidiContext';
 
+/** TODO: create input object type, fix connected device in play, maybe pass connected device as a prop so not everything has access to the midi context? */
+
+type midiInput = {
+
+}
+
 /**
  * Main component used to handle Tone.js, MIDI device connections, and routing
  * @returns routes
  */
 const App = () => {
   
-  const [fullName] = useState();
-  const [connectedDeviceName, setConnectedDeviceName] = useState();
-  const [inputDevices, setInputDevices] = useState([]);
-  const [midiStateChanged, setMidiStateChanged] = useState(false);
+  const [fullName] = useState<string | null>(null);
+  const [connectedDeviceName, setConnectedDeviceName] = useState<string | null>();
+  const [inputDevices, setInputDevices] = useState<midiInput[]>([]);
+  const [midiStateChanged, setMidiStateChanged] = useState<boolean>(false);
 
-  const { setConnectedDevice, connectedDevice } = useContext(MidiContext);
+  const midiContext = useContext(MidiContext);
 
   /*
   * Runs when component mounts, sets up MIDI access and lists MIDI devices
@@ -63,12 +69,12 @@ const App = () => {
    const handleStateChange = async (event) => {
     event.preventDefault();
     if(event.port.state === 'disconnected') {
-      toast.dismiss();
-      toast.error('MIDI device disconnected.');
+      /* toast.dismiss();
+      toast.error('MIDI device disconnected.'); */
       setMidiStateChanged(true);
     } else if (event.port.state === 'connected') {
-      toast.dismiss();
-      toast.success('MIDI device connected.');
+      /* toast.dismiss();
+      toast.success('MIDI device connected.'); */
       setMidiStateChanged(true);
       window.location.reload();
     }
@@ -80,7 +86,7 @@ const App = () => {
    * @returns MIDI inputs
    */
   const listMIDIInputs = async (midiAccess) => {
-    const inputs = Array.from(midiAccess.inputs.values());
+    const inputs: midiInput[] = Array.from(midiAccess.inputs.values());
     inputs.forEach(input => {
       console.log(input);
     });
@@ -101,33 +107,28 @@ const App = () => {
    * Removes Tone.js input device
    */
   const removeConnectedDevice = () => {
-    setConnectedDevice(undefined);
+    midiContext?.setConnectedDevice(null);
     setConnectedDeviceName(null);
+    console.log('Disconnecting device.');
 
-    if(connectedDevice) {
-      console.log(`Disconnecting device: ${connectedDevice.name}`);
-    } else {
-      console.log('Disconnecting device.');
-    }
-    Tone.Transport.set({ midi: null });
+    // Tone.Transport.set({ midi: null });
   }
 
   // returns routes and basic view
   return (
       <div className="app-container d-flex flex-column" style={{ backgroundColor: '#f8f8f8', marginTop: '60px' }}>
-        <Toaster/>
             <Router>
                 <Navbar/>
                 <Routes>
-                    <Route exact path="/" element={<Play fullName={fullName} connectedDevice={connectedDevice} />} />
-                    <Route exact path="/connect" element={<Connect connectedDevice={connectedDevice} updateConnectedDevice={updateConnectedDevice} midiInputDevices={inputDevices} />} />
-                    <Route exact path="/about" element={<About />} />
-                    <Route exact path="/login" element={<Login />} />
-                    <Route exact path="/register" element={<Register />} />
+                    <Route path="/" element={<Play />} />
+                    <Route path="/connect" element={<Connect updateConnectedDevice={updateConnectedDevice} midiInputDevices={inputDevices} />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
                 </Routes>
             </Router>
             <div className="fixed-bottom">
-                <Footer connectedDevice={connectedDeviceName} removeConnectedDevice={removeConnectedDevice} />
+                <Footer removeConnectedDevice={removeConnectedDevice} />
             </div>
         </div>
   )

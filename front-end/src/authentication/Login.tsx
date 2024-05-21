@@ -5,7 +5,7 @@ import Cookies from 'js-cookie';
 import { Button, Box, TextField, Typography, Container, Alert } from '@mui/material';
 import './Login.scss';
 import { MidiContext } from '../MidiContext';
-import {toast, Toaster} from 'react-hot-toast';
+// import {toast, Toaster} from 'react-hot-toast';
 
 /**
  * Allows user to log in to account
@@ -78,7 +78,7 @@ const Login = () =>
                     setFirstName(name);
                     midiContext.setCurrentUser(name);
                     navigate('/');
-                    toast.success('Login successful.');
+                    // toast.success('Login successful.');
                 } else {
                     setError("An error occurred during the login. Please try again.")
                 }

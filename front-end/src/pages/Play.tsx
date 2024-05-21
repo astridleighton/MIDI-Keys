@@ -8,6 +8,7 @@ import StarIcon from '@mui/icons-material/Star';
 import Piano from './Piano';
 import { MidiContext } from '../MidiContext';
 import { MidiInstrument } from '../MidiInstrument';
+import { QwertyInstrument } from '../QwertyInstrument';
 
 import './Play.scss'
 
@@ -38,24 +39,6 @@ const Play = () =>
     const [selectedSound, setSelectedSound] = useState<string | null>(null);
     const connectedDevice = midiContext?.connectedDevice;
 
-    // maps QWERTY to note values
-    const keyToNote = {
-        65: 'C4', // A
-        87: 'Db4', // W
-        83: 'D4', // S
-        69: 'Eb4', // E
-        68: 'E4', // D
-        70: 'F4', // F
-        84: 'Gb4', // T
-        71: 'G4', // G
-        89: 'Ab4', // Y
-        72: 'A4', // H
-        85: 'Bb4', // U
-        74: 'B4', // J
-        75: 'C5', // K
-        79: 'Db5' // O
-    };
-
     /**
        * Starts tone.JS and sets up MIDI input devices
        */
@@ -68,8 +51,7 @@ const Play = () =>
 
                 await Tone.setContext(new AudioContext({ sampleRate: 41000 })); // sets audio preferences
 
-                const keyboard = await createQwerty();
-                await setUpQwertyKeyboard(keyboard); // device setup
+                const qwertyInstrument = new QwertyInstrument('casio piano');
                 
                 await initializeSounds();
                 
@@ -126,16 +108,6 @@ const Play = () =>
                 attack: 0.1
             }
         }).toDestination();
-      }
-
-      /**
-       * Creates an instance of the QWERTY keyboard
-       * @returns instance
-       */
-      const createQwerty = () => {
-        return new AudioKeys({
-            polyphony: 10, // Adjust the polyphony as needed
-        });
       }
 
       /**
@@ -472,37 +444,6 @@ const Play = () =>
                 break;
         }
     }
-
-    /**
-     * - Sets up keyboard using AudioKeys and allows QWERTY keyboard input
-        - Maps MIDI notes to music notes
-        - Triggers audio output with keydown event
-        - Stores current notes being played
-     */
-    const setUpQwertyKeyboard = async(keyboard) => {
-
-        /*
-        Triggers audio output, converts MIDI note to music note, and adds note to notes played
-        */
-        keyboard.down(async (e) => {
-
-            const note = keyToNote[e.keyCode];
-
-            if(note)
-            {
-                await addNote(note);
-                await playSound(note);
-            }
-        });
-
-    /*
-        Stops audio output and removes note from notes played
-    */
-        keyboard.up(async(e) => {
-            const note = keyToNote[e.keyCode];
-            await removeNote(note);
-        })
-        }
 
     /*
     * Converts MIDI input (number value) to note value and octave

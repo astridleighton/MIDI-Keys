@@ -38,7 +38,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const jsx_runtime_1 = require("react/jsx-runtime");
 const react_1 = require("react");
 const Tone = __importStar(require("tone"));
-const audiokeys_1 = __importDefault(require("audiokeys"));
 const js_cookie_1 = __importDefault(require("js-cookie"));
 const axios_1 = __importDefault(require("axios"));
 const material_1 = require("@mui/material");
@@ -46,6 +45,7 @@ const Star_1 = __importDefault(require("@mui/icons-material/Star"));
 const Piano_1 = __importDefault(require("./Piano"));
 const MidiContext_1 = require("../MidiContext");
 const MidiInstrument_1 = require("../MidiInstrument");
+const QwertyInstrument_1 = require("../QwertyInstrument");
 require("./Play.scss");
 /**
  * Initiates QWERTY and MIDI keyboard setup
@@ -64,23 +64,6 @@ const Play = () => {
     const [notesEnabled, setNotesEnabled] = (0, react_1.useState)(false);
     const [selectedSound, setSelectedSound] = (0, react_1.useState)(null);
     const connectedDevice = midiContext === null || midiContext === void 0 ? void 0 : midiContext.connectedDevice;
-    // maps QWERTY to note values
-    const keyToNote = {
-        65: 'C4', // A
-        87: 'Db4', // W
-        83: 'D4', // S
-        69: 'Eb4', // E
-        68: 'E4', // D
-        70: 'F4', // F
-        84: 'Gb4', // T
-        71: 'G4', // G
-        89: 'Ab4', // Y
-        72: 'A4', // H
-        85: 'Bb4', // U
-        74: 'B4', // J
-        75: 'C5', // K
-        79: 'Db5' // O
-    };
     /**
        * Starts tone.JS and sets up MIDI input devices
        */
@@ -90,8 +73,7 @@ const Play = () => {
             try {
                 Tone.start();
                 yield Tone.setContext(new AudioContext({ sampleRate: 41000 })); // sets audio preferences
-                const keyboard = yield createQwerty();
-                yield setUpQwertyKeyboard(keyboard); // device setup
+                const qwertyInstrument = new QwertyInstrument_1.QwertyInstrument('casio piano');
                 yield initializeSounds();
                 const connectedDevice2 = yield connectMIDIInputDevice(connectedDevice);
                 yield setUpMIDIKeyboard(connectedDevice2);
@@ -141,15 +123,6 @@ const Play = () => {
                 attack: 0.1
             }
         }).toDestination();
-    };
-    /**
-     * Creates an instance of the QWERTY keyboard
-     * @returns instance
-     */
-    const createQwerty = () => {
-        return new audiokeys_1.default({
-            polyphony: 10, // Adjust the polyphony as needed
-        });
     };
     /**
      * Creates an instance of the sampler
@@ -449,31 +422,6 @@ const Play = () => {
             default:
                 break;
         }
-    });
-    /**
-     * - Sets up keyboard using AudioKeys and allows QWERTY keyboard input
-        - Maps MIDI notes to music notes
-        - Triggers audio output with keydown event
-        - Stores current notes being played
-     */
-    const setUpQwertyKeyboard = (keyboard) => __awaiter(void 0, void 0, void 0, function* () {
-        /*
-        Triggers audio output, converts MIDI note to music note, and adds note to notes played
-        */
-        keyboard.down((e) => __awaiter(void 0, void 0, void 0, function* () {
-            const note = keyToNote[e.keyCode];
-            if (note) {
-                yield addNote(note);
-                yield playSound(note);
-            }
-        }));
-        /*
-            Stops audio output and removes note from notes played
-        */
-        keyboard.up((e) => __awaiter(void 0, void 0, void 0, function* () {
-            const note = keyToNote[e.keyCode];
-            yield removeNote(note);
-        }));
     });
     /*
     * Converts MIDI input (number value) to note value and octave

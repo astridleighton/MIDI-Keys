@@ -7,6 +7,7 @@ import { List, FormControl, FormLabel, RadioGroup, InputLabel, Box, Alert, FormC
 import StarIcon from '@mui/icons-material/Star';
 import Piano from './Piano';
 import { MidiContext } from '../MidiContext';
+import { MidiInstrument } from '../MidiInstrument';
 
 import './Play.scss'
 
@@ -59,6 +60,8 @@ const Play = () =>
        * Starts tone.JS and sets up MIDI input devices
        */
     useEffect (() => {
+        const testInstrument = new MidiInstrument('synth');
+
         const initTone = async() => {
             try {
                 Tone.start();
@@ -99,8 +102,7 @@ const Play = () =>
        * @returns instance
        */
       const createSynth = () => {
-        const synth = new Tone.Synth().toDestination();
-        return synth;
+        return new Tone.Synth().toDestination();
       }
 
       /**
@@ -108,8 +110,7 @@ const Play = () =>
        * @returns instance
        */
       const createAMSynth = () => {
-        const amSynth = new Tone.AMSynth().toDestination();
-        return amSynth;
+        return new Tone.AMSynth().toDestination();
       }
 
       /**
@@ -117,7 +118,7 @@ const Play = () =>
        * @returns instance
        */
       const createMonoSynth = () => {
-        const monoSynth = new Tone.MonoSynth({
+        return new Tone.MonoSynth({
             oscillator: {
                 type: "square"
             },
@@ -125,8 +126,6 @@ const Play = () =>
                 attack: 0.1
             }
         }).toDestination();
-        monoSynth.volume.value = -5;
-        return monoSynth;
       }
 
       /**
@@ -134,10 +133,9 @@ const Play = () =>
        * @returns instance
        */
       const createQwerty = () => {
-        const keyboard = new AudioKeys({
+        return new AudioKeys({
             polyphony: 10, // Adjust the polyphony as needed
         });
-        return keyboard;
       }
 
       /**
@@ -360,7 +358,6 @@ const Play = () =>
         } finally {
             setIsLoading(false);
         }
-
       }
 
       /**
@@ -432,8 +429,7 @@ const Play = () =>
                 default:
                     break;
                 }
-            }   
-            
+            }    
     }
 
     /**

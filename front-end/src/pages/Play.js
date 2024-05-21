@@ -45,6 +45,7 @@ const material_1 = require("@mui/material");
 const Star_1 = __importDefault(require("@mui/icons-material/Star"));
 const Piano_1 = __importDefault(require("./Piano"));
 const MidiContext_1 = require("../MidiContext");
+const MidiInstrument_1 = require("../MidiInstrument");
 require("./Play.scss");
 /**
  * Initiates QWERTY and MIDI keyboard setup
@@ -84,6 +85,7 @@ const Play = () => {
        * Starts tone.JS and sets up MIDI input devices
        */
     (0, react_1.useEffect)(() => {
+        const testInstrument = new MidiInstrument_1.MidiInstrument('synth');
         const initTone = () => __awaiter(void 0, void 0, void 0, function* () {
             try {
                 Tone.start();
@@ -117,23 +119,21 @@ const Play = () => {
      * @returns instance
      */
     const createSynth = () => {
-        const synth = new Tone.Synth().toDestination();
-        return synth;
+        return new Tone.Synth().toDestination();
     };
     /**
      * Creates an instance of the AM Synth
      * @returns instance
      */
     const createAMSynth = () => {
-        const amSynth = new Tone.AMSynth().toDestination();
-        return amSynth;
+        return new Tone.AMSynth().toDestination();
     };
     /**
      * Creates an instance of the mono synth
      * @returns instance
      */
     const createMonoSynth = () => {
-        const monoSynth = new Tone.MonoSynth({
+        return new Tone.MonoSynth({
             oscillator: {
                 type: "square"
             },
@@ -141,18 +141,15 @@ const Play = () => {
                 attack: 0.1
             }
         }).toDestination();
-        monoSynth.volume.value = -5;
-        return monoSynth;
     };
     /**
      * Creates an instance of the QWERTY keyboard
      * @returns instance
      */
     const createQwerty = () => {
-        const keyboard = new audiokeys_1.default({
+        return new audiokeys_1.default({
             polyphony: 10, // Adjust the polyphony as needed
         });
-        return keyboard;
     };
     /**
      * Creates an instance of the sampler

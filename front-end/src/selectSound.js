@@ -41,7 +41,6 @@ const selectSound = (selectedSound) => {
                 }
             }).toDestination();
         case 'casiopiano':
-            console.log('testing');
             return new Tone.Sampler({
                 urls: {
                     A1: "A1.mp3",
@@ -50,10 +49,15 @@ const selectSound = (selectedSound) => {
                 baseUrl: "https://tonejs.github.io/audio/casio/"
             }).toDestination();
         case 'salamander':
+            break;
         case 'eeriepad':
+            break;
         case 'guitar':
+            break;
         case 'choir':
+            break;
         case 'kalimba':
+            break;
         default:
             console.error('Unknown type of synthesizer. Could not build sound.');
             return null;

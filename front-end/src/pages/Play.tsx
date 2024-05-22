@@ -9,15 +9,10 @@ import Piano from './Piano';
 import { MidiContext } from '../MidiContext';
 import { MidiInstrument } from '../MidiInstrument';
 import { QwertyInstrument } from '../QwertyInstrument';
+import SoundService from '../SoundService';
+import { Sound } from '../types';
 
 import './Play.scss'
-
-type Sound = {
-    id: number;
-    name: string;
-    location: string;
-    isFavorite: boolean;
-}
 
 /**
  * Initiates QWERTY and MIDI keyboard setup
@@ -31,19 +26,21 @@ const Play = () =>
     const midiContext = useContext(MidiContext);
     const isAuthenticated = !!Cookies.get('token');
     const firstName = Cookies.get('name');
-    const [chordNotes, setChordNotes] = useState<string[]>([]);
-    const [soundObjects, setSoundObjects] = useState<Sound[]>([]);
+    const [chordNotes, setChordNotes] = useState<string[] | null>([]);
+    const [soundObjects, setSoundObjects] = useState<Sound[] | null>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [url, setURL] = useState<string | null>(null);
     const [notesEnabled, setNotesEnabled] = useState<boolean>(false);
     const [selectedSound, setSelectedSound] = useState<string | null>(null);
     const connectedDevice = midiContext?.connectedDevice;
+    const soundService = new SoundService();
 
     /**
        * Starts tone.JS and sets up MIDI input devices
        */
     useEffect (() => {
         const testInstrument = new MidiInstrument('synth');
+        // const soundService = new SoundService();
 
         const initTone = async() => {
             try {
@@ -323,8 +320,13 @@ const Play = () =>
 
         try {
             setIsLoading(true);
-            const sounds = await getAllSounds();
-            setSoundObjects(sounds);
+            const soundsData: Sound[] | null = await soundService.getAllSounds();
+            const token = Cookies.get('token');
+
+            if (isAuthenticated && soundsData) {
+                await soundService.getAllFavorites(token, soundsData);
+            }
+            setSoundObjects(soundsData);
         } catch (err) {
             console.error(err);
         } finally {
@@ -464,7 +466,7 @@ const Play = () =>
     */
     const addNote = async (newNote) => {
         setChordNotes((previousChord) => {
-            if(!previousChord.includes(newNote)) {
+            if(previousChord && !previousChord.includes(newNote)) {
                 return [...previousChord, newNote]
             } else {
                 return previousChord;
@@ -477,8 +479,10 @@ const Play = () =>
     */
     const removeNote = async (oldNote) => {
         const previousChord = chordNotes;
-        const newChord = previousChord.filter((note) => note !== oldNote);
-        setChordNotes(newChord);
+        if (previousChord) {
+            const newChord = previousChord.filter((note) => note !== oldNote);
+            setChordNotes(newChord);
+        }
     }
 
     /*
@@ -489,12 +493,14 @@ const Play = () =>
         const instrument = event.target.value;
         let location;
 
-        soundObjects.forEach((sound) => {
-            if(sound.name === instrument) {
-                location = sound.location;
-            }
-        })
-
+        if(soundObjects) {
+            soundObjects.forEach((sound) => {
+                if(sound.name === instrument) {
+                    location = sound.location;
+                }
+            })
+        }
+        
         if ((location === "react" || location) && midiContext) {
             if (instrument === 'Synth') {
                 midiContext.setSelectedSound(instrument);
@@ -526,114 +532,15 @@ const Play = () =>
             console.log('Error! Could not set selected instrument.');
         }
     }
-    
-    /**
-     * Retrieves all sounds from the database
-     */
-    const getAllSounds = async () => {
-        try {
-            const result = await axios.get('http://localhost:3000/all-sounds');
-
-            console.log(result);
-
-            if (result.status === 200) {
-                const sounds: Sound[] = result.data.map(sound => ({
-                    id: sound.id,
-                    name: sound.name,
-                    location: sound.source,
-                    isFavorite: sound.isFavorite
-                }));
-                console.log(sounds);
-
-                if(isAuthenticated) {
-                    return getAllFavorites(sounds);
-                } else {
-                    return sounds;
-                }
-            } else {
-                console.log("Error");
-                return null;
-            }
-
-        } catch (error) {
-            console.error("Could not get sounds from database.", error);
-            return null;
-        }
-    }
-
-    /**
-     * Retrieves all favorite sounds from the database
-     * Only called when user is logged in with a valid token
-     */
-    const getAllFavorites = async (sounds) => {
-
-        const token = Cookies.get('token');
-
-        try {
-            const result = await axios.get('http://localhost:3000/all-favorites', {
-                    headers:{
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-            
-                if(result.data.length > 0) {
-                    const favorites: Sound[] = result.data.map(sound => ({
-                        id: sound.id,
-                        name: sound.name,
-                        location: sound.source,
-                        isFavorite: sound.isFavorite
-                    }));
-
-                    for(let i = 0; i < sounds.length; i++) {
-                        const matchingFavorite = favorites.find(favorite => favorite.id === sounds[i].id);
-
-                        if(matchingFavorite) {
-                            sounds[i].isFavorite = true;
-                        }
-                    }
-                }
-                return sounds;
-        } catch (error:any) {
-            if (error.status === 403 || error.status === 401) {
-                console.log("Unauthorized to load samples");
-            } else {
-                console.log("No favorites to show.");
-                return sounds;
-            }
-        }
-    }
 
     /**
      * Adds a specified sound to the user's favorites
      * Only called if user is logged in with a valid token
      * @param {*} soundName 
      */
-    const addFavorite = async (sound) => {
-
+    const addFavorite = async (soundName) => {
         const token = Cookies.get('token');
-        try {
-            const response = await axios.post(`http://localhost:3000/add-favorite/${sound}`, null, {
-                headers:{
-                    Authorization: `Bearer ${token}`
-                }
-            });
-    
-            console.log(response);
-    
-            for (let i = 0; i < soundObjects.length; i++) {
-                if (soundObjects[i].name === sound) {
-                    const updatedSoundObjects = [...soundObjects];
-                    updatedSoundObjects[i].isFavorite = true;
-                    console.log('setting fav');
-                    setSoundObjects(updatedSoundObjects);
-                    break; // Once found, exit the loop
-                }
-            }
-    
-            console.log(soundObjects);
-        } catch (error) {
-            console.log(error);
-        }
+        soundService.addFavorite(token, soundName, soundObjects);
     }
 
     /**
@@ -642,31 +549,8 @@ const Play = () =>
      * @param {*} soundName 
      */
     const removeFavorite = async (soundName) => {
-    
         const token = Cookies.get('token');
-
-        try {
-            const response = await axios.delete(`http://localhost:3000/remove-favorite/${soundName}`, {
-                headers:{
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            
-            console.log(response);
-            // Check if the sound is present in state and update its isFavorite property
-            const updatedSoundObjects = soundObjects.map(sound => {
-                if (sound.name === soundName) {
-                    return { ...sound, isFavorite: false };
-                }
-                return sound;
-            });
-
-            // Update state with the modified soundObjects array
-            setSoundObjects(updatedSoundObjects);
-
-        } catch (error) {
-            console.log(error);
-        }
+        soundService.removeFavorite(token, soundName, soundObjects);
     }
 
     // renders user session and displays available sounds and notes played
@@ -742,7 +626,7 @@ const Play = () =>
                         <div className="note-content">
                             {notesEnabled && (
                                 <>
-                                    {chordNotes.map((note) => (
+                                    {chordNotes?.map((note) => (
                                         <p className="d-inline">{note}&nbsp;</p>
                                     ))}
                                 </>

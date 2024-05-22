@@ -39,13 +39,13 @@ const jsx_runtime_1 = require("react/jsx-runtime");
 const react_1 = require("react");
 const Tone = __importStar(require("tone"));
 const js_cookie_1 = __importDefault(require("js-cookie"));
-const axios_1 = __importDefault(require("axios"));
 const material_1 = require("@mui/material");
 const Star_1 = __importDefault(require("@mui/icons-material/Star"));
 const Piano_1 = __importDefault(require("./Piano"));
 const MidiContext_1 = require("../MidiContext");
 const MidiInstrument_1 = require("../MidiInstrument");
 const QwertyInstrument_1 = require("../QwertyInstrument");
+const SoundService_1 = __importDefault(require("../SoundService"));
 require("./Play.scss");
 /**
  * Initiates QWERTY and MIDI keyboard setup
@@ -64,11 +64,13 @@ const Play = () => {
     const [notesEnabled, setNotesEnabled] = (0, react_1.useState)(false);
     const [selectedSound, setSelectedSound] = (0, react_1.useState)(null);
     const connectedDevice = midiContext === null || midiContext === void 0 ? void 0 : midiContext.connectedDevice;
+    const soundService = new SoundService_1.default();
     /**
        * Starts tone.JS and sets up MIDI input devices
        */
     (0, react_1.useEffect)(() => {
         const testInstrument = new MidiInstrument_1.MidiInstrument('synth');
+        // const soundService = new SoundService();
         const initTone = () => __awaiter(void 0, void 0, void 0, function* () {
             try {
                 Tone.start();
@@ -307,8 +309,12 @@ const Play = () => {
         console.log("Getting all sounds and favorites.");
         try {
             setIsLoading(true);
-            const sounds = yield getAllSounds();
-            setSoundObjects(sounds);
+            const soundsData = yield soundService.getAllSounds();
+            const token = js_cookie_1.default.get('token');
+            if (isAuthenticated && soundsData) {
+                yield soundService.getAllFavorites(token, soundsData);
+            }
+            setSoundObjects(soundsData);
         }
         catch (err) {
             console.error(err);
@@ -439,7 +445,7 @@ const Play = () => {
     */
     const addNote = (newNote) => __awaiter(void 0, void 0, void 0, function* () {
         setChordNotes((previousChord) => {
-            if (!previousChord.includes(newNote)) {
+            if (previousChord && !previousChord.includes(newNote)) {
                 return [...previousChord, newNote];
             }
             else {
@@ -452,8 +458,10 @@ const Play = () => {
     */
     const removeNote = (oldNote) => __awaiter(void 0, void 0, void 0, function* () {
         const previousChord = chordNotes;
-        const newChord = previousChord.filter((note) => note !== oldNote);
-        setChordNotes(newChord);
+        if (previousChord) {
+            const newChord = previousChord.filter((note) => note !== oldNote);
+            setChordNotes(newChord);
+        }
     });
     /*
         Selects instrument type based on user option
@@ -461,11 +469,13 @@ const Play = () => {
     const handleSelectSound = (event) => {
         const instrument = event.target.value;
         let location;
-        soundObjects.forEach((sound) => {
-            if (sound.name === instrument) {
-                location = sound.location;
-            }
-        });
+        if (soundObjects) {
+            soundObjects.forEach((sound) => {
+                if (sound.name === instrument) {
+                    location = sound.location;
+                }
+            });
+        }
         if ((location === "react" || location) && midiContext) {
             if (instrument === 'Synth') {
                 midiContext.setSelectedSound(instrument);
@@ -508,103 +518,13 @@ const Play = () => {
         }
     };
     /**
-     * Retrieves all sounds from the database
-     */
-    const getAllSounds = () => __awaiter(void 0, void 0, void 0, function* () {
-        try {
-            const result = yield axios_1.default.get('http://localhost:3000/all-sounds');
-            console.log(result);
-            if (result.status === 200) {
-                const sounds = result.data.map(sound => ({
-                    id: sound.id,
-                    name: sound.name,
-                    location: sound.source,
-                    isFavorite: sound.isFavorite
-                }));
-                console.log(sounds);
-                if (isAuthenticated) {
-                    return getAllFavorites(sounds);
-                }
-                else {
-                    return sounds;
-                }
-            }
-            else {
-                console.log("Error");
-                return null;
-            }
-        }
-        catch (error) {
-            console.error("Could not get sounds from database.", error);
-            return null;
-        }
-    });
-    /**
-     * Retrieves all favorite sounds from the database
-     * Only called when user is logged in with a valid token
-     */
-    const getAllFavorites = (sounds) => __awaiter(void 0, void 0, void 0, function* () {
-        const token = js_cookie_1.default.get('token');
-        try {
-            const result = yield axios_1.default.get('http://localhost:3000/all-favorites', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            if (result.data.length > 0) {
-                const favorites = result.data.map(sound => ({
-                    id: sound.id,
-                    name: sound.name,
-                    location: sound.source,
-                    isFavorite: sound.isFavorite
-                }));
-                for (let i = 0; i < sounds.length; i++) {
-                    const matchingFavorite = favorites.find(favorite => favorite.id === sounds[i].id);
-                    if (matchingFavorite) {
-                        sounds[i].isFavorite = true;
-                    }
-                }
-            }
-            return sounds;
-        }
-        catch (error) {
-            if (error.status === 403 || error.status === 401) {
-                console.log("Unauthorized to load samples");
-            }
-            else {
-                console.log("No favorites to show.");
-                return sounds;
-            }
-        }
-    });
-    /**
      * Adds a specified sound to the user's favorites
      * Only called if user is logged in with a valid token
      * @param {*} soundName
      */
-    const addFavorite = (sound) => __awaiter(void 0, void 0, void 0, function* () {
+    const addFavorite = (soundName) => __awaiter(void 0, void 0, void 0, function* () {
         const token = js_cookie_1.default.get('token');
-        try {
-            const response = yield axios_1.default.post(`http://localhost:3000/add-favorite/${sound}`, null, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            console.log(response);
-            for (let i = 0; i < soundObjects.length; i++) {
-                if (soundObjects[i].name === sound) {
-                    const updatedSoundObjects = [...soundObjects];
-                    updatedSoundObjects[i].isFavorite = true;
-                    console.log('setting fav');
-                    setSoundObjects(updatedSoundObjects);
-                    break; // Once found, exit the loop
-                }
-            }
-            console.log(soundObjects);
-        }
-        catch (error) {
-            console.log(error);
-        }
+        soundService.addFavorite(token, soundName, soundObjects);
     });
     /**
      * Removes a specified sound from the user's favorites
@@ -613,31 +533,12 @@ const Play = () => {
      */
     const removeFavorite = (soundName) => __awaiter(void 0, void 0, void 0, function* () {
         const token = js_cookie_1.default.get('token');
-        try {
-            const response = yield axios_1.default.delete(`http://localhost:3000/remove-favorite/${soundName}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            console.log(response);
-            // Check if the sound is present in state and update its isFavorite property
-            const updatedSoundObjects = soundObjects.map(sound => {
-                if (sound.name === soundName) {
-                    return Object.assign(Object.assign({}, sound), { isFavorite: false });
-                }
-                return sound;
-            });
-            // Update state with the modified soundObjects array
-            setSoundObjects(updatedSoundObjects);
-        }
-        catch (error) {
-            console.log(error);
-        }
+        soundService.removeFavorite(token, soundName, soundObjects);
     });
     // renders user session and displays available sounds and notes played
     return ((0, jsx_runtime_1.jsxs)("div", { className: "play-container", children: [(0, jsx_runtime_1.jsx)("div", { className: "play-container play-header", children: isAuthenticated ? ((0, jsx_runtime_1.jsx)("div", { children: (0, jsx_runtime_1.jsxs)("h1", { children: ["Welcome,\u00A0", firstName, "!"] }) })) : ((0, jsx_runtime_1.jsx)("div", { children: (0, jsx_runtime_1.jsx)("h1", { children: "MIDI Made Simple." }) })) }), (0, jsx_runtime_1.jsx)("div", { className: "play-container play-content", children: isLoading ? ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)("p", { children: "Could not load sounds from database. Please refresh to try again." }), (0, jsx_runtime_1.jsx)(material_1.CircularProgress, {})] })) : ((0, jsx_runtime_1.jsx)("div", { children: (0, jsx_runtime_1.jsxs)(material_1.FormControl, { variant: "standard", sx: { m: 1, minWidth: 120 }, children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, { id: "select-sound-label", sx: { color: 'white', fontSize: '20px' }, children: "Selected Sound" }), (0, jsx_runtime_1.jsx)(material_1.Select, { sx: { marginTop: '35px', width: '250px', height: '50px', color: 'white' }, labelId: "select-sound-label", value: selectedSound, onChange: (event) => handleSelectSound(event), label: "Sound", children: soundObjects && soundObjects.map((sound, index) => ((0, jsx_runtime_1.jsxs)(material_1.MenuItem, { value: sound.name, children: [sound.name, isAuthenticated && ((0, jsx_runtime_1.jsx)(jsx_runtime_1.Fragment, { children: sound.isFavorite ?
                                                 (0, jsx_runtime_1.jsx)(material_1.IconButton, { style: { color: 'white' }, onClick: () => removeFavorite(sound.name), children: (0, jsx_runtime_1.jsx)(Star_1.default, { style: { color: 'yellow' } }) })
                                                 :
-                                                    (0, jsx_runtime_1.jsx)(material_1.IconButton, { style: { color: 'white' }, onClick: () => addFavorite(sound.name), children: (0, jsx_runtime_1.jsx)(Star_1.default, { style: { color: 'primary' } }) }) }))] }, index))) })] }) })) }), (0, jsx_runtime_1.jsx)(Piano_1.default, { notes: chordNotes }), (0, jsx_runtime_1.jsx)("div", { className: "chord-container", children: (0, jsx_runtime_1.jsx)(material_1.FormGroup, { children: (0, jsx_runtime_1.jsxs)("div", { className: "display-notes-container", children: [(0, jsx_runtime_1.jsx)(material_1.FormControlLabel, { control: (0, jsx_runtime_1.jsx)(material_1.Switch, {}), label: "Notes:", onChange: handleNotesToggle }), (0, jsx_runtime_1.jsx)("div", { className: "note-content", children: notesEnabled && ((0, jsx_runtime_1.jsx)(jsx_runtime_1.Fragment, { children: chordNotes.map((note) => ((0, jsx_runtime_1.jsxs)("p", { className: "d-inline", children: [note, "\u00A0"] }))) })) })] }) }) })] }));
+                                                    (0, jsx_runtime_1.jsx)(material_1.IconButton, { style: { color: 'white' }, onClick: () => addFavorite(sound.name), children: (0, jsx_runtime_1.jsx)(Star_1.default, { style: { color: 'primary' } }) }) }))] }, index))) })] }) })) }), (0, jsx_runtime_1.jsx)(Piano_1.default, { notes: chordNotes }), (0, jsx_runtime_1.jsx)("div", { className: "chord-container", children: (0, jsx_runtime_1.jsx)(material_1.FormGroup, { children: (0, jsx_runtime_1.jsxs)("div", { className: "display-notes-container", children: [(0, jsx_runtime_1.jsx)(material_1.FormControlLabel, { control: (0, jsx_runtime_1.jsx)(material_1.Switch, {}), label: "Notes:", onChange: handleNotesToggle }), (0, jsx_runtime_1.jsx)("div", { className: "note-content", children: notesEnabled && ((0, jsx_runtime_1.jsx)(jsx_runtime_1.Fragment, { children: chordNotes === null || chordNotes === void 0 ? void 0 : chordNotes.map((note) => ((0, jsx_runtime_1.jsxs)("p", { className: "d-inline", children: [note, "\u00A0"] }))) })) })] }) }) })] }));
 };
 exports.default = Play;

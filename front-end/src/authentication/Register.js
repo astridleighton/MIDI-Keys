@@ -8,16 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsx_runtime_1 = require("react/jsx-runtime");
 const react_1 = require("react");
-const axios_1 = __importDefault(require("axios"));
 const react_router_dom_1 = require("react-router-dom");
 const material_1 = require("@mui/material");
 require("./Register.scss");
+const Auth_1 = require("./Auth");
 // import {toast, Toaster} from 'react-hot-toast';
 /**
  * Allows user to create an account
@@ -121,22 +118,14 @@ const Register = () => {
      * @param {*} registerCredentials
      */
     const processRegister = (registerCredentials) => __awaiter(void 0, void 0, void 0, function* () {
-        yield axios_1.default.post(`http://localhost:3000/register`, registerCredentials)
-            .then((result) => {
-            console.log(result);
+        const result = yield (0, Auth_1.signUp)(registerCredentials);
+        if (result.isSuccess) {
             // toast.success('Registration successful. Please log in with your current credentials.');
             navigate('/login');
-        }).catch((error) => {
-            if (error.response.status === 403) {
-                setError("Username already exists. Please choose another one.");
-            }
-            else if (error.response.status === 500) {
-                setError("Network error. Please try again.");
-            }
-            else {
-                setError("An unknown error occurred. Please try again.");
-            }
-        });
+        }
+        else {
+            setError(result.message);
+        }
     });
     /**
      * Displays registration form

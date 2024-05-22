@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Button, Box, TextField, Typography, Container, Alert } from '@mui/material';
 import './Register.scss';
+import { signUp } from './Auth';
 // import {toast, Toaster} from 'react-hot-toast';
 
 /**
@@ -114,20 +115,14 @@ const Register = () =>
      */
     const processRegister = async (registerCredentials) => {
 
-        await axios.post(`http://localhost:3000/register`, registerCredentials)
-        .then((result) => {
-            console.log(result);
+        const result = await signUp(registerCredentials);
+
+        if(result.isSuccess) {
             // toast.success('Registration successful. Please log in with your current credentials.');
-            navigate('/login')
-        }).catch((error) => {
-            if(error.response.status === 403) {
-                setError("Username already exists. Please choose another one.");
-            } else if (error.response.status === 500) {
-                setError("Network error. Please try again.");
-            } else {
-                setError("An unknown error occurred. Please try again.");
-            }
-        })
+            navigate('/login');
+        } else {
+            setError(result.message);
+        }
     }
 
     /**

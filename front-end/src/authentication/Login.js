@@ -8,18 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsx_runtime_1 = require("react/jsx-runtime");
 const react_1 = require("react");
 const react_router_dom_1 = require("react-router-dom");
-const axios_1 = __importDefault(require("axios"));
-const js_cookie_1 = __importDefault(require("js-cookie"));
 const material_1 = require("@mui/material");
 require("./Login.scss");
 const MidiContext_1 = require("../MidiContext");
+const Auth_1 = require("./Auth");
 // import {toast, Toaster} from 'react-hot-toast';
 /**
  * Allows user to log in to account
@@ -78,41 +74,21 @@ const Login = () => {
      * @param {*} loginCredentials
      */
     const processLogin = (loginCredentials) => __awaiter(void 0, void 0, void 0, function* () {
-        yield axios_1.default.post(`http://localhost:3000/login`, loginCredentials)
-            .then((result) => {
-            if (result.data && result.data.status === 200) {
-                const token = result.data.token;
-                const name = result.data.firstName;
-                if (token && name && midiContext) {
-                    js_cookie_1.default.set('token', token, { expires: 1 });
-                    js_cookie_1.default.set('name', name, { expires: 1 });
-                    setFirstName(name);
-                    midiContext.setCurrentUser(name);
-                    navigate('/');
-                    // toast.success('Login successful.');
-                }
-                else {
-                    setError("An error occurred during the login. Please try again.");
-                }
-            }
-            else {
-                setError("An error occurred during login. Please try again!");
-            }
-        }).catch((error) => {
-            if (error.response && error.response.status === 401) {
-                setError("Invalid login credentials. Please try again.");
+        const result = yield (0, Auth_1.signIn)(loginCredentials);
+        if (result.isSuccess) {
+            /* setFirstName(name);
+            midiContext.setCurrentUser(name); */
+            navigate('/');
+            // toast.success('Login successful.');
+        }
+        else {
+            setError(result.message);
+        }
+        /* TODO: may need this for a 401 error:
                 setUsername(null);
                 setPassword(null);
                 setSubmitted(false);
-            }
-            else if (error.response && error.response.status === 500) {
-                setError("A network error occurred. Please try again.");
-            }
-            else {
-                console.log('test');
-                setError("An unknown error occurred. Please try again.");
-            }
-        });
+        */
     });
     // returns login view
     return ((0, jsx_runtime_1.jsx)("div", { className: "login-container", children: (0, jsx_runtime_1.jsxs)(material_1.Container, { maxWidth: "xs", children: [(0, jsx_runtime_1.jsx)("div", { className: "login-header", children: (0, jsx_runtime_1.jsx)("h1", { children: "Sign In" }) }), (0, jsx_runtime_1.jsxs)(material_1.Box, { component: "form", onSubmit: handleSubmit, noValidate: true, sx: {

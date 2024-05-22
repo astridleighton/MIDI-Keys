@@ -1,10 +1,10 @@
 import React, {useState, useContext} from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import Cookies from 'js-cookie';
 import { Button, Box, TextField, Typography, Container, Alert } from '@mui/material';
 import './Login.scss';
 import { MidiContext } from '../MidiContext';
+import { signIn } from './Auth';
+
 // import {toast, Toaster} from 'react-hot-toast';
 
 /**
@@ -67,37 +67,20 @@ const Login = () =>
      * @param {*} loginCredentials 
      */
     const processLogin = async (loginCredentials) => {
-        await axios.post(`http://localhost:3000/login`, loginCredentials)
-        .then((result) => {
-            if (result.data && result.data.status === 200) {
-                const token = result.data.token;
-                const name = result.data.firstName;
-                if (token && name && midiContext) {
-                    Cookies.set('token', token, { expires: 1 });
-                    Cookies.set('name', name, {expires: 1 });
-                    setFirstName(name);
-                    midiContext.setCurrentUser(name);
-                    navigate('/');
-                    // toast.success('Login successful.');
-                } else {
-                    setError("An error occurred during the login. Please try again.")
-                }
-            } else {
-                setError("An error occurred during login. Please try again!");
-            }
-        }).catch((error) => {
-            if (error.response && error.response.status === 401) {
-                setError("Invalid login credentials. Please try again.")
+        const result = await signIn(loginCredentials);
+        if (result.isSuccess) {
+            /* setFirstName(name);
+            midiContext.setCurrentUser(name); */
+            navigate('/');
+            // toast.success('Login successful.');
+        } else {
+            setError(result.message);
+        }
+        /* TODO: may need this for a 401 error:
                 setUsername(null);
                 setPassword(null);
                 setSubmitted(false);
-            } else if (error.response && error.response.status === 500) {
-                setError("A network error occurred. Please try again.");
-            } else {
-                console.log('test');
-                setError("An unknown error occurred. Please try again.")
-            }
-        })
+        */
     }
 
     // returns login view

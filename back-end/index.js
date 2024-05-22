@@ -82,7 +82,7 @@ app.post('/register', function (req, res, next) {
         const password = req.body.password;
         try {
             const usernameCheck = yield db.findByUsername(username); // checks if username exists
-            if (usernameCheck) {
+            if (usernameCheck && usernameCheck.length > 0) {
                 res.status(403).send("Username already exists.");
                 return;
             }
@@ -116,7 +116,7 @@ app.post('/add-favorite/:sound', function (req, res) {
             const sound = req.params.sound;
             try {
                 const username = yield security_1.default.getUserNameFromToken(token); // get username from token
-                if (username) { // if token is valid
+                if (username && username.length > 0) { // if token is valid
                     const userID = yield db.getIDFromUser(username);
                     const soundID = yield db.getIDFromSound(sound);
                     const favoriteExists = yield db.findFavoriteByUserAndSound(userID, soundID);
@@ -157,7 +157,7 @@ app.delete('/remove-favorite/:sound', (req, res) => __awaiter(void 0, void 0, vo
         const token = req.headers.authorization.split(' ')[1]; // Extract token from Authorization header
         try {
             const username = yield security_1.default.getUserNameFromToken(token); // get username from token
-            console.log(username);
+            console.log(username && username.length > 0);
             if (username) {
                 const userID = yield db.getIDFromUser(username);
                 const soundID = yield db.getIDFromSound(sound);
@@ -185,7 +185,7 @@ app.delete('/remove-favorite/:sound', (req, res) => __awaiter(void 0, void 0, vo
 /*
 * Gets all sounds
 */
-app.get('/all-sounds', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.get('/all-sounds', (res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const allSounds = yield db.getAllSounds();
         res.status(200).json(allSounds);
@@ -202,9 +202,8 @@ app.get('/all-favorites', (req, res) => __awaiter(void 0, void 0, void 0, functi
         const token = req.headers.authorization.split(' ')[1]; // Extract token from Authorization header
         console.log("Token: " + token);
         const username = yield security_1.default.getUserNameFromToken(token); // get username from token
-        console.log("Username: " + username);
         const usernameCheck = yield db.findByUsername(username); // checks if username exists
-        if (usernameCheck) {
+        if (usernameCheck && username.length > 0) {
             res.status(403).send("Invalid token or username not found.");
         }
         else {

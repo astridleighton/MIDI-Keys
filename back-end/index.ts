@@ -75,16 +75,14 @@ app.post('/login', async function(req: Request, res: Response) {
 * Allows user to create an account by registering
 */
 app.post('/register', async function(req, res, next) {
-
     const firstname = req.body.firstname;
     const username = req.body.username;
     const password = req.body.password;
 
     try {
-        
-        const usernameCheck = await db.findByUsername(username); // checks if username exists
+        const usernameCheck: any = await db.findByUsername(username); // checks if username exists
 
-        if(usernameCheck) {
+        if(usernameCheck && usernameCheck.length > 0) {
             res.status(403).send("Username already exists.");
             return;
         } else {
@@ -101,9 +99,7 @@ app.post('/register', async function(req, res, next) {
                 res.status(500).json({ error: "Database error. "});
                 return;
             }
-
             res.json({ message: 'Registration successful.', status: 200 });
-
         }
 
     } catch (error) {
@@ -126,16 +122,15 @@ app.post('/add-favorite/:sound', async function(req, res) {
         const sound = req.params.sound;
     
         try {
-            const username = await Security.getUserNameFromToken(token); // get username from token
+            const username:any = await Security.getUserNameFromToken(token); // get username from token
 
-            if(username) { // if token is valid
+            if(username && username.length > 0) { // if token is valid
                 const userID = await db.getIDFromUser(username);
                 const soundID = await db.getIDFromSound(sound);
 
                 const favoriteExists = await db.findFavoriteByUserAndSound(userID, soundID);
 
                 if(favoriteExists) {
-
                     const addFavorite = await db.addFavorite(userID, soundID);
 
                     if (addFavorite) {
@@ -170,9 +165,9 @@ app.delete('/remove-favorite/:sound', async (req, res) => {
 
         try {
 
-            const username = await Security.getUserNameFromToken(token); // get username from token
+            const username:any = await Security.getUserNameFromToken(token); // get username from token
 
-            console.log(username);
+            console.log(username && username.length > 0);
 
             if(username) {
 
@@ -204,8 +199,7 @@ app.delete('/remove-favorite/:sound', async (req, res) => {
 /*
 * Gets all sounds
 */
-app.get('/all-sounds', async (req, res) => {
-
+app.get('/all-sounds', async (res) => {
     try {
         const allSounds = await db.getAllSounds();
         res.status(200).json(allSounds);
@@ -225,17 +219,13 @@ app.get('/all-favorites', async (req, res) => {
         console.log("Token: " + token);
 
         const username = await Security.getUserNameFromToken(token); // get username from token
-
-        console.log("Username: " + username);
-
         const usernameCheck = await db.findByUsername(username); // checks if username exists
 
-        if (usernameCheck) {
+        if (usernameCheck && username.length > 0) {
             res.status(403).send("Invalid token or username not found.");
         } else {
             try {
                 const userID = await db.getIDFromUser(username);
-
                 const allFavorites = await db.getAllFavoritesFromUser(userID);
 
                 if(allFavorites) {

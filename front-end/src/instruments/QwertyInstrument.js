@@ -48,8 +48,10 @@ class QwertyInstrument {
         this.initializeQwerty();
     }
     initializeTone() {
-        console.log("Setting up: " + this.instrumentName);
-        this.synth = (0, selectSound_1.selectSound)(this.instrumentName);
+        if (this.instrumentName) {
+            console.log("Setting up: " + this.instrumentName);
+            this.synth = (0, selectSound_1.selectSound)(this.instrumentName);
+        }
     }
     initializeQwerty() {
         return __awaiter(this, void 0, void 0, function* () {

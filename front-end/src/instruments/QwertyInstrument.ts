@@ -34,14 +34,16 @@ export class QwertyInstrument {
     private synth: Tone.Synth | null = null;
     private keyboard = new AudioKeys({ polyphony: 10 });
 
-    constructor(private instrumentName: string) {
+    constructor(private instrumentName: string | null) {
         this.initializeTone();
         this.initializeQwerty();
     }
 
     private initializeTone() {
-        console.log("Setting up: " + this.instrumentName);
-        this.synth = selectSound(this.instrumentName);
+        if (this.instrumentName) {
+            console.log("Setting up: " + this.instrumentName);
+            this.synth = selectSound(this.instrumentName);
+        }
     }
 
     private async initializeQwerty() {

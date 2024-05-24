@@ -41,6 +41,7 @@ const selectSound = (selectedSound) => {
                 }
             }).toDestination();
         case 'casiopiano':
+            console.log('casio!!!');
             return new Tone.Sampler({
                 urls: {
                     A1: "A1.mp3",

@@ -7,10 +7,11 @@ import { List, FormControl, FormLabel, RadioGroup, InputLabel, Box, Alert, FormC
 import StarIcon from '@mui/icons-material/Star';
 import Piano from './Piano';
 import { MidiContext } from '../MidiContext';
-import { MidiInstrument } from '../MidiInstrument';
-import { QwertyInstrument } from '../QwertyInstrument';
-import SoundService from '../SoundService';
+import { MidiInstrument } from '../instruments/MidiInstrument';
+import { QwertyInstrument } from '../instruments/QwertyInstrument';
+import SoundService from '../services/SoundService';
 import { Sound } from '../types';
+import DrumService from '../services/DrumService';
 
 import './Play.scss'
 
@@ -31,15 +32,18 @@ const Play = () =>
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [url, setURL] = useState<string | null>(null);
     const [notesEnabled, setNotesEnabled] = useState<boolean>(false);
-    const [selectedSound, setSelectedSound] = useState<string | null>(null);
+    const [selectedSound, setSelectedSound] = useState<string | null>("synth");
     const connectedDevice = midiContext?.connectedDevice;
     const soundService = new SoundService();
+    const drumService = new DrumService();
 
     /**
        * Starts tone.JS and sets up MIDI input devices
        */
     useEffect (() => {
-        const testInstrument = new MidiInstrument('synth');
+        if (selectedSound) {
+            const testInstrument = new MidiInstrument(selectedSound);
+        }
         // const soundService = new SoundService();
 
         const initTone = async() => {
@@ -217,100 +221,7 @@ const Play = () =>
         }).toDestination();
       }
 
-      /**
-       * Creates an instance of the kick
-       */
-      const createKickPlayer = () => {
-
-        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/kick.mp3", function(){
-            const kickPlayer = new Tone.Player(buffer.get()).toDestination();
-            kickPlayer.start(0.5);
-
-        });
-      }
-
-      /**
-       * Creates an instance of the snare
-       */
-      const createSnarePlayer = () => {
-
-        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/snare.mp3", function(){
-            const snarePlayer = new Tone.Player(buffer.get()).toDestination();
-            snarePlayer.start(0.5);
-
-        });
-      }
-
-      /**
-       * Creates an instance of tom1
-       */
-      const createTom1Player = () => {
-
-        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/tom1.mp3", function(){
-            const tom1Player = new Tone.Player(buffer.get()).toDestination();
-            tom1Player.start(0.5);
-
-        });
-      }
-
-      /**
-       * Creates an instance of tom2
-       */
-      const createTom2Player = () => {
-
-        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/tom2.mp3", function(){
-            const tom2Player = new Tone.Player(buffer.get()).toDestination();
-            tom2Player.start(0.5);
-
-        });
-      }
-
-      /**
-       * Creates an instance of tom3 (floor tom)
-       */
-      const createTom3Player = () => {
-
-        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/tom3.mp3", function(){
-            const tom3Player = new Tone.Player(buffer.get()).toDestination();
-            tom3Player.start(0.5);
-
-        });
-      }
-
-      /**
-       * Creates an instance of the hi-hat
-       */
-      const createHiHatPlayer = () => {
-
-        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/4OP-FM/hihat.mp3", function(){
-            const hiHatPlayer = new Tone.Player(buffer.get()).toDestination();
-            hiHatPlayer.start(0.5);
-
-        });
-      }
-
-      /**
-       * Creates an instance of a bongo sound
-       */
-      const createBongo1Player = () => {
-
-        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/Bongos/snare.mp3", function(){
-            const hiHatPlayer = new Tone.Player(buffer.get()).toDestination();
-            hiHatPlayer.start(0.5);
-
-        });
-      }
-
-      /**
-       * Creates an instance of another bongo sound
-       */
-      const createBongo2Player = () => {
-
-        var buffer = new Tone.Buffer("https://tonejs.github.io/audio/drum-samples/Bongos/tom1.mp3", function(){
-            const bongo2Player = new Tone.Player(buffer.get()).toDestination();
-            bongo2Player.start(0.5);
-        });
-      }
+      
 
       /**
        * Ensures sounds are loaded before receiving favorite sounds
@@ -368,28 +279,28 @@ const Play = () =>
                         } else {
                             switch (noteInput) {
                                 case 48:
-                                    createKickPlayer();
+                                    drumService.createKickPlayer();
                                     break;
                                 case 49:
-                                    createSnarePlayer();
+                                    drumService.createSnarePlayer();
                                     break;
                                 case 50:
-                                    createTom1Player();
+                                    drumService.createTom1Player();
                                     break;
                                 case 51:
-                                    createTom2Player();
+                                    drumService.createTom2Player();
                                     break;
                                 case 44:
-                                    createTom3Player();
+                                    drumService.createTom3Player();
                                     break;
                                 case 45:
-                                    createHiHatPlayer();
+                                    drumService.createHiHatPlayer();
                                     break;
                                 case 46:
-                                    createBongo1Player();
+                                    drumService.createBongo1Player();
                                     break;
                                 case 47:
-                                    createBongo2Player();
+                                    drumService.createBongo2Player();
                                     break;
                                 default:
                                     break;

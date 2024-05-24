@@ -1,25 +1,21 @@
 import axios from 'axios';
-import { Sound } from './types';
+// import { Sound } from './types';
+
+// TODO: convert this back to typescript
 
 class SoundService {
 
-    public async getAllSounds(): Promise<Sound[] | null> {
+    /*public */async getAllSounds()/*: Promise<Sound[] | null>*/ {
         try {
             const result = await axios.get('http://localhost:3000/all-sounds');
             if (result.status === 200) {
-                const sounds: Sound[] = result.data.map(sound => ({
+                const sounds/*: Sound[]*/ = result.data.map(sound => ({
                     id: sound.id,
                     name: sound.name,
                     location: sound.source,
                     isFavorite: sound.isFavorite
                 }));
-                console.log(sounds);
-
-                /* if(isAuthenticated) {
-                    return getAllFavorites(sounds);
-                } else { */
                     return sounds;
-                // }
             } else {
                 console.log("Error");
                 return null;
@@ -31,7 +27,7 @@ class SoundService {
         }
     }
 
-    public async getAllFavorites(token: string, sounds: Sound[]): Promise<Sound[] | null> {
+    /*public */async getAllFavorites(token/*: string*/, sounds/*: Sound[]*/)/*: Promise<Sound[] | null>*/ {
 
         try {
             const result = await axios.get('http://localhost:3000/all-favorites', {
@@ -41,7 +37,7 @@ class SoundService {
                 });
             
                 if(result.data.length > 0) {
-                    const favorites: Sound[] = result.data.map(sound => ({
+                    const favorites/*: Sound[]*/ = result.data.map(sound => ({
                         id: sound.id,
                         name: sound.name,
                         location: sound.source,
@@ -57,7 +53,7 @@ class SoundService {
                     }
                 }
                 return sounds;
-        } catch (error:any) {
+        } catch (error/*:any*/) {
             if (error.status === 403 || error.status === 401) {
                 console.log("Unauthorized to load samples");
             } else {
@@ -67,7 +63,7 @@ class SoundService {
         }
     }
 
-    public async addFavorite(token: string, soundName: string, sounds: Sound[] | null): Promise<Sound[] | null> {
+    /*public */async addFavorite(token/*: string*/, soundName/*: string*/, sounds/*: Sound[] | null*/)/*: Promise<Sound[] | null>*/ {
         try {
 
             if(!sounds) {
@@ -94,7 +90,7 @@ class SoundService {
         }
     }
 
-    public async removeFavorite(token: string, soundName: string, sounds: Sound[] | null): Promise<Sound[] | null> {
+    /*public */async removeFavorite(token/*: string*/, soundName/*: string*/, sounds/*: Sound[] | null*/)/*: Promise<Sound[] | null>*/ {
         try {
 
             if(!sounds) {

@@ -31,54 +31,78 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MidiInstrument = void 0;
 const Tone = __importStar(require("tone"));
+const InstrumentService_1 = require("../services/InstrumentService");
+const DrumService_1 = __importDefault(require("../services/DrumService"));
 /**
- * TODO: abstract all MIDI instrument and sample references here
- * Start with synth
- * setUpMIDIKeyboard(), midiToNote(), playSound()
- * move qwerty into different class (different event listeners)
- * may need to abstract samples further into separate class because both qwerty and tone use them
+ * TODO: ensure drums work
+ * TODO: test midi instrument
+ * TODO: ensure we keep track of notes played and pass back to play (I think)
  */
 class MidiInstrument {
-    constructor(instrumentName) {
-        this.instrumentName = instrumentName;
-        this.midiAccess = null;
-        this.midiInput = null;
+    constructor(sound) {
+        this.sound = sound;
         this.synth = null;
-        this.playNote = (message) => {
-            var _a, _b;
-            // TODO: determine which note to play
-            console.log("A note is being played but this method is not set up.");
-            const [command, note, velocity] = message.data;
-            if (command === 144 && velocity > 0) { // note on
-                (_a = this.synth) === null || _a === void 0 ? void 0 : _a.triggerAttack(Tone.Frequency(note, "midi"));
-            }
-            else if (command === 128 || (command === 144 && velocity === 0)) { // note off
-                (_b = this.synth) === null || _b === void 0 ? void 0 : _b.triggerRelease(note);
-            }
-        };
-        this.initializeMidi();
-        this.initializeTone();
-    }
-    initializeMidi() {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const midiAccess = yield navigator.requestMIDIAccess();
-                // midiAccess.addEventListener('midimessage', this.playNote);
-                // await listMIDIInputs(midiAccess);
-            }
-            catch (error) {
-                console.error('MIDI Access failed: ', error);
-            }
+        this.drumService = new DrumService_1.default();
+        this.initializeMidi = (connectedDevice) => __awaiter(this, void 0, void 0, function* () {
+            console.log("Setting up MIDI keyboard.");
+            connectedDevice.onmidimessage = (event) => __awaiter(this, void 0, void 0, function* () {
+                var _a, _b;
+                event.preventDefault();
+                const [command, note, velocity] = event.data;
+                if (command === 144 && velocity > 0) { // note on
+                    (_a = this.synth) === null || _a === void 0 ? void 0 : _a.triggerAttack(Tone.Frequency(note, "midi"));
+                    // TODO: add drums 
+                    /*
+                    * switch (noteInput) {
+                                    case 48:
+                                        drumService.createKickPlayer();
+                                        break;
+                                    case 49:
+                                        drumService.createSnarePlayer();
+                                        break;
+                                    case 50:
+                                        drumService.createTom1Player();
+                                        break;
+                                    case 51:
+                                        drumService.createTom2Player();
+                                        break;
+                                    case 44:
+                                        drumService.createTom3Player();
+                                        break;
+                                    case 45:
+                                        drumService.createHiHatPlayer();
+                                        break;
+                                    case 46:
+                                        drumService.createBongo1Player();
+                                        break;
+                                    case 47:
+                                        drumService.createBongo2Player();
+                                        break;
+                                    default:
+                                        break;
+                                }
+                    */
+                }
+                else if (command === 128 || (command === 144 && velocity === 0)) { // note off
+                    (_b = this.synth) === null || _b === void 0 ? void 0 : _b.triggerRelease(note);
+                }
+            });
         });
+        this.initializeTone();
+        this.initializeMidi(sound);
     }
     initializeTone() {
-        // to destination
-        console.log("Setting up: " + this.instrumentName);
-        this.synth = new Tone.Synth().toDestination();
-        // TODO: select device
+        var _a;
+        if (this.sound) {
+            console.log("Setting up: " + ((_a = this.sound) === null || _a === void 0 ? void 0 : _a.name));
+            this.synth = (0, InstrumentService_1.selectSound)(this.sound);
+        }
     }
     disconnect() {
         // TODO: remove event listener

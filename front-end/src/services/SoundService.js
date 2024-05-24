@@ -13,7 +13,8 @@ class SoundService {
                     id: sound.id,
                     name: sound.name,
                     location: sound.source,
-                    isFavorite: sound.isFavorite
+                    isFavorite: sound.isFavorite,
+                    urls: sound.urls
                 }));
                     return sounds;
             } else {
@@ -41,7 +42,8 @@ class SoundService {
                         id: sound.id,
                         name: sound.name,
                         location: sound.source,
-                        isFavorite: sound.isFavorite
+                        isFavorite: sound.isFavorite,
+                        urls: sound.urls
                     }));
 
                     for(let i = 0; i < sounds.length; i++) {

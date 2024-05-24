@@ -26,7 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.selectSound = void 0;
 const Tone = __importStar(require("tone"));
 const selectSound = (selectedSound) => {
-    switch (selectedSound.toLowerCase().replace(/\s+/g, '')) {
+    switch (selectedSound.name.toLowerCase().replace(/\s+/g, '')) {
         case 'synth':
             return new Tone.Synth().toDestination();
         case 'amsynth':
@@ -43,22 +43,46 @@ const selectSound = (selectedSound) => {
         case 'casiopiano':
             console.log('casio!!!');
             return new Tone.Sampler({
-                urls: {
-                    A1: "A1.mp3",
-                    A2: "A2.mp3",
-                },
-                baseUrl: "https://tonejs.github.io/audio/casio/"
+                urls: selectedSound.urls,
+                baseUrl: selectedSound.location
             }).toDestination();
         case 'salamander':
             break;
         case 'eeriepad':
-            break;
+            return new Tone.Sampler({
+                urls: {
+                    A3: "eerie_synth1.mp3",
+                    A4: "eerie_synth2.mp3",
+                    A5: "eerie_synth3.mp3"
+                },
+                baseUrl: "",
+            }).toDestination();
         case 'guitar':
-            break;
+            return new Tone.Sampler({
+                urls: {
+                    A3: "guitar_Astring.mp3",
+                    E2: "guitar_LowEstring1.mp3",
+                    G4: "guitar_Gstring.mp3"
+                },
+                baseUrl: "",
+            }).toDestination();
         case 'choir':
-            break;
+            return new Tone.Sampler({
+                urls: {
+                    A3: "femalevoices_aa2_A3.mp3",
+                    A4: "femalevoices_aa2_A4.mp3",
+                    A5: "femalevoices_aa2_A5.mp3"
+                },
+                baseUrl: "",
+            }).toDestination();
         case 'kalimba':
-            break;
+            return new Tone.Sampler({
+                urls: {
+                    Ab3: "Kalimba_1.mp3",
+                    Ab4: "Kalimba_3.mp3"
+                },
+                baseUrl: "",
+            }).toDestination();
         default:
             console.error('Unknown type of synthesizer. Could not build sound.');
             return null;

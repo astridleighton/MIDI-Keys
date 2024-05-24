@@ -14,7 +14,7 @@ const react_1 = require("react");
 const react_router_dom_1 = require("react-router-dom");
 const material_1 = require("@mui/material");
 require("./Register.scss");
-const Auth_1 = require("./Auth");
+const AuthService_1 = require("../services/AuthService");
 // import {toast, Toaster} from 'react-hot-toast';
 /**
  * Allows user to create an account
@@ -118,7 +118,7 @@ const Register = () => {
      * @param {*} registerCredentials
      */
     const processRegister = (registerCredentials) => __awaiter(void 0, void 0, void 0, function* () {
-        const result = yield (0, Auth_1.signUp)(registerCredentials);
+        const result = yield (0, AuthService_1.signUp)(registerCredentials);
         if (result.isSuccess) {
             // toast.success('Registration successful. Please log in with your current credentials.');
             navigate('/login');

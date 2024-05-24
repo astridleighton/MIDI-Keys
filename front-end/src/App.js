@@ -20,8 +20,8 @@ const Connect_1 = __importDefault(require("./pages/Connect"));
 const Play_1 = __importDefault(require("./pages/Play"));
 const Navbar_1 = __importDefault(require("./layouts/Navbar"));
 const About_1 = __importDefault(require("./pages/About"));
-const Login_1 = __importDefault(require("./authentication/Login"));
-const Register_1 = __importDefault(require("./authentication/Register"));
+const Login_1 = __importDefault(require("./pages/Login"));
+const Register_1 = __importDefault(require("./pages/Register"));
 const Footer_1 = __importDefault(require("./layouts/Footer"));
 const MidiContext_1 = require("./MidiContext");
 /**

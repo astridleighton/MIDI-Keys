@@ -221,14 +221,14 @@ app.get('/all-favorites', async (req, res) => {
         const username = await Security.getUserNameFromToken(token); // get username from token
         const usernameCheck = await db.findByUsername(username); // checks if username exists
 
-        if (usernameCheck && username.length > 0) {
+        if (!usernameCheck) {
             res.status(403).send("Invalid token or username not found.");
         } else {
             try {
                 const userID = await db.getIDFromUser(username);
                 const allFavorites = await db.getAllFavoritesFromUser(userID);
 
-                if(allFavorites) {
+                if(!allFavorites) {
                     return res.status(404).json({ error: 'No favorites found for the user.' });
                 } else {
                     res.status(200).json(allFavorites);

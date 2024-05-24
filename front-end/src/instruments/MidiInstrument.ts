@@ -1,52 +1,78 @@
 import * as Tone from 'tone';
+import { selectSound } from '../services/InstrumentService';
+import DrumService from '../services/DrumService';
+import { Sound } from '../types';
 
 /**
- * TODO: abstract all MIDI instrument and sample references here
- * Start with synth
- * setUpMIDIKeyboard(), midiToNote(), playSound()
- * move qwerty into different class (different event listeners)
- * may need to abstract samples further into separate class because both qwerty and tone use them
+ * TODO: ensure drums work
+ * TODO: test midi instrument
+ * TODO: ensure we keep track of notes played and pass back to play (I think)
  */
 
 export class MidiInstrument {
 
-    private midiAccess: WebMidi.MIDIAccess | null = null;
-    private midiInput: WebMidi.MIDIInput | null = null;
     private synth: Tone.Synth | null = null;
+    private drumService = new DrumService();
 
-    constructor(private instrumentName: string) {
-        this.initializeMidi();
+    constructor(private sound: Sound | null) {
         this.initializeTone();
-    }
-
-    private async initializeMidi() {
-        try {
-            const midiAccess = await navigator.requestMIDIAccess();
-            // midiAccess.addEventListener('midimessage', this.playNote);
-            // await listMIDIInputs(midiAccess);
-        } catch (error) {
-          console.error('MIDI Access failed: ', error);
-        }
+        this.initializeMidi(sound);
     }
 
     private initializeTone() {
-        // to destination
-        console.log("Setting up: " + this.instrumentName);
-        this.synth = new Tone.Synth().toDestination();
-
-        // TODO: select device
+        if(this.sound) {
+            console.log("Setting up: " + this.sound?.name);
+            this.synth = selectSound(this.sound);
+        }
     }
 
-    private playNote = (message: WebMidi.MIDIMessageEvent) => {
-        // TODO: determine which note to play
-        console.log("A note is being played but this method is not set up.");
-        const [command, note, velocity] = message.data;
 
-        if(command === 144 && velocity > 0) { // note on
-            this.synth?.triggerAttack(Tone.Frequency(note, "midi"));
-        } else if (command === 128 || (command === 144 && velocity === 0)) { // note off
-            this.synth?.triggerRelease(note);
+    private initializeMidi = async(connectedDevice) => {
+        console.log("Setting up MIDI keyboard.");
+
+        connectedDevice.onmidimessage = async (event) => {
+            event.preventDefault();
+            const [command, note, velocity] = event.data;
+
+            if(command === 144 && velocity > 0) { // note on
+                this.synth?.triggerAttack(Tone.Frequency(note, "midi"));
+
+                // TODO: add drums 
+                /* 
+                * switch (noteInput) {
+                                case 48:
+                                    drumService.createKickPlayer();
+                                    break;
+                                case 49:
+                                    drumService.createSnarePlayer();
+                                    break;
+                                case 50:
+                                    drumService.createTom1Player();
+                                    break;
+                                case 51:
+                                    drumService.createTom2Player();
+                                    break;
+                                case 44:
+                                    drumService.createTom3Player();
+                                    break;
+                                case 45:
+                                    drumService.createHiHatPlayer();
+                                    break;
+                                case 46:
+                                    drumService.createBongo1Player();
+                                    break;
+                                case 47:
+                                    drumService.createBongo2Player();
+                                    break;
+                                default:
+                                    break;
+                            }
+                */
+            } else if (command === 128 || (command === 144 && velocity === 0)) { // note off
+                this.synth?.triggerRelease(note);
+            }
         }
+        
     }
 
     public disconnect() {

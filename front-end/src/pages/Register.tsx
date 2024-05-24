@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Button, Box, TextField, Typography, Container, Alert } from '@mui/material';
 import './Register.scss';
-import { signUp } from './Auth';
+import { signUp } from '../services/AuthService';
 // import {toast, Toaster} from 'react-hot-toast';
 
 /**

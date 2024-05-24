@@ -46,13 +46,13 @@ const MidiContext_1 = require("../MidiContext");
 const MidiInstrument_1 = require("../instruments/MidiInstrument");
 const QwertyInstrument_1 = require("../instruments/QwertyInstrument");
 const SoundService_1 = __importDefault(require("../services/SoundService"));
-const DrumService_1 = __importDefault(require("../services/DrumService"));
 require("./Play.scss");
 /**
  * Initiates QWERTY and MIDI keyboard setup
  * Contains the Tone.JS instruments and database samples
  * Allows user to select between instruments
  * Displays notes played
+ * TODO: keep track of notes being played by qwerty and midi
  */
 const Play = () => {
     const midiContext = (0, react_1.useContext)(MidiContext_1.MidiContext);
@@ -63,26 +63,24 @@ const Play = () => {
     const [isLoading, setIsLoading] = (0, react_1.useState)(true);
     const [url, setURL] = (0, react_1.useState)(null);
     const [notesEnabled, setNotesEnabled] = (0, react_1.useState)(false);
-    const [selectedSound, setSelectedSound] = (0, react_1.useState)("synth");
+    const [selectedSound, setSelectedSound] = (0, react_1.useState)();
     const connectedDevice = midiContext === null || midiContext === void 0 ? void 0 : midiContext.connectedDevice;
     const soundService = new SoundService_1.default();
-    const drumService = new DrumService_1.default();
     /**
        * Starts tone.JS and sets up MIDI input devices
        */
     (0, react_1.useEffect)(() => {
-        if (selectedSound) {
-            const testInstrument = new MidiInstrument_1.MidiInstrument(selectedSound);
-        }
-        // const soundService = new SoundService();
         const initTone = () => __awaiter(void 0, void 0, void 0, function* () {
             try {
                 Tone.start();
-                yield Tone.setContext(new AudioContext({ sampleRate: 41000 })); // sets audio preferences
-                const qwertyInstrument = new QwertyInstrument_1.QwertyInstrument('casio piano');
                 yield initializeSounds();
-                const connectedDevice2 = yield connectMIDIInputDevice(connectedDevice);
-                yield setUpMIDIKeyboard(connectedDevice2);
+                if (selectedSound && connectedDevice) {
+                    const midiInstrument = new MidiInstrument_1.MidiInstrument(selectedSound);
+                    const qwertyInstrument = new QwertyInstrument_1.QwertyInstrument(selectedSound);
+                }
+                else {
+                    console.log("Missing some info.");
+                }
             }
             catch (error) {
                 console.error('Error setting up MIDI in your browser. Please reload and try again.', error);
@@ -103,138 +101,6 @@ const Play = () => {
         }
     });
     /**
-     * Creates an instance of the synth
-     * @returns instance
-     */
-    const createSynth = () => {
-        return new Tone.Synth().toDestination();
-    };
-    /**
-     * Creates an instance of the AM Synth
-     * @returns instance
-     */
-    const createAMSynth = () => {
-        return new Tone.AMSynth().toDestination();
-    };
-    /**
-     * Creates an instance of the mono synth
-     * @returns instance
-     */
-    const createMonoSynth = () => {
-        return new Tone.MonoSynth({
-            oscillator: {
-                type: "square"
-            },
-            envelope: {
-                attack: 0.1
-            }
-        }).toDestination();
-    };
-    /**
-     * Creates an instance of the sampler
-     * @param {*} note
-     */
-    const createSampler = (note) => {
-        const casio = new Tone.Sampler({
-            urls: {
-                A1: "A1.mp3",
-                A2: "A2.mp3",
-            },
-            baseUrl: "https://tonejs.github.io/audio/casio/",
-            onload: () => {
-                casio.triggerAttackRelease(note, 1);
-            }
-        }).toDestination();
-    };
-    /**
-     * Creates an instance of the choir sampler
-     * @param {*} note
-     * @param {*} url
-     */
-    const createChoirSampler = (note, url) => {
-        const sampler = new Tone.Sampler({
-            urls: {
-                A3: "femalevoices_aa2_A3.mp3",
-                A4: "femalevoices_aa2_A4.mp3",
-                A5: "femalevoices_aa2_A5.mp3"
-            },
-            baseUrl: url,
-            onload: () => {
-                sampler.triggerAttackRelease(note, 1);
-            }
-        }).toDestination();
-    };
-    /**
-     * Creates an instance of the eerie sampler
-     * @param {*} note
-     * @param {*} url
-     */
-    const createEerieSynthSampler = (note, url) => {
-        const sampler = new Tone.Sampler({
-            urls: {
-                A3: "eerie_synth1.mp3",
-                A4: "eerie_synth2.mp3",
-                A5: "eerie_synth3.mp3"
-            },
-            baseUrl: url,
-            onload: () => {
-                sampler.triggerAttackRelease(note, 1);
-            }
-        }).toDestination();
-    };
-    /**
-     * Creates an instance of the guitar sampler
-     * @param {*} note
-     * @param {*} url
-     */
-    const createGuitarSampler = (note, url) => {
-        const sampler = new Tone.Sampler({
-            urls: {
-                A3: "guitar_Astring.mp3",
-                E2: "guitar_LowEstring1.mp3",
-                G4: "guitar_Gstring.mp3"
-            },
-            baseUrl: url,
-            onload: () => {
-                sampler.triggerAttackRelease(note, 1);
-            }
-        }).toDestination();
-    };
-    /**
-     * Creates an instance of the kalimba sampler
-     * @param {*} note
-     * @param {*} url
-     */
-    const createKalimbaSampler = (note, url) => {
-        const sampler = new Tone.Sampler({
-            urls: {
-                Ab3: "Kalimba_1.mp3",
-                Ab4: "Kalimba_3.mp3"
-            },
-            baseUrl: url,
-            onload: () => {
-                sampler.triggerAttackRelease(note, 1);
-            }
-        }).toDestination();
-    };
-    /**
-     * Creates an instance of the online sampler (used for online URLs)
-     * @param {*} note
-     * @param {*} url
-     */
-    const createOnlineSampler = (note, url) => {
-        const sampler = new Tone.Sampler({
-            urls: {
-                A1: "A1.mp3",
-                A2: "A2.mp3",
-            },
-            baseUrl: url,
-            onload: () => {
-                sampler.triggerAttackRelease(note, 0.8);
-            }
-        }).toDestination();
-    };
-    /**
      * Ensures sounds are loaded before receiving favorite sounds
      */
     const initializeSounds = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -244,7 +110,8 @@ const Play = () => {
             const soundsData = yield soundService.getAllSounds();
             const token = js_cookie_1.default.get('token');
             if (isAuthenticated && soundsData) {
-                yield soundService.getAllFavorites(token, soundsData);
+                // await soundService.getAllFavorites(token, soundsData); // TODO: need to add this back
+                setSelectedSound(soundsData[0]); // TODO: remove, used for testing
             }
             setSoundObjects(soundsData);
         }
@@ -261,106 +128,6 @@ const Play = () => {
     const handleNotesToggle = () => {
         setNotesEnabled(!notesEnabled);
     };
-    /**
-     * Used to set up MIDI keyboard with note mappings, sounds, and MIDI events
-     * @param {*} midiKeyboard
-     */
-    const setUpMIDIKeyboard = (midiKeyboard) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log('Setting up MIDI keyboard');
-        midiKeyboard.onmidimessage = (event) => __awaiter(void 0, void 0, void 0, function* () {
-            event.preventDefault();
-            const command = event.data[0];
-            const noteInput = event.data[1];
-            const velocity = event.data[2];
-            const note = yield midiToNote(noteInput);
-            switch (command) {
-                case 144: // note on
-                    if (velocity > 0) {
-                        // determine if drums or keys
-                        if (noteInput >= 60) {
-                            yield addNote(note);
-                            yield playSound(note);
-                        }
-                        else {
-                            switch (noteInput) {
-                                case 48:
-                                    drumService.createKickPlayer();
-                                    break;
-                                case 49:
-                                    drumService.createSnarePlayer();
-                                    break;
-                                case 50:
-                                    drumService.createTom1Player();
-                                    break;
-                                case 51:
-                                    drumService.createTom2Player();
-                                    break;
-                                case 44:
-                                    drumService.createTom3Player();
-                                    break;
-                                case 45:
-                                    drumService.createHiHatPlayer();
-                                    break;
-                                case 46:
-                                    drumService.createBongo1Player();
-                                    break;
-                                case 47:
-                                    drumService.createBongo2Player();
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                    }
-                    break;
-                case 128: // note off
-                    yield removeNote(note);
-                    break;
-                default:
-                    break;
-            }
-        });
-    });
-    /**
-     * Chooses appropriate sample baesd on note
-     * @param {*} note
-     */
-    const playSound = (note) => __awaiter(void 0, void 0, void 0, function* () {
-        switch (selectedSound) {
-            case 'Synth':
-                const synth = yield createSynth();
-                synth.triggerAttackRelease(note, "4n");
-                break;
-            case 'AM Synth':
-                const amSynth = yield createAMSynth();
-                amSynth.triggerAttackRelease(note, "4n");
-                break;
-            case 'Mono Synth':
-                const monoSynth = yield createMonoSynth();
-                monoSynth.triggerAttackRelease(note, "4n");
-                break;
-            case 'Casio Piano':
-                yield createSampler(note);
-                break;
-            case 'Salamander':
-                yield createOnlineSampler(note, url);
-                break;
-            case 'Eerie Pad':
-                yield createEerieSynthSampler(note, url);
-                break;
-            case 'Guitar':
-                yield createGuitarSampler(note, url);
-                break;
-            case 'Choir':
-                yield createChoirSampler(note, url);
-                break;
-            case 'Kalimba':
-                yield createKalimbaSampler(note, url);
-                break;
-            default:
-                break;
-        }
-    });
     /*
     * Converts MIDI input (number value) to note value and octave
     * Example: #28 -> E1

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Box, TextField, Typography, Container, Alert } from '@mui/material';
 import './Login.scss';
 import { MidiContext } from '../MidiContext';
-import { signIn } from './Auth';
+import { signIn } from '../services/AuthService';
 
 // import {toast, Toaster} from 'react-hot-toast';
 

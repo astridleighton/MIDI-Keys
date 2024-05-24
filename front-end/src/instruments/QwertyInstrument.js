@@ -14,33 +14,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.QwertyInstrument = void 0;
 const audiokeys_1 = __importDefault(require("audiokeys"));
-const selectSound_1 = require("./selectSound");
-/**
- * TODO: abstract all MIDI instrument and sample references here
- * Start with synth
- * setUpMIDIKeyboard(), midiToNote(), playSound()
- * move qwerty into different class (different event listeners)
- * may need to abstract samples further into separate class because both qwerty and tone use them
- */
+const InstrumentService_1 = require("../services/InstrumentService");
 class QwertyInstrument {
-    constructor(instrumentName) {
-        this.instrumentName = instrumentName;
+    constructor(sound) {
+        this.sound = sound;
         // maps QWERTY to note values
         this.keyToNote = {
-            65: 'C4', // A
-            87: 'Db4', // W
-            83: 'D4', // S
-            69: 'Eb4', // E
-            68: 'E4', // D
-            70: 'F4', // F
-            84: 'Gb4', // T
-            71: 'G4', // G
-            89: 'Ab4', // Y
-            72: 'A4', // H
-            85: 'Bb4', // U
-            74: 'B4', // J
-            75: 'C5', // K
-            79: 'Db5' // O
+            65: 'C3', // A
+            87: 'Db3', // W
+            83: 'D3', // S
+            69: 'Eb3', // E
+            68: 'E3', // D
+            70: 'F3', // F
+            84: 'Gb3', // T
+            71: 'G3', // G
+            89: 'Ab3', // Y
+            72: 'A3', // H
+            85: 'Bb3', // U
+            74: 'B3', // J
+            75: 'C4', // K
+            79: 'Db4' // O
         };
         this.synth = null;
         this.keyboard = new audiokeys_1.default({ polyphony: 10 });
@@ -48,9 +41,10 @@ class QwertyInstrument {
         this.initializeQwerty();
     }
     initializeTone() {
-        if (this.instrumentName) {
-            console.log("Setting up: " + this.instrumentName);
-            this.synth = (0, selectSound_1.selectSound)(this.instrumentName);
+        var _a;
+        if ((_a = this.sound) === null || _a === void 0 ? void 0 : _a.name) {
+            console.log("Setting up: " + this.sound.name);
+            this.synth = (0, InstrumentService_1.selectSound)(this.sound);
         }
     }
     initializeQwerty() {
@@ -59,8 +53,6 @@ class QwertyInstrument {
                 var _a;
                 const note = this.keyToNote[e.keyCode];
                 if (note) {
-                    // TODO: ensure that other instruments may be selected
-                    // TODO: keep track of notes being played
                     (_a = this.synth) === null || _a === void 0 ? void 0 : _a.triggerAttackRelease(note, '4n');
                     console.log('Playing ' + note);
                 }

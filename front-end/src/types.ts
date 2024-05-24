@@ -3,4 +3,5 @@ export interface Sound {
     name: string;
     location: string;
     isFavorite: boolean;
+    urls: string;
 }

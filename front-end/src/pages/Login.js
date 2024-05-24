@@ -15,7 +15,7 @@ const react_router_dom_1 = require("react-router-dom");
 const material_1 = require("@mui/material");
 require("./Login.scss");
 const MidiContext_1 = require("../MidiContext");
-const Auth_1 = require("./Auth");
+const AuthService_1 = require("../services/AuthService");
 // import {toast, Toaster} from 'react-hot-toast';
 /**
  * Allows user to log in to account
@@ -74,7 +74,7 @@ const Login = () => {
      * @param {*} loginCredentials
      */
     const processLogin = (loginCredentials) => __awaiter(void 0, void 0, void 0, function* () {
-        const result = yield (0, Auth_1.signIn)(loginCredentials);
+        const result = yield (0, AuthService_1.signIn)(loginCredentials);
         if (result.isSuccess) {
             /* setFirstName(name);
             midiContext.setCurrentUser(name); */

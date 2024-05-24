@@ -203,14 +203,14 @@ app.get('/all-favorites', (req, res) => __awaiter(void 0, void 0, void 0, functi
         console.log("Token: " + token);
         const username = yield security_1.default.getUserNameFromToken(token); // get username from token
         const usernameCheck = yield db.findByUsername(username); // checks if username exists
-        if (usernameCheck && username.length > 0) {
+        if (!usernameCheck) {
             res.status(403).send("Invalid token or username not found.");
         }
         else {
             try {
                 const userID = yield db.getIDFromUser(username);
                 const allFavorites = yield db.getAllFavoritesFromUser(userID);
-                if (allFavorites) {
+                if (!allFavorites) {
                     return res.status(404).json({ error: 'No favorites found for the user.' });
                 }
                 else {

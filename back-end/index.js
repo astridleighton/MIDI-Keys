@@ -185,7 +185,7 @@ app.delete('/remove-favorite/:sound', (req, res) => __awaiter(void 0, void 0, vo
 /*
 * Gets all sounds
 */
-app.get('/all-sounds', (res) => __awaiter(void 0, void 0, void 0, function* () {
+app.get('/all-sounds', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const allSounds = yield db.getAllSounds();
         res.status(200).json(allSounds);

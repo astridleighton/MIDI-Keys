@@ -199,7 +199,7 @@ app.delete('/remove-favorite/:sound', async (req, res) => {
 /*
 * Gets all sounds
 */
-app.get('/all-sounds', async (res) => {
+app.get('/all-sounds', async (req, res) => {
     try {
         const allSounds = await db.getAllSounds();
         res.status(200).json(allSounds);

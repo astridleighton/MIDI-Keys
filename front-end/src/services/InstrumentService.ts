@@ -1,6 +1,8 @@
 import * as Tone from 'tone';
 import { Sound } from '../types';
 
+// TODO: ensure samples may be loaded properly
+
 export const selectSound = (selectedSound: Sound): any => {
 
         switch (selectedSound.name.toLowerCase().replace(/\s+/g, '')) {
@@ -39,5 +41,4 @@ const buildSampler = (sound) => {
         console.error('Could not build synthesizer.', err);
         return null;
     }
-    
 }

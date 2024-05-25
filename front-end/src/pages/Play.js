@@ -56,7 +56,8 @@ require("./Play.scss");
  */
 const Play = () => {
     const midiContext = (0, react_1.useContext)(MidiContext_1.MidiContext);
-    const isAuthenticated = !!js_cookie_1.default.get('token');
+    const token = js_cookie_1.default.get('token');
+    const isAuthenticated = !!token;
     const firstName = js_cookie_1.default.get('name');
     const [chordNotes, setChordNotes] = (0, react_1.useState)([]);
     const [isLoading, setIsLoading] = (0, react_1.useState)(true);
@@ -65,7 +66,7 @@ const Play = () => {
     const [selectedSound, setSelectedSound] = (0, react_1.useState)();
     const connectedDevice = midiContext === null || midiContext === void 0 ? void 0 : midiContext.connectedDevice;
     const soundService = new SoundService_1.default();
-    const [soundObjects, setSoundObjects] = (0, react_1.useState)(soundService.getAllSounds());
+    const [soundObjects, setSoundObjects] = (0, react_1.useState)();
     // Fetch sound objects once on component mount
     (0, react_1.useEffect)(() => {
         initializeSounds();
@@ -78,9 +79,6 @@ const Play = () => {
         const initTone = () => __awaiter(void 0, void 0, void 0, function* () {
             try {
                 Tone.start();
-                soundObjects === null || soundObjects === void 0 ? void 0 : soundObjects.forEach((sound) => {
-                    console.log('Sound:', sound.id);
-                });
                 if (selectedSound) { // TODO: fix this so it connects to connectedDevice
                     const midiInstrument = new MidiInstrument_1.MidiInstrument(selectedSound);
                     const qwertyInstrument = new QwertyInstrument_1.QwertyInstrument(selectedSound, addNote, removeNote);
@@ -115,7 +113,6 @@ const Play = () => {
         try {
             setIsLoading(true);
             const soundsData = yield soundService.getAllSounds();
-            const token = js_cookie_1.default.get('token');
             if (soundsData) {
                 if (isAuthenticated) {
                     yield soundService.getAllFavorites(token, soundsData);
@@ -166,54 +163,21 @@ const Play = () => {
         Selects instrument type based on user option
     */
     const handleSelectSound = (event) => {
+        console.log("In handleSelectSound()");
         const instrument = event.target.value;
-        let location;
+        // TODO: need to fix so this works correctly according to the database
         if (soundObjects) {
-            soundObjects.forEach((sound) => {
-                if (sound.name === instrument) {
-                    location = sound.location;
-                }
-            });
-        }
-        if ((location === "react" || location) && midiContext) {
-            if (instrument === 'Synth') {
-                midiContext.setSelectedSound(instrument);
-            }
-            else if (instrument === 'AM Synth') {
-                midiContext.setSelectedSound(instrument);
-            }
-            else if (instrument === 'Mono Synth') {
-                midiContext.setSelectedSound(instrument);
-            }
-            else if (instrument === 'Casio Piano') {
-                midiContext.setSelectedSound(instrument);
-            }
-            else if (instrument === 'Salamander') {
-                midiContext.setSelectedSound(instrument);
-                setURL(location);
-            }
-            else if (instrument === 'Choir') {
-                midiContext.setSelectedSound(instrument);
-                setURL(location);
-            }
-            else if (instrument === 'Eerie Pad') {
-                midiContext.setSelectedSound(instrument);
-                setURL(location);
-            }
-            else if (instrument === 'Guitar') {
-                midiContext.setSelectedSound(instrument);
-                setURL(location);
-            }
-            else if (instrument === 'Kalimba') {
-                midiContext.setSelectedSound(instrument);
-                setURL(location);
+            const foundSound = soundObjects.find(sound => sound.name === instrument);
+            if (foundSound) {
+                setSelectedSound(foundSound);
+                console.log('Selected Sound:', foundSound);
             }
             else {
-                console.log("Error! Could not set selected instrument.");
+                console.log(`Could not select ${instrument}.`);
             }
         }
-        else { // external sample
-            console.log('Error! Could not set selected instrument.');
+        else {
+            console.error("Could not change to selected sound since there are no sounds present.");
         }
     };
     /**
@@ -222,7 +186,6 @@ const Play = () => {
      * @param {*} soundName
      */
     const addFavorite = (soundName) => __awaiter(void 0, void 0, void 0, function* () {
-        const token = js_cookie_1.default.get('token');
         soundService.addFavorite(token, soundName, soundObjects);
     });
     /**
@@ -231,7 +194,6 @@ const Play = () => {
      * @param {*} soundName
      */
     const removeFavorite = (soundName) => __awaiter(void 0, void 0, void 0, function* () {
-        const token = js_cookie_1.default.get('token');
         soundService.removeFavorite(token, soundName, soundObjects);
     });
     // renders user session and displays available sounds and notes played

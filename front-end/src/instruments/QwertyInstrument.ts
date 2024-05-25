@@ -57,7 +57,6 @@ export class QwertyInstrument {
             const note = this.keyToNote[e.keyCode];
             if (note) {
                 // this.synth?.triggerRelease(note);
-                console.log('Stopped playing ' + note);
                 this.removeNoteCallback(note);
             }
         });

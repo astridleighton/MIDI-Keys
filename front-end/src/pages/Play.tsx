@@ -23,7 +23,8 @@ import './Play.scss'
 const Play = () =>
 {
     const midiContext = useContext(MidiContext);
-    const isAuthenticated = !!Cookies.get('token');
+    const token = Cookies.get('token');
+    const isAuthenticated = !!token;
     const firstName = Cookies.get('name');
     const [chordNotes, setChordNotes] = useState<string[] | null>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -32,8 +33,7 @@ const Play = () =>
     const [selectedSound, setSelectedSound] = useState<Sound | null>();
     const connectedDevice = midiContext?.connectedDevice;
     const soundService = new SoundService();
-
-    const [soundObjects, setSoundObjects] = useState<Sound[] | null>(soundService.getAllSounds());
+    const [soundObjects, setSoundObjects] = useState<Sound[] | null>();
 
     // Fetch sound objects once on component mount
     useEffect(() => {
@@ -48,9 +48,6 @@ const Play = () =>
         const initTone = async() => {
             try {
                 Tone.start();
-                soundObjects?.forEach((sound) => {
-                    console.log('Sound:', sound.id);
-                  });
 
                 if (selectedSound) { // TODO: fix this so it connects to connectedDevice
                     const midiInstrument = new MidiInstrument(selectedSound);
@@ -87,8 +84,6 @@ const Play = () =>
         try {
             setIsLoading(true);
             const soundsData: Sound[] | null = await soundService.getAllSounds();
-            const token = Cookies.get('token');
-
             if (soundsData) {
                 if (isAuthenticated) {
                     await soundService.getAllFavorites(token, soundsData);
@@ -140,46 +135,20 @@ const Play = () =>
         Selects instrument type based on user option
     */
     const handleSelectSound = (event) => {
+        console.log("In handleSelectSound()");
         const instrument = event.target.value;
-        let location;
 
-        if(soundObjects) {
-            soundObjects.forEach((sound) => {
-                if(sound.name === instrument) {
-                    location = sound.location;
-                }
-            })
-        }
-        
-        if ((location === "react" || location) && midiContext) {
-            if (instrument === 'Synth') {
-                midiContext.setSelectedSound(instrument);
-            } else if (instrument === 'AM Synth') {
-                midiContext.setSelectedSound(instrument);
-            } else if (instrument === 'Mono Synth') {
-                midiContext.setSelectedSound(instrument);
-            } else if (instrument === 'Casio Piano') {
-                midiContext.setSelectedSound(instrument);
-            } else if (instrument === 'Salamander') {
-                midiContext.setSelectedSound(instrument);
-                setURL(location);
-            } else if (instrument === 'Choir') {
-                midiContext.setSelectedSound(instrument);
-                setURL(location);
-            } else if (instrument === 'Eerie Pad') {
-                midiContext.setSelectedSound(instrument);
-                setURL(location);
-            }  else if (instrument === 'Guitar') {
-                midiContext.setSelectedSound(instrument);
-                setURL(location);
-            } else if (instrument === 'Kalimba') {
-                midiContext.setSelectedSound(instrument);
-                setURL(location);
+        // TODO: need to fix so this works correctly according to the database
+        if (soundObjects) {
+            const foundSound = soundObjects.find(sound => sound.name === instrument);
+            if (foundSound) {
+              setSelectedSound(foundSound);
+              console.log('Selected Sound:', foundSound);
             } else {
-                console.log("Error! Could not set selected instrument.");
+              console.log(`Could not select ${instrument}.`);
             }
-        } else { // external sample
-            console.log('Error! Could not set selected instrument.');
+        } else {
+            console.error("Could not change to selected sound since there are no sounds present.");
         }
     }
 
@@ -189,7 +158,6 @@ const Play = () =>
      * @param {*} soundName 
      */
     const addFavorite = async (soundName) => {
-        const token = Cookies.get('token');
         soundService.addFavorite(token, soundName, soundObjects);
     }
 
@@ -199,7 +167,6 @@ const Play = () =>
      * @param {*} soundName 
      */
     const removeFavorite = async (soundName) => {
-        const token = Cookies.get('token');
         soundService.removeFavorite(token, soundName, soundObjects);
     }
 

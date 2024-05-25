@@ -17,7 +17,7 @@ import './Play.scss'
  * Contains the Tone.JS instruments and database samples
  * Allows user to select between instruments
  * Displays notes played
- * TODO: keep track of notes being played by qwerty and midi
+ * TODO: render when new notes are being played to show visual (new useEffect?)
  */
 
 const Play = () =>
@@ -38,14 +38,23 @@ const Play = () =>
        * Starts tone.JS and sets up MIDI input devices
        */
     useEffect (() => {
+        console.log('in use effect');
         const initTone = async() => {
             try {
                 Tone.start();
                 await initializeSounds();
 
-                if (selectedSound && connectedDevice) {
-                    const midiInstrument = new MidiInstrument(selectedSound);
-                    const qwertyInstrument = new QwertyInstrument(selectedSound);
+                const testSound: Sound = { // TODO: replace with default sound
+                    id: '0',
+                    name: 'Synth',
+                    location: '',
+                    isFavorite: false,
+                    urls: ''
+                }
+
+                if (testSound) { // TODO: fix this so it connects to connectedDevice
+                    const midiInstrument = new MidiInstrument(testSound);
+                    const qwertyInstrument = new QwertyInstrument(testSound, addNote, removeNote);
                 } else {
                     console.log("Missing some info.");
                 }              
@@ -55,7 +64,7 @@ const Play = () =>
         }
 
         initTone();
-  }, []);
+  }, [selectedSound]);
 
   /**
    * Connects to MIDI device
@@ -75,17 +84,17 @@ const Play = () =>
        */
       const initializeSounds = async () => {
         console.log("Getting all sounds and favorites.");
-
         try {
             setIsLoading(true);
             const soundsData: Sound[] | null = await soundService.getAllSounds();
             const token = Cookies.get('token');
 
-            if (isAuthenticated && soundsData) {
-                // await soundService.getAllFavorites(token, soundsData); // TODO: need to add this back
-                setSelectedSound(soundsData[0]); // TODO: remove, used for testing
+            if (soundsData) {
+                if (isAuthenticated) {
+                    await soundService.getAllFavorites(token, soundsData);
+                }
+                setSoundObjects(soundsData);
             }
-            setSoundObjects(soundsData);
         } catch (err) {
             console.error(err);
         } finally {
@@ -101,23 +110,10 @@ const Play = () =>
       }
 
     /*
-    * Converts MIDI input (number value) to note value and octave
-    * Example: #28 -> E1
-    */
-    const midiToNote = async (midiInput) =>
-    {
-        const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
-        const octave = Math.floor(midiInput / 12) - 1;
-        const noteIndex = midiInput % 12;
-
-        const noteName = noteNames[noteIndex];
-        return noteName + octave;
-    }
-
-    /*
         Adds note to state array, checks for duplicates
     */
-    const addNote = async (newNote) => {
+    const addNote = async (newNote: string) => {
+        console.log('Adding note: ' + newNote);
         setChordNotes((previousChord) => {
             if(previousChord && !previousChord.includes(newNote)) {
                 return [...previousChord, newNote]
@@ -131,6 +127,7 @@ const Play = () =>
         Removes note from state array
     */
     const removeNote = async (oldNote) => {
+        console.log('Stopped playing ' + oldNote);
         const previousChord = chordNotes;
         if (previousChord) {
             const newChord = previousChord.filter((note) => note !== oldNote);

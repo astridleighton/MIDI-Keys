@@ -25,9 +25,14 @@ export class QwertyInstrument {
 
     private synth: Tone.Synth | null = null;
     private keyboard = new AudioKeys({ polyphony: 10 });
+    private addNoteCallback: (note: string) => void;
+    private removeNoteCallback: (note: string) => void;
 
-    constructor(private sound: Sound | null) {
+    constructor(private sound: Sound | null, playNoteCallback: (note: string) => void, removeNoteCallback: (note: string) => void) {
         this.initializeTone();
+        this.addNoteCallback = playNoteCallback;
+        this.removeNoteCallback = removeNoteCallback;
+
         this.initializeQwerty();
     }
 
@@ -42,8 +47,8 @@ export class QwertyInstrument {
         this.keyboard.down(async (e) => {
             const note = this.keyToNote[e.keyCode];
             if (note) {
+                this.addNoteCallback(note);
                 this.synth?.triggerAttackRelease(note, '4n');
-                console.log('Playing ' + note);
             }
 
         });
@@ -53,6 +58,7 @@ export class QwertyInstrument {
             if (note) {
                 // this.synth?.triggerRelease(note);
                 console.log('Stopped playing ' + note);
+                this.removeNoteCallback(note);
             }
         });
     }

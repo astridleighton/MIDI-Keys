@@ -94,6 +94,17 @@ class MidiInstrument {
                 }
             });
         });
+        /*
+        * Converts MIDI input (number value) to note value and octave
+        * Example: #28 -> E1
+        */
+        this.midiToNote = (midiInput) => __awaiter(this, void 0, void 0, function* () {
+            const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+            const octave = Math.floor(midiInput / 12) - 1;
+            const noteIndex = midiInput % 12;
+            const noteName = noteNames[noteIndex];
+            return noteName + octave;
+        });
         this.initializeTone();
         this.initializeMidi(sound);
     }

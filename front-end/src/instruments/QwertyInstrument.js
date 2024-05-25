@@ -16,7 +16,7 @@ exports.QwertyInstrument = void 0;
 const audiokeys_1 = __importDefault(require("audiokeys"));
 const InstrumentService_1 = require("../services/InstrumentService");
 class QwertyInstrument {
-    constructor(sound) {
+    constructor(sound, playNoteCallback, removeNoteCallback) {
         this.sound = sound;
         // maps QWERTY to note values
         this.keyToNote = {
@@ -38,6 +38,8 @@ class QwertyInstrument {
         this.synth = null;
         this.keyboard = new audiokeys_1.default({ polyphony: 10 });
         this.initializeTone();
+        this.addNoteCallback = playNoteCallback;
+        this.removeNoteCallback = removeNoteCallback;
         this.initializeQwerty();
     }
     initializeTone() {
@@ -53,8 +55,8 @@ class QwertyInstrument {
                 var _a;
                 const note = this.keyToNote[e.keyCode];
                 if (note) {
+                    this.addNoteCallback(note);
                     (_a = this.synth) === null || _a === void 0 ? void 0 : _a.triggerAttackRelease(note, '4n');
-                    console.log('Playing ' + note);
                 }
             }));
             this.keyboard.up((e) => __awaiter(this, void 0, void 0, function* () {
@@ -63,6 +65,7 @@ class QwertyInstrument {
                 if (note) {
                     // this.synth?.triggerRelease(note);
                     console.log('Stopped playing ' + note);
+                    this.removeNoteCallback(note);
                 }
             }));
         });

@@ -75,6 +75,20 @@ export class MidiInstrument {
         
     }
 
+    /*
+    * Converts MIDI input (number value) to note value and octave
+    * Example: #28 -> E1
+    */
+    private midiToNote = async (midiInput) =>
+        {
+            const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+            const octave = Math.floor(midiInput / 12) - 1;
+            const noteIndex = midiInput % 12;
+    
+            const noteName = noteNames[noteIndex];
+            return noteName + octave;
+        }
+
     public disconnect() {
         // TODO: remove event listener
     }

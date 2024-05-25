@@ -9,6 +9,7 @@ class SoundService {
         try {
             const result = await axios.get('http://localhost:3000/all-sounds');
             if (result.status === 200) {
+                console.log('Sounds result data: ' + JSON.stringify(result.data, null, 2));
                 const sounds/*: Sound[]*/ = result.data.map(sound => ({
                     id: sound.id,
                     name: sound.name,

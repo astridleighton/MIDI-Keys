@@ -17,51 +17,27 @@ export const selectSound = (selectedSound: Sound): any => {
                         attack: 0.1
                     }
                 }).toDestination();
-            case 'casiopiano':
-                console.log('casio!!!');
-                return new Tone.Sampler({
-                    urls: selectedSound.urls,
-                    baseUrl: selectedSound.location
-                }).toDestination();
-            case 'salamander':
-                break;
-            case 'eeriepad':
-                return new Tone.Sampler({
-                    urls: {
-                    A3: "eerie_synth1.mp3",
-                    A4: "eerie_synth2.mp3",
-                    A5: "eerie_synth3.mp3"
-                },
-                    baseUrl: "",
-                }).toDestination();
-            case 'guitar':
-                return new Tone.Sampler({
-                    urls: {
-                    A3: "guitar_Astring.mp3",
-                    E2: "guitar_LowEstring1.mp3",
-                    G4: "guitar_Gstring.mp3"
-                },
-                    baseUrl: "",
-                }).toDestination();
-            case 'choir':
-                return new Tone.Sampler({
-                    urls: {
-                        A3: "femalevoices_aa2_A3.mp3",
-                        A4: "femalevoices_aa2_A4.mp3",
-                        A5: "femalevoices_aa2_A5.mp3"
-            },
-	            baseUrl: "",
-                }).toDestination();
-            case 'kalimba':
-                return new Tone.Sampler({
-                    urls: {
-                    Ab3: "Kalimba_1.mp3",
-                    Ab4: "Kalimba_3.mp3"
-                },
-                    baseUrl: "",
-                }).toDestination();
             default:
-                console.error('Unknown type of synthesizer. Could not build sound.');
-                return null;
+                if (selectedSound.location && selectedSound.urls) {
+                    // try to build sample from base url and sample urls
+                    return buildSampler(selectedSound); 
+                } else {
+                    console.error("Not enough information to build synthesizer. Please choose another synth.");
+                    break;
+                }
         }
+}
+
+const buildSampler = (sound) => {
+    try {
+        const sampler = new Tone.Sampler({
+            urls: sound.urls,
+            baseUrl: sound.location
+        }).toDestination();
+        return sampler;
+    } catch (err: any) {
+        console.error('Could not build synthesizer.', err);
+        return null;
+    }
+    
 }

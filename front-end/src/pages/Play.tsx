@@ -17,7 +17,7 @@ import './Play.scss'
  * Contains the Tone.JS instruments and database samples
  * Allows user to select between instruments
  * Displays notes played
- * TODO: render when new notes are being played to show visual (new useEffect?)
+ * TODO: ensure a device can be connected to
  */
 
 const Play = () =>
@@ -26,13 +26,19 @@ const Play = () =>
     const isAuthenticated = !!Cookies.get('token');
     const firstName = Cookies.get('name');
     const [chordNotes, setChordNotes] = useState<string[] | null>([]);
-    const [soundObjects, setSoundObjects] = useState<Sound[] | null>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [url, setURL] = useState<string | null>(null);
     const [notesEnabled, setNotesEnabled] = useState<boolean>(false);
     const [selectedSound, setSelectedSound] = useState<Sound | null>();
     const connectedDevice = midiContext?.connectedDevice;
     const soundService = new SoundService();
+
+    const [soundObjects, setSoundObjects] = useState<Sound[] | null>(soundService.getAllSounds());
+
+    // Fetch sound objects once on component mount
+    useEffect(() => {
+        initializeSounds();
+    }, []);
 
     /**
        * Starts tone.JS and sets up MIDI input devices
@@ -42,21 +48,15 @@ const Play = () =>
         const initTone = async() => {
             try {
                 Tone.start();
-                await initializeSounds();
+                soundObjects?.forEach((sound) => {
+                    console.log('Sound:', sound.id);
+                  });
 
-                const testSound: Sound = { // TODO: replace with default sound
-                    id: '0',
-                    name: 'Synth',
-                    location: '',
-                    isFavorite: false,
-                    urls: ''
-                }
-
-                if (testSound) { // TODO: fix this so it connects to connectedDevice
-                    const midiInstrument = new MidiInstrument(testSound);
-                    const qwertyInstrument = new QwertyInstrument(testSound, addNote, removeNote);
+                if (selectedSound) { // TODO: fix this so it connects to connectedDevice
+                    const midiInstrument = new MidiInstrument(selectedSound);
+                    const qwertyInstrument = new QwertyInstrument(selectedSound, addNote, removeNote);
                 } else {
-                    console.log("Missing some info.");
+                    console.log("Could not set up instruments because no sound is selected. Please select a sound.");
                 }              
             } catch (error) {
                 console.error('Error setting up MIDI in your browser. Please reload and try again.', error);
@@ -94,6 +94,7 @@ const Play = () =>
                     await soundService.getAllFavorites(token, soundsData);
                 }
                 setSoundObjects(soundsData);
+                setSelectedSound(soundsData[0]);
             }
         } catch (err) {
             console.error(err);
@@ -139,7 +140,6 @@ const Play = () =>
         Selects instrument type based on user option
     */
     const handleSelectSound = (event) => {
-
         const instrument = event.target.value;
         let location;
 

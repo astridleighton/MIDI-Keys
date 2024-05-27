@@ -6,7 +6,6 @@ import { Sound } from '../types';
 /**
  * TODO: ensure drums work
  * TODO: test midi instrument
- * TODO: ensure we keep track of notes played and pass back to play (I think)
  */
 
 export class MidiInstrument {

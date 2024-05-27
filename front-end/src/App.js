@@ -23,6 +23,7 @@ const About_1 = __importDefault(require("./pages/About"));
 const Login_1 = __importDefault(require("./pages/Login"));
 const Register_1 = __importDefault(require("./pages/Register"));
 const Footer_1 = __importDefault(require("./layouts/Footer"));
+const react_hot_toast_1 = require("react-hot-toast");
 const MidiContext_1 = require("./MidiContext");
 /**
  * Main component used to handle Tone.js, MIDI device connections, and routing
@@ -110,6 +111,6 @@ const App = () => {
         // Tone.Transport.set({ midi: null });
     };
     // returns routes and basic view
-    return ((0, jsx_runtime_1.jsxs)("div", { className: "app-container d-flex flex-column", style: { backgroundColor: '#f8f8f8', marginTop: '60px' }, children: [(0, jsx_runtime_1.jsxs)(react_router_dom_1.BrowserRouter, { children: [(0, jsx_runtime_1.jsx)(Navbar_1.default, {}), (0, jsx_runtime_1.jsxs)(react_router_dom_1.Routes, { children: [(0, jsx_runtime_1.jsx)(react_router_dom_1.Route, { path: "/", element: (0, jsx_runtime_1.jsx)(Play_1.default, {}) }), (0, jsx_runtime_1.jsx)(react_router_dom_1.Route, { path: "/connect", element: (0, jsx_runtime_1.jsx)(Connect_1.default, { updateConnectedDevice: updateConnectedDevice, midiInputDevices: inputDevices }) }), (0, jsx_runtime_1.jsx)(react_router_dom_1.Route, { path: "/about", element: (0, jsx_runtime_1.jsx)(About_1.default, {}) }), (0, jsx_runtime_1.jsx)(react_router_dom_1.Route, { path: "/login", element: (0, jsx_runtime_1.jsx)(Login_1.default, {}) }), (0, jsx_runtime_1.jsx)(react_router_dom_1.Route, { path: "/register", element: (0, jsx_runtime_1.jsx)(Register_1.default, {}) })] })] }), (0, jsx_runtime_1.jsx)("div", { className: "fixed-bottom", children: (0, jsx_runtime_1.jsx)(Footer_1.default, { removeConnectedDevice: removeConnectedDevice }) })] }));
+    return ((0, jsx_runtime_1.jsxs)("div", { className: "app-container d-flex flex-column", style: { backgroundColor: '#f8f8f8', marginTop: '60px' }, children: [(0, jsx_runtime_1.jsx)(react_hot_toast_1.Toaster, { position: "top-center" }), (0, jsx_runtime_1.jsxs)(react_router_dom_1.BrowserRouter, { children: [(0, jsx_runtime_1.jsx)(Navbar_1.default, {}), (0, jsx_runtime_1.jsxs)(react_router_dom_1.Routes, { children: [(0, jsx_runtime_1.jsx)(react_router_dom_1.Route, { path: "/", element: (0, jsx_runtime_1.jsx)(Play_1.default, {}) }), (0, jsx_runtime_1.jsx)(react_router_dom_1.Route, { path: "/connect", element: (0, jsx_runtime_1.jsx)(Connect_1.default, { updateConnectedDevice: updateConnectedDevice, midiInputDevices: inputDevices }) }), (0, jsx_runtime_1.jsx)(react_router_dom_1.Route, { path: "/about", element: (0, jsx_runtime_1.jsx)(About_1.default, {}) }), (0, jsx_runtime_1.jsx)(react_router_dom_1.Route, { path: "/login", element: (0, jsx_runtime_1.jsx)(Login_1.default, {}) }), (0, jsx_runtime_1.jsx)(react_router_dom_1.Route, { path: "/register", element: (0, jsx_runtime_1.jsx)(Register_1.default, {}) })] })] }), (0, jsx_runtime_1.jsx)("div", { className: "fixed-bottom", children: (0, jsx_runtime_1.jsx)(Footer_1.default, { removeConnectedDevice: removeConnectedDevice }) })] }));
 };
 exports.default = App;

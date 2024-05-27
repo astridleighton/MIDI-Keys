@@ -60,9 +60,9 @@ class QwertyInstrument {
                 }
             }));
             this.keyboard.up((e) => __awaiter(this, void 0, void 0, function* () {
-                // TODO: fix so synth stops when user stops playing note
                 const note = this.keyToNote[e.keyCode];
                 if (note) {
+                    // TODO: fix so synth stops when user stops playing note
                     // this.synth?.triggerRelease(note);
                     this.removeNoteCallback(note);
                 }

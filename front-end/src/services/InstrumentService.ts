@@ -19,6 +19,20 @@ export const selectSound = (selectedSound: Sound): any => {
                         attack: 0.1
                     }
                 }).toDestination();
+            case 'duosynth':
+                return new Tone.DuoSynth().toDestination();
+            case 'fmsynth':
+                return new Tone.FMSynth().toDestination();
+            case 'membranesynth':
+                return new Tone.MembraneSynth().toDestination();
+            case 'metalsynth':
+                return new Tone.MetalSynth().toDestination();
+            case 'noisesynth':
+                return new Tone.NoiseSynth().toDestination();
+            case 'plucksynth':
+                return new Tone.PluckSynth().toDestination();
+            case 'polysynth':
+                return new Tone.PolySynth().toDestination(); // TODO: may need to change output to more notes at once
             default:
                 if (selectedSound.location && selectedSound.urls) {
                     // try to build sample from base url and sample urls

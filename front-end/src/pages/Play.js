@@ -41,7 +41,7 @@ const Tone = __importStar(require("tone"));
 const js_cookie_1 = __importDefault(require("js-cookie"));
 const material_1 = require("@mui/material");
 const Star_1 = __importDefault(require("@mui/icons-material/Star"));
-const Piano_1 = __importDefault(require("./Piano"));
+const Piano_1 = __importDefault(require("../layouts/Piano"));
 const MidiContext_1 = require("../MidiContext");
 const MidiInstrument_1 = require("../instruments/MidiInstrument");
 const QwertyInstrument_1 = require("../instruments/QwertyInstrument");
@@ -61,14 +61,15 @@ const Play = () => {
     const firstName = js_cookie_1.default.get('name');
     const [chordNotes, setChordNotes] = (0, react_1.useState)([]);
     const [isLoading, setIsLoading] = (0, react_1.useState)(true);
-    const [url, setURL] = (0, react_1.useState)(null);
     const [notesEnabled, setNotesEnabled] = (0, react_1.useState)(false);
     const [selectedSound, setSelectedSound] = (0, react_1.useState)();
+    const [selectedSoundName, setSelectedSoundName] = (0, react_1.useState)('Synth'); // TODO: look into this further
     const connectedDevice = midiContext === null || midiContext === void 0 ? void 0 : midiContext.connectedDevice;
     const soundService = new SoundService_1.default();
     const [soundObjects, setSoundObjects] = (0, react_1.useState)();
     // Fetch sound objects once on component mount
     (0, react_1.useEffect)(() => {
+        connectMIDIInputDevice(connectedDevice);
         initializeSounds();
     }, []);
     /**
@@ -79,7 +80,7 @@ const Play = () => {
         const initTone = () => __awaiter(void 0, void 0, void 0, function* () {
             try {
                 Tone.start();
-                if (selectedSound) { // TODO: fix this so it connects to connectedDevice
+                if (selectedSound) { // TODO: fix this so it connects to connectedDevice?
                     const midiInstrument = new MidiInstrument_1.MidiInstrument(selectedSound);
                     const qwertyInstrument = new QwertyInstrument_1.QwertyInstrument(selectedSound, addNote, removeNote);
                 }
@@ -101,9 +102,7 @@ const Play = () => {
         const midiAccess = yield navigator.requestMIDIAccess();
         const inputs = Array.from(midiAccess.inputs.values());
         const device = inputs.find(input => input.name === deviceName);
-        if (device) {
-            return device;
-        }
+        // TODO: ensure this connects to device
     });
     /**
      * Ensures sounds are loaded before receiving favorite sounds
@@ -134,9 +133,9 @@ const Play = () => {
     const handleNotesToggle = () => {
         setNotesEnabled(!notesEnabled);
     };
-    /*
-        Adds note to state array, checks for duplicates
-    */
+    /**
+     * Adds note to state array, checks for duplicates
+     */
     const addNote = (newNote) => __awaiter(void 0, void 0, void 0, function* () {
         console.log('Adding note: ' + newNote);
         setChordNotes((previousChord) => {
@@ -148,9 +147,9 @@ const Play = () => {
             }
         });
     });
-    /*
-        Removes note from state array
-    */
+    /**
+     * Removes note from state array, checks for duplicates
+     */
     const removeNote = (oldNote) => __awaiter(void 0, void 0, void 0, function* () {
         console.log('Stopped playing ' + oldNote);
         const previousChord = chordNotes;
@@ -159,16 +158,16 @@ const Play = () => {
             setChordNotes(newChord);
         }
     });
-    /*
-        Selects instrument type based on user option
-    */
+    /**
+     * Selects instrument type based on user option
+     */
     const handleSelectSound = (event) => {
         console.log("In handleSelectSound()");
         const instrument = event.target.value;
-        // TODO: need to fix so this works correctly according to the database
         if (soundObjects) {
             const foundSound = soundObjects.find(sound => sound.name === instrument);
             if (foundSound) {
+                setSelectedSoundName(foundSound.name);
                 setSelectedSound(foundSound);
                 console.log('Selected Sound:', foundSound);
             }
@@ -197,7 +196,7 @@ const Play = () => {
         soundService.removeFavorite(token, soundName, soundObjects);
     });
     // renders user session and displays available sounds and notes played
-    return ((0, jsx_runtime_1.jsxs)("div", { className: "play-container", children: [(0, jsx_runtime_1.jsx)("div", { className: "play-container play-header", children: isAuthenticated ? ((0, jsx_runtime_1.jsx)("div", { children: (0, jsx_runtime_1.jsxs)("h1", { children: ["Welcome,\u00A0", firstName, "!"] }) })) : ((0, jsx_runtime_1.jsx)("div", { children: (0, jsx_runtime_1.jsx)("h1", { children: "MIDI Made Simple." }) })) }), (0, jsx_runtime_1.jsx)("div", { className: "play-container play-content", children: isLoading ? ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)("p", { children: "Could not load sounds from database. Please refresh to try again." }), (0, jsx_runtime_1.jsx)(material_1.CircularProgress, {})] })) : ((0, jsx_runtime_1.jsx)("div", { children: (0, jsx_runtime_1.jsxs)(material_1.FormControl, { variant: "standard", sx: { m: 1, minWidth: 120 }, children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, { id: "select-sound-label", sx: { color: 'white', fontSize: '20px' }, children: "Selected Sound" }), (0, jsx_runtime_1.jsx)(material_1.Select, { sx: { marginTop: '35px', width: '250px', height: '50px', color: 'white' }, labelId: "select-sound-label", value: selectedSound, onChange: (event) => handleSelectSound(event), label: "Sound", children: soundObjects && soundObjects.map((sound, index) => ((0, jsx_runtime_1.jsxs)(material_1.MenuItem, { value: sound.name, children: [sound.name, isAuthenticated && ((0, jsx_runtime_1.jsx)(jsx_runtime_1.Fragment, { children: sound.isFavorite ?
+    return ((0, jsx_runtime_1.jsxs)("div", { className: "play-container", children: [(0, jsx_runtime_1.jsx)("div", { className: "play-container play-header", children: isAuthenticated ? ((0, jsx_runtime_1.jsx)("div", { children: (0, jsx_runtime_1.jsxs)("h1", { children: ["Welcome,\u00A0", firstName, "!"] }) })) : ((0, jsx_runtime_1.jsx)("div", { children: (0, jsx_runtime_1.jsx)("h1", { children: "MIDI Made Simple." }) })) }), (0, jsx_runtime_1.jsx)("div", { className: "play-container play-content", children: isLoading ? ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)("p", { children: "Could not load sounds from database. Please refresh to try again." }), (0, jsx_runtime_1.jsx)(material_1.CircularProgress, {})] })) : ((0, jsx_runtime_1.jsx)("div", { children: (0, jsx_runtime_1.jsxs)(material_1.FormControl, { variant: "standard", sx: { m: 1, minWidth: 120 }, children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, { id: "select-sound-label", sx: { color: 'white', fontSize: '20px' }, children: "Selected Sound" }), (0, jsx_runtime_1.jsx)(material_1.Select, { sx: { marginTop: '35px', width: '250px', height: '50px', color: 'white' }, labelId: "select-sound-label", value: selectedSoundName, onChange: (event) => handleSelectSound(event), label: "Sound", children: soundObjects && soundObjects.map((sound, index) => ((0, jsx_runtime_1.jsxs)(material_1.MenuItem, { value: sound.name, children: [sound.name, isAuthenticated && ((0, jsx_runtime_1.jsx)(jsx_runtime_1.Fragment, { children: sound.isFavorite ?
                                                 (0, jsx_runtime_1.jsx)(material_1.IconButton, { style: { color: 'white' }, onClick: () => removeFavorite(sound.name), children: (0, jsx_runtime_1.jsx)(Star_1.default, { style: { color: 'yellow' } }) })
                                                 :
                                                     (0, jsx_runtime_1.jsx)(material_1.IconButton, { style: { color: 'white' }, onClick: () => addFavorite(sound.name), children: (0, jsx_runtime_1.jsx)(Star_1.default, { style: { color: 'primary' } }) }) }))] }, index))) })] }) })) }), (0, jsx_runtime_1.jsx)(Piano_1.default, { notes: chordNotes }), (0, jsx_runtime_1.jsx)("div", { className: "chord-container", children: (0, jsx_runtime_1.jsx)(material_1.FormGroup, { children: (0, jsx_runtime_1.jsxs)("div", { className: "display-notes-container", children: [(0, jsx_runtime_1.jsx)(material_1.FormControlLabel, { control: (0, jsx_runtime_1.jsx)(material_1.Switch, {}), label: "Notes:", onChange: handleNotesToggle }), (0, jsx_runtime_1.jsx)("div", { className: "note-content", children: notesEnabled && ((0, jsx_runtime_1.jsx)(jsx_runtime_1.Fragment, { children: chordNotes === null || chordNotes === void 0 ? void 0 : chordNotes.map((note) => ((0, jsx_runtime_1.jsxs)("p", { className: "d-inline", children: [note, "\u00A0"] }))) })) })] }) }) })] }));

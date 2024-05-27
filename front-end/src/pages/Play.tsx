@@ -3,7 +3,7 @@ import * as Tone from 'tone';
 import Cookies from 'js-cookie';
 import { List, FormControl, FormLabel, RadioGroup, InputLabel, Box, Alert, FormControlLabel, Switch, FormGroup, CircularProgress, Select, MenuItem, Menu, IconButton } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
-import Piano from './Piano';
+import Piano from '../layouts/Piano';
 import { MidiContext } from '../MidiContext';
 import { MidiInstrument } from '../instruments/MidiInstrument';
 import { QwertyInstrument } from '../instruments/QwertyInstrument';
@@ -18,6 +18,7 @@ import './Play.scss'
  * Allows user to select between instruments
  * Displays notes played
  * TODO: ensure a device can be connected to
+ * TODO: add cleanup methods for dismounts
  */
 
 const Play = () =>
@@ -28,15 +29,16 @@ const Play = () =>
     const firstName = Cookies.get('name');
     const [chordNotes, setChordNotes] = useState<string[] | null>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [url, setURL] = useState<string | null>(null);
     const [notesEnabled, setNotesEnabled] = useState<boolean>(false);
-    const [selectedSound, setSelectedSound] = useState<Sound | null>();
+    const [selectedSound, setSelectedSound] = useState<Sound | null>()
+    const [selectedSoundName, setSelectedSoundName] = useState<string>('Synth'); // TODO: look into this further
     const connectedDevice = midiContext?.connectedDevice;
     const soundService = new SoundService();
     const [soundObjects, setSoundObjects] = useState<Sound[] | null>();
 
     // Fetch sound objects once on component mount
     useEffect(() => {
+        connectMIDIInputDevice(connectedDevice);
         initializeSounds();
     }, []);
 
@@ -49,7 +51,7 @@ const Play = () =>
             try {
                 Tone.start();
 
-                if (selectedSound) { // TODO: fix this so it connects to connectedDevice
+                if (selectedSound) { // TODO: fix this so it connects to connectedDevice?
                     const midiInstrument = new MidiInstrument(selectedSound);
                     const qwertyInstrument = new QwertyInstrument(selectedSound, addNote, removeNote);
                 } else {
@@ -71,9 +73,7 @@ const Play = () =>
         const midiAccess = await navigator.requestMIDIAccess();
         const inputs = Array.from(midiAccess.inputs.values());
         const device = inputs.find(input => input.name === deviceName);
-        if (device) {
-          return device;
-        }
+        // TODO: ensure this connects to device
     }
 
       /**
@@ -105,9 +105,9 @@ const Play = () =>
         setNotesEnabled(!notesEnabled);
       }
 
-    /*
-        Adds note to state array, checks for duplicates
-    */
+    /**
+     * Adds note to state array, checks for duplicates
+     */
     const addNote = async (newNote: string) => {
         console.log('Adding note: ' + newNote);
         setChordNotes((previousChord) => {
@@ -119,9 +119,9 @@ const Play = () =>
         })        
     }
 
-    /*
-        Removes note from state array
-    */
+    /**
+     * Removes note from state array, checks for duplicates
+     */
     const removeNote = async (oldNote) => {
         console.log('Stopped playing ' + oldNote);
         const previousChord = chordNotes;
@@ -131,19 +131,20 @@ const Play = () =>
         }
     }
 
-    /*
-        Selects instrument type based on user option
-    */
+    /**
+     * Selects instrument type based on user option
+     */
+
     const handleSelectSound = (event) => {
         console.log("In handleSelectSound()");
         const instrument = event.target.value;
 
-        // TODO: need to fix so this works correctly according to the database
         if (soundObjects) {
             const foundSound = soundObjects.find(sound => sound.name === instrument);
             if (foundSound) {
-              setSelectedSound(foundSound);
-              console.log('Selected Sound:', foundSound);
+                setSelectedSoundName(foundSound.name);
+                setSelectedSound(foundSound);
+                console.log('Selected Sound:', foundSound);
             } else {
               console.log(`Could not select ${instrument}.`);
             }
@@ -197,7 +198,7 @@ const Play = () =>
                         <Select
                             sx={{marginTop: '35px', width: '250px', height: '50px', color: 'white'}}
                             labelId="select-sound-label"
-                            value={selectedSound}
+                            value={selectedSoundName}
                             onChange={(event) => handleSelectSound(event)}
                             label="Sound"
                             >

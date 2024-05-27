@@ -4,7 +4,6 @@ import './App.css';
 import Connect from './pages/Connect';
 import Play from './pages/Play';
 import Navbar from './layouts/Navbar';
-import * as Tone from 'tone';
 import About from './pages/About';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -13,6 +12,7 @@ import {toast, Toaster} from 'react-hot-toast';
 import { MidiContext } from './MidiContext';
 
 /** TODO: create input object type, fix connected device in play, maybe pass connected device as a prop so not everything has access to the midi context? */
+// TODO: fix toaster
 
 type midiInput = {
 

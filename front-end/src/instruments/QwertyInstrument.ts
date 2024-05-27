@@ -53,9 +53,9 @@ export class QwertyInstrument {
 
         });
         this.keyboard.up(async(e) => {
-            // TODO: fix so synth stops when user stops playing note
             const note = this.keyToNote[e.keyCode];
             if (note) {
+                // TODO: fix so synth stops when user stops playing note
                 // this.synth?.triggerRelease(note);
                 this.removeNoteCallback(note);
             }

@@ -1,20 +1,27 @@
 # Project Status
 
-Complete as of April 2024 - will receive additional updates in the future
+Current Version: 1.1 (released May 2024)
 
+# Base Features (Version 1.0, released April 2024)
 - React front-end to display the visual elements of the website and allow site navigation
 - Express back-end to contain all login, registration, and favorite functionality
 - SQL database to hold user information, sound data, and saved sounds
 - Playback functionality from V49 MIDI device and QWERTY keyboard using a few sound samples
 - JWT token authentication and session functionality
 - Sleek user interface using Material UI and Sass
-- Allow user to select between different MIDI devices
-- Additional error handling
+- MIDI device selection
+- Authentication and MIDI device error handling
 - On-screen keyboard
 
+# Updated Features (Version 1.1)
+- Implemented TypeScript
+- Created a service-oriented architecture (SOA)
+- Fixed Tone.js timing issue
+
 # Out of Scope (Future Implementations)
-- Deploy to cloud (AWS or Azure)
+- Cloud deployment
 - Dockerize
-- Implement audio recording functionality
-- Add sheet music display
-- Implement chord display functionality
+- Audio recording functionality
+- Sheet music display
+- Chord display
+- Dynamic note lengths

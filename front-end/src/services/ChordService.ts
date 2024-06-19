@@ -26,35 +26,62 @@ export const findChord = (notes: string[] | null): string => {
     const root = notesInSemitones[0];
     console.log('Root: ' + root);
     let intervalVals: number[] = [];
+    let chordType: string = "";
 
     // get interval
     if (sortedNotes.length >= 3) {
-        // triad chords
         const interval1 = sortedNotes[1] - sortedNotes[0];
         const interval2 = sortedNotes[2] - sortedNotes[1];
-        intervalVals = [interval1, interval2];
+
+        // works for 3 or 4-note chords
+        if (sortedNotes.length === 3) {
+            intervalVals = [interval1, interval2];
+        } else if (sortedNotes.length === 4) {
+            const interval3 = sortedNotes[3] - sortedNotes[2];
+            intervalVals = [interval1, interval2, interval3];
+        }
     }
     
     // determine interval name
     if (intervalVals.length === 2) {
         if (intervalVals[0] === 4 && intervalVals[1] === 3) {
-            console.log('maj');
+            chordType = "maj";
         } else if (intervalVals[0] === 3 && intervalVals[1] === 3) {
-            console.log('min');
+            chordType = "min";
         } else if (intervalVals[0] === 3 && intervalVals[1] === 2) {
-            console.log('dim');
+            chordType = "dim";
         } else if (intervalVals[0] === 4 && intervalVals[1] === 4) {
-            console.log('aug');
+            chordType = "aug";
         } else if (intervalVals[0] === 5 && intervalVals[1] === 2) {
-            console.log('sus4');
+            chordType = "sus4";
         } else if (intervalVals[0] === 2 && intervalVals[1] === 5) {
-            console.log('sus2');
+            chordType = "sus2";
         } else if (intervalVals[0] === 3 && intervalVals[1] === 5) {
-            console.log('minMaj');
+            chordType = "minMaj";
         } else {
             console.log('Unknown triad chord')
         }
+    } else if (intervalVals.length === 3) {
+        if (intervalVals[0] === 4 && intervalVals[1] === 3 && intervalVals[2] === 2) {
+            chordType = "maj6";
+        } else if (intervalVals[0] === 3 && intervalVals[1] === 4 && intervalVals[2] === 2) {
+            chordType = "min6";
+        } else if (intervalVals[0] === 3 && intervalVals[1] === 4 && intervalVals[2] === 3) {
+            chordType = "min7";
+        } else if (intervalVals[0] === 4 && intervalVals[1] === 3 && intervalVals[2] === 3) {
+            chordType = "7"; // dominant 7th
+        } else if (intervalVals[0] === 3 && intervalVals[1] === 3 && intervalVals[2] === 3) {
+            chordType = "dim7";
+        } else if (intervalVals[0] === 3 && intervalVals[1] === 3 && intervalVals[2] === 4) {
+            chordType = "m7♭5"; // half-diminished
+        } else if (intervalVals[0] === 4 && intervalVals[1] === 4 && intervalVals[2] === 3) {
+            chordType = "aug7";
+        } else {
+            console.log('Unknown 4-note chord');
+        }
     }
+
+    console.log("Chord: " + chordType);
 
     return "";
     

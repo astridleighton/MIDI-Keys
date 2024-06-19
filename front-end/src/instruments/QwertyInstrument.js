@@ -20,19 +20,19 @@ class QwertyInstrument {
         this.sound = sound;
         // maps QWERTY to note values
         this.keyToNote = {
-            65: 'C3', // A
-            87: 'Db3', // W
-            83: 'D3', // S
-            69: 'Eb3', // E
-            68: 'E3', // D
-            70: 'F3', // F
-            84: 'Gb3', // T
-            71: 'G3', // G
-            89: 'Ab3', // Y
-            72: 'A3', // H
-            85: 'Bb3', // U
-            74: 'B3', // J
-            75: 'C4', // K
+            65: 'C3',
+            87: 'Db3',
+            83: 'D3',
+            69: 'Eb3',
+            68: 'E3',
+            70: 'F3',
+            84: 'Gb3',
+            71: 'G3',
+            89: 'Ab3',
+            72: 'A3',
+            85: 'Bb3',
+            74: 'B3',
+            75: 'C4',
             79: 'Db4' // O
         };
         this.synth = null;
@@ -64,7 +64,7 @@ class QwertyInstrument {
                 if (note) {
                     // TODO: fix so synth stops when user stops playing note
                     // this.synth?.triggerRelease(note);
-                    this.removeNoteCallback(note);
+                    this.removeNoteCallback(note, e.keyCode);
                 }
             }));
         });

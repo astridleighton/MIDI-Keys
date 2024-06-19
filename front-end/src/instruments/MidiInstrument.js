@@ -42,7 +42,6 @@ const DrumService_1 = __importDefault(require("../services/DrumService"));
 /**
  * TODO: ensure drums work
  * TODO: test midi instrument
- * TODO: ensure we keep track of notes played and pass back to play (I think)
  */
 class MidiInstrument {
     constructor(sound) {

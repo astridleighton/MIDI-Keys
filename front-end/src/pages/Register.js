@@ -130,12 +130,12 @@ const Register = () => {
     /**
      * Displays registration form
      */
-    return ((0, jsx_runtime_1.jsx)("div", { className: "register-container", children: (0, jsx_runtime_1.jsxs)(material_1.Container, { maxWidth: "xs", children: [(0, jsx_runtime_1.jsx)("div", { className: "register-header", children: (0, jsx_runtime_1.jsx)("h1", { children: "Create An Account" }) }), (0, jsx_runtime_1.jsxs)(material_1.Box, { component: "form", onSubmit: handleSubmit, noValidate: true, sx: {
+    return ((0, jsx_runtime_1.jsx)("div", Object.assign({ className: "register-container" }, { children: (0, jsx_runtime_1.jsxs)(material_1.Container, Object.assign({ maxWidth: "xs" }, { children: [(0, jsx_runtime_1.jsx)("div", Object.assign({ className: "register-header" }, { children: (0, jsx_runtime_1.jsx)("h1", { children: "Create An Account" }) })), (0, jsx_runtime_1.jsxs)(material_1.Box, Object.assign({ component: "form", onSubmit: handleSubmit, noValidate: true, sx: {
                         marginTop: 8,
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center'
-                    }, children: [error && (0, jsx_runtime_1.jsx)(material_1.Alert, { severity: "error", children: error }), (0, jsx_runtime_1.jsx)(material_1.TextField, { margin: "normal", required: true, fullWidth: true, label: "First Name", error: !!firstNameMessage, helperText: firstNameMessage, value: firstname, onChange: handleFirstNameChange, autoComplete: "off", focused: true, sx: {
+                    } }, { children: [error && (0, jsx_runtime_1.jsx)(material_1.Alert, Object.assign({ severity: "error" }, { children: error })), (0, jsx_runtime_1.jsx)(material_1.TextField, { margin: "normal", required: true, fullWidth: true, label: "First Name", error: !!firstNameMessage, helperText: firstNameMessage, value: firstname, onChange: handleFirstNameChange, autoComplete: "off", focused: true, sx: {
                                 '& input': {
                                     color: 'white'
                                 }
@@ -148,17 +148,17 @@ const Register = () => {
                                 '& input': {
                                     color: 'white'
                                 }
-                            } }), (0, jsx_runtime_1.jsx)(material_1.Container, { sx: {
+                            } }), (0, jsx_runtime_1.jsx)(material_1.Container, Object.assign({ sx: {
                                 margin: '20px'
-                            }, children: (0, jsx_runtime_1.jsx)(material_1.Button, { type: "submit", fullWidth: true, variant: "contained", onClick: handleSubmit, disabled: !isFormValid, sx: {
+                            } }, { children: (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ type: "submit", fullWidth: true, variant: "contained", onClick: handleSubmit, disabled: !isFormValid, sx: {
                                     backgroundColor: 'black',
                                     color: 'white',
                                     padding: '10px',
-                                }, children: "Register" }) }), (0, jsx_runtime_1.jsxs)(material_1.Typography, { children: ["Already have an account?", (0, jsx_runtime_1.jsx)("a", { href: "/login", style: {
+                                } }, { children: "Register" })) })), (0, jsx_runtime_1.jsxs)(material_1.Typography, { children: ["Already have an account?", (0, jsx_runtime_1.jsx)("a", Object.assign({ href: "/login", style: {
                                         textDecoration: 'underline',
                                         color: 'inherit',
                                         fontWeight: 'bold',
                                         padding: '5px'
-                                    }, children: "Sign In" })] })] })] }) }));
+                                    } }, { children: "Sign In" }))] })] }))] })) })));
 };
 exports.default = Register;

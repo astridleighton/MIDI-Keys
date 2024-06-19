@@ -24,6 +24,6 @@ const MidiProvider = ({ children }) => {
         setSelectedSound
     };
     // values that will be utilized by child components
-    return ((0, jsx_runtime_1.jsx)(MidiContext.Provider, { value: contextInterface, children: children }));
+    return ((0, jsx_runtime_1.jsx)(MidiContext.Provider, Object.assign({ value: contextInterface }, { children: children })));
 };
 exports.MidiProvider = MidiProvider;

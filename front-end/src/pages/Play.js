@@ -46,6 +46,7 @@ const MidiContext_1 = require("../MidiContext");
 const MidiInstrument_1 = require("../instruments/MidiInstrument");
 const QwertyInstrument_1 = require("../instruments/QwertyInstrument");
 const SoundService_1 = __importDefault(require("../services/SoundService"));
+const ChordService_1 = require("../services/ChordService");
 require("./Play.scss");
 /**
  * Initiates QWERTY and MIDI keyboard setup
@@ -53,6 +54,7 @@ require("./Play.scss");
  * Allows user to select between instruments
  * Displays notes played
  * TODO: ensure a device can be connected to
+ * TODO: add cleanup methods for dismounts
  */
 const Play = () => {
     const midiContext = (0, react_1.useContext)(MidiContext_1.MidiContext);
@@ -60,6 +62,7 @@ const Play = () => {
     const isAuthenticated = !!token;
     const firstName = js_cookie_1.default.get('name');
     const [chordNotes, setChordNotes] = (0, react_1.useState)([]);
+    const [chord, setChord] = (0, react_1.useState)();
     const [isLoading, setIsLoading] = (0, react_1.useState)(true);
     const [notesEnabled, setNotesEnabled] = (0, react_1.useState)(false);
     const [selectedSound, setSelectedSound] = (0, react_1.useState)();
@@ -94,6 +97,9 @@ const Play = () => {
         });
         initTone();
     }, [selectedSound]);
+    (0, react_1.useEffect)(() => {
+        setChord((0, ChordService_1.findChord)(chordNotes));
+    }, [chordNotes]);
     /**
      * Connects to MIDI device
      * @returns connected device
@@ -136,11 +142,11 @@ const Play = () => {
     /**
      * Adds note to state array, checks for duplicates
      */
-    const addNote = (newNote) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log('Adding note: ' + newNote);
+    const addNote = (note) => __awaiter(void 0, void 0, void 0, function* () {
+        console.log('Adding note: ' + note);
         setChordNotes((previousChord) => {
-            if (previousChord && !previousChord.includes(newNote)) {
-                return [...previousChord, newNote];
+            if (previousChord && !previousChord.includes(note)) {
+                return [...previousChord, note];
             }
             else {
                 return previousChord;
@@ -196,9 +202,9 @@ const Play = () => {
         soundService.removeFavorite(token, soundName, soundObjects);
     });
     // renders user session and displays available sounds and notes played
-    return ((0, jsx_runtime_1.jsxs)("div", { className: "play-container", children: [(0, jsx_runtime_1.jsx)("div", { className: "play-container play-header", children: isAuthenticated ? ((0, jsx_runtime_1.jsx)("div", { children: (0, jsx_runtime_1.jsxs)("h1", { children: ["Welcome,\u00A0", firstName, "!"] }) })) : ((0, jsx_runtime_1.jsx)("div", { children: (0, jsx_runtime_1.jsx)("h1", { children: "MIDI Made Simple." }) })) }), (0, jsx_runtime_1.jsx)("div", { className: "play-container play-content", children: isLoading ? ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)("p", { children: "Could not load sounds from database. Please refresh to try again." }), (0, jsx_runtime_1.jsx)(material_1.CircularProgress, {})] })) : ((0, jsx_runtime_1.jsx)("div", { children: (0, jsx_runtime_1.jsxs)(material_1.FormControl, { variant: "standard", sx: { m: 1, minWidth: 120 }, children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, { id: "select-sound-label", sx: { color: 'white', fontSize: '20px' }, children: "Selected Sound" }), (0, jsx_runtime_1.jsx)(material_1.Select, { sx: { marginTop: '35px', width: '250px', height: '50px', color: 'white' }, labelId: "select-sound-label", value: selectedSoundName, onChange: (event) => handleSelectSound(event), label: "Sound", children: soundObjects && soundObjects.map((sound, index) => ((0, jsx_runtime_1.jsxs)(material_1.MenuItem, { value: sound.name, children: [sound.name, isAuthenticated && ((0, jsx_runtime_1.jsx)(jsx_runtime_1.Fragment, { children: sound.isFavorite ?
-                                                (0, jsx_runtime_1.jsx)(material_1.IconButton, { style: { color: 'white' }, onClick: () => removeFavorite(sound.name), children: (0, jsx_runtime_1.jsx)(Star_1.default, { style: { color: 'yellow' } }) })
+    return ((0, jsx_runtime_1.jsxs)("div", Object.assign({ className: "play-container" }, { children: [(0, jsx_runtime_1.jsx)("div", Object.assign({ className: "play-container play-header" }, { children: isAuthenticated ? ((0, jsx_runtime_1.jsx)("div", { children: (0, jsx_runtime_1.jsxs)("h1", { children: ["Welcome,\u00A0", firstName, "!"] }) })) : ((0, jsx_runtime_1.jsx)("div", { children: (0, jsx_runtime_1.jsx)("h1", { children: "MIDI Made Simple." }) })) })), (0, jsx_runtime_1.jsx)("div", Object.assign({ className: "play-container play-content" }, { children: isLoading ? ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)("p", { children: "Could not load sounds from database. Please refresh to try again." }), (0, jsx_runtime_1.jsx)(material_1.CircularProgress, {})] })) : ((0, jsx_runtime_1.jsx)("div", { children: (0, jsx_runtime_1.jsxs)(material_1.FormControl, Object.assign({ variant: "standard", sx: { m: 1, minWidth: 120 } }, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, Object.assign({ id: "select-sound-label", sx: { color: 'white', fontSize: '20px' } }, { children: "Selected Sound" })), (0, jsx_runtime_1.jsx)(material_1.Select, Object.assign({ sx: { marginTop: '35px', width: '250px', height: '50px', color: 'white' }, labelId: "select-sound-label", value: selectedSoundName, onChange: (event) => handleSelectSound(event), label: "Sound" }, { children: soundObjects && soundObjects.map((sound, index) => ((0, jsx_runtime_1.jsxs)(material_1.MenuItem, Object.assign({ value: sound.name }, { children: [sound.name, isAuthenticated && ((0, jsx_runtime_1.jsx)(jsx_runtime_1.Fragment, { children: sound.isFavorite ?
+                                                (0, jsx_runtime_1.jsx)(material_1.IconButton, Object.assign({ style: { color: 'white' }, onClick: () => removeFavorite(sound.name) }, { children: (0, jsx_runtime_1.jsx)(Star_1.default, { style: { color: 'yellow' } }) }))
                                                 :
-                                                    (0, jsx_runtime_1.jsx)(material_1.IconButton, { style: { color: 'white' }, onClick: () => addFavorite(sound.name), children: (0, jsx_runtime_1.jsx)(Star_1.default, { style: { color: 'primary' } }) }) }))] }, index))) })] }) })) }), (0, jsx_runtime_1.jsx)(Piano_1.default, { notes: chordNotes }), (0, jsx_runtime_1.jsx)("div", { className: "chord-container", children: (0, jsx_runtime_1.jsx)(material_1.FormGroup, { children: (0, jsx_runtime_1.jsxs)("div", { className: "display-notes-container", children: [(0, jsx_runtime_1.jsx)(material_1.FormControlLabel, { control: (0, jsx_runtime_1.jsx)(material_1.Switch, {}), label: "Notes:", onChange: handleNotesToggle }), (0, jsx_runtime_1.jsx)("div", { className: "note-content", children: notesEnabled && ((0, jsx_runtime_1.jsx)(jsx_runtime_1.Fragment, { children: chordNotes === null || chordNotes === void 0 ? void 0 : chordNotes.map((note) => ((0, jsx_runtime_1.jsxs)("p", { className: "d-inline", children: [note, "\u00A0"] }))) })) })] }) }) })] }));
+                                                    (0, jsx_runtime_1.jsx)(material_1.IconButton, Object.assign({ style: { color: 'white' }, onClick: () => addFavorite(sound.name) }, { children: (0, jsx_runtime_1.jsx)(Star_1.default, { style: { color: 'primary' } }) })) }))] }), index))) }))] })) })) })), (0, jsx_runtime_1.jsx)(Piano_1.default, { notes: chordNotes }), (0, jsx_runtime_1.jsx)("div", Object.assign({ className: "chord-container" }, { children: (0, jsx_runtime_1.jsx)(material_1.FormGroup, { children: (0, jsx_runtime_1.jsxs)("div", Object.assign({ className: "display-notes-container" }, { children: [(0, jsx_runtime_1.jsx)(material_1.FormControlLabel, { control: (0, jsx_runtime_1.jsx)(material_1.Switch, {}), label: "Notes:", onChange: handleNotesToggle }), (0, jsx_runtime_1.jsx)("div", Object.assign({ className: "note-content" }, { children: notesEnabled && ((0, jsx_runtime_1.jsx)(jsx_runtime_1.Fragment, { children: chordNotes === null || chordNotes === void 0 ? void 0 : chordNotes.map((note) => ((0, jsx_runtime_1.jsxs)("p", Object.assign({ className: "d-inline" }, { children: [note, "\u00A0"] })))) })) }))] })) }) }))] })));
 };
 exports.default = Play;

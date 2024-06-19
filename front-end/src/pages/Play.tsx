@@ -9,6 +9,7 @@ import { MidiInstrument } from '../instruments/MidiInstrument';
 import { QwertyInstrument } from '../instruments/QwertyInstrument';
 import SoundService from '../services/SoundService';
 import { Sound } from '../types';
+import { findChord } from '../services/ChordService';
 
 import './Play.scss'
 
@@ -28,6 +29,7 @@ const Play = () =>
     const isAuthenticated = !!token;
     const firstName = Cookies.get('name');
     const [chordNotes, setChordNotes] = useState<string[] | null>([]);
+    const [chord, setChord] = useState<string>();
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [notesEnabled, setNotesEnabled] = useState<boolean>(false);
     const [selectedSound, setSelectedSound] = useState<Sound | null>()
@@ -64,6 +66,10 @@ const Play = () =>
 
         initTone();
   }, [selectedSound]);
+
+  useEffect(() => {
+    setChord(findChord(chordNotes));
+  }, [chordNotes]);
 
   /**
    * Connects to MIDI device
@@ -108,15 +114,15 @@ const Play = () =>
     /**
      * Adds note to state array, checks for duplicates
      */
-    const addNote = async (newNote: string) => {
-        console.log('Adding note: ' + newNote);
+    const addNote = async (note: string) => {
+        console.log('Adding note: ' + note);
         setChordNotes((previousChord) => {
-            if(previousChord && !previousChord.includes(newNote)) {
-                return [...previousChord, newNote]
+            if(previousChord && !previousChord.includes(note)) {
+                return [...previousChord, note]
             } else {
                 return previousChord;
             }
-        })        
+        })     
     }
 
     /**
@@ -247,6 +253,7 @@ const Play = () =>
                                     {chordNotes?.map((note) => (
                                         <p className="d-inline">{note}&nbsp;</p>
                                     ))}
+                                    
                                 </>
                             )}
                         </div>

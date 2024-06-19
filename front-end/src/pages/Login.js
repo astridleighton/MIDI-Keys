@@ -91,14 +91,14 @@ const Login = () => {
         */
     });
     // returns login view
-    return ((0, jsx_runtime_1.jsx)("div", { className: "login-container", children: (0, jsx_runtime_1.jsxs)(material_1.Container, { maxWidth: "xs", children: [(0, jsx_runtime_1.jsx)("div", { className: "login-header", children: (0, jsx_runtime_1.jsx)("h1", { children: "Sign In" }) }), (0, jsx_runtime_1.jsxs)(material_1.Box, { component: "form", onSubmit: handleSubmit, noValidate: true, sx: {
+    return ((0, jsx_runtime_1.jsx)("div", Object.assign({ className: "login-container" }, { children: (0, jsx_runtime_1.jsxs)(material_1.Container, Object.assign({ maxWidth: "xs" }, { children: [(0, jsx_runtime_1.jsx)("div", Object.assign({ className: "login-header" }, { children: (0, jsx_runtime_1.jsx)("h1", { children: "Sign In" }) })), (0, jsx_runtime_1.jsxs)(material_1.Box, Object.assign({ component: "form", onSubmit: handleSubmit, noValidate: true, sx: {
                         marginTop: 8,
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
                         color: 'white'
-                    }, children: [error &&
-                            (0, jsx_runtime_1.jsx)(material_1.Alert, { severity: "error", children: error }), (0, jsx_runtime_1.jsx)(material_1.TextField, { margin: "normal", required: true, fullWidth: true, label: "Username", value: username, error: submitted && !username, helperText: submitted && !username ? 'Username is required ' : '', onChange: handleUsernameChange, focused: true, autoComplete: 'off', variant: "filled", sx: {
+                    } }, { children: [error &&
+                            (0, jsx_runtime_1.jsx)(material_1.Alert, Object.assign({ severity: "error" }, { children: error })), (0, jsx_runtime_1.jsx)(material_1.TextField, { margin: "normal", required: true, fullWidth: true, label: "Username", value: username, error: submitted && !username, helperText: submitted && !username ? 'Username is required ' : '', onChange: handleUsernameChange, focused: true, autoComplete: 'off', variant: "filled", sx: {
                                 '& input': {
                                     color: 'white'
                                 }
@@ -106,17 +106,17 @@ const Login = () => {
                                 '& input': {
                                     color: 'white'
                                 }
-                            } }), (0, jsx_runtime_1.jsx)(material_1.Container, { sx: {
+                            } }), (0, jsx_runtime_1.jsx)(material_1.Container, Object.assign({ sx: {
                                 margin: '20px'
-                            }, children: (0, jsx_runtime_1.jsx)(material_1.Button, { type: "submit", fullWidth: true, variant: "contained", onClick: handleSubmit, disabled: !isFormValid, sx: {
+                            } }, { children: (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ type: "submit", fullWidth: true, variant: "contained", onClick: handleSubmit, disabled: !isFormValid, sx: {
                                     backgroundColor: 'black',
                                     color: 'white',
                                     padding: '10px'
-                                }, children: "Sign In" }) }), (0, jsx_runtime_1.jsxs)(material_1.Typography, { children: ["Don't have an account?", (0, jsx_runtime_1.jsx)("a", { href: "/register", style: {
+                                } }, { children: "Sign In" })) })), (0, jsx_runtime_1.jsxs)(material_1.Typography, { children: ["Don't have an account?", (0, jsx_runtime_1.jsx)("a", Object.assign({ href: "/register", style: {
                                         textDecoration: 'underline',
                                         color: 'inherit',
                                         fontWeight: 'bold',
                                         padding: '5px',
-                                    }, children: "Sign Up" })] })] })] }) }));
+                                    } }, { children: "Sign Up" }))] })] }))] })) })));
 };
 exports.default = Login;

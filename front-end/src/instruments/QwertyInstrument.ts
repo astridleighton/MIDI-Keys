@@ -26,7 +26,7 @@ export class QwertyInstrument {
     private synth: Tone.Synth | null = null;
     private keyboard = new AudioKeys({ polyphony: 10 });
     private addNoteCallback: (note: string) => void;
-    private removeNoteCallback: (note: string) => void;
+    private removeNoteCallback: (note: string, noteVal: number) => void;
 
     constructor(private sound: Sound | null, playNoteCallback: (note: string) => void, removeNoteCallback: (note: string) => void) {
         this.initializeTone();
@@ -57,7 +57,7 @@ export class QwertyInstrument {
             if (note) {
                 // TODO: fix so synth stops when user stops playing note
                 // this.synth?.triggerRelease(note);
-                this.removeNoteCallback(note);
+                this.removeNoteCallback(note, e.keyCode);
             }
         });
     }

@@ -32,7 +32,7 @@ const Connect = ({ updateConnectedDevice, midiInputDevices }) => {
         // toast.success('Updated connected device.');
     };
     // returns connect view
-    return ((0, jsx_runtime_1.jsxs)("div", { className: "connect-container", children: [(0, jsx_runtime_1.jsx)("div", { className: "connect-header", children: (0, jsx_runtime_1.jsx)("h1", { className: "connect-title", children: "Connect" }) }), (0, jsx_runtime_1.jsxs)("div", { className: "connect-content", children: [(0, jsx_runtime_1.jsx)(material_1.FormLabel, { sx: { color: 'white', padding: '20px' }, children: "Select input MIDI device:" }), (0, jsx_runtime_1.jsxs)(material_1.RadioGroup, { "aria-label": "devices", name: "device-group", defaultValue: connectedDevice, onChange: (e) => handleDeviceSelect(midiInputDevices[e.target.value]), children: [(0, jsx_runtime_1.jsx)(material_1.List, { sx: {
+    return ((0, jsx_runtime_1.jsxs)("div", Object.assign({ className: "connect-container" }, { children: [(0, jsx_runtime_1.jsx)("div", Object.assign({ className: "connect-header" }, { children: (0, jsx_runtime_1.jsx)("h1", Object.assign({ className: "connect-title" }, { children: "Connect" })) })), (0, jsx_runtime_1.jsxs)("div", Object.assign({ className: "connect-content" }, { children: [(0, jsx_runtime_1.jsx)(material_1.FormLabel, Object.assign({ sx: { color: 'white', padding: '20px' } }, { children: "Select input MIDI device:" })), (0, jsx_runtime_1.jsxs)(material_1.RadioGroup, Object.assign({ "aria-label": "devices", name: "device-group", defaultValue: connectedDevice, onChange: (e) => handleDeviceSelect(midiInputDevices[e.target.value]) }, { children: [(0, jsx_runtime_1.jsx)(material_1.List, Object.assign({ sx: {
                                     '& .MuiListItem-root': {
                                         borderRadius: '8px',
                                         backgroundColor: 'black',
@@ -42,11 +42,11 @@ const Connect = ({ updateConnectedDevice, midiInputDevices }) => {
                                     '& .MuiRadio-root': {
                                         color: 'grey', // Radio button color
                                     }
-                                }, children: midiInputDevices && midiInputDevices.length ? (midiInputDevices.map((device, index) => ((0, jsx_runtime_1.jsx)(material_1.ListItem, { sx: { color: "#FFF" }, children: (0, jsx_runtime_1.jsx)(material_1.FormControlLabel, { value: index, control: (0, jsx_runtime_1.jsx)(material_1.Radio, {}), label: device.name }) }, index)))) : ((0, jsx_runtime_1.jsx)("p", { children: "No available MIDI devices." })) }), (0, jsx_runtime_1.jsx)(material_1.Button, { type: "submit", fullWidth: true, variant: "contained", onClick: handleDeviceConnect, disabled: !selectedDevice, sx: {
+                                } }, { children: midiInputDevices && midiInputDevices.length ? (midiInputDevices.map((device, index) => ((0, jsx_runtime_1.jsx)(material_1.ListItem, Object.assign({ sx: { color: "#FFF" } }, { children: (0, jsx_runtime_1.jsx)(material_1.FormControlLabel, { value: index, control: (0, jsx_runtime_1.jsx)(material_1.Radio, {}), label: device.name }) }), index)))) : ((0, jsx_runtime_1.jsx)("p", { children: "No available MIDI devices." })) })), (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ type: "submit", fullWidth: true, variant: "contained", onClick: handleDeviceConnect, disabled: !selectedDevice, sx: {
                                     backgroundColor: 'grey',
                                     color: 'white',
                                     padding: '10px',
                                     margin: '15px'
-                                }, children: "Connect" })] })] })] }));
+                                } }, { children: "Connect" }))] }))] }))] })));
 };
 exports.default = Connect;

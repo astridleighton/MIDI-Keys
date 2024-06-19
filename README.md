@@ -1,8 +1,11 @@
-# Project Status
+# Project Status (version 1.1)
 
-Current Version: 1.1 (released May 2024)
+### Latest Update (Version 1.1, released May 2024)
+- Implemented TypeScript
+- Created a service-oriented architecture (SOA)
+- Fixed Tone.js timing issue
 
-# Base Features (Version 1.0, released April 2024)
+### Base Features (Version 1.0, released April 2024)
 - React front-end to display the visual elements of the website and allow site navigation
 - Express back-end to contain all login, registration, and favorite functionality
 - SQL database to hold user information, sound data, and saved sounds
@@ -13,15 +16,15 @@ Current Version: 1.1 (released May 2024)
 - Authentication and MIDI device error handling
 - On-screen keyboard
 
-# Updated Features (Version 1.1)
-- Implemented TypeScript
-- Created a service-oriented architecture (SOA)
-- Fixed Tone.js timing issue
+# Future Updates
 
-# Out of Scope (Future Implementations)
+### Upcoming Features (Version 1.2, June 2024)
+- Chord display
+- Dynamic note lengths
+- TypeScript compatibility fixes
+
+### Out of Scope (Future Implementations)
 - Cloud deployment
 - Dockerize
 - Audio recording functionality
 - Sheet music display
-- Chord display
-- Dynamic note lengths

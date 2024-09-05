@@ -1,5 +1,7 @@
 # Project Status (version 1.1)
 
+![Dynamic JSON Badge](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fastridleighton%2FMIDI-Keys%2Fmain%2Ffront-end%2Fpackage.json&query=%24.version&label=version)
+
 ### Latest Update (Version 1.1, released May 2024)
 - Implemented TypeScript
 - Created a service-oriented architecture (SOA)

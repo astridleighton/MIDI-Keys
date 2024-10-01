@@ -3,19 +3,15 @@ import cors from 'cors';
 import Security from './app/security/security';
 import Database from './app/database/database';
 
-const app = express();
+const app = express(); // Explicitly typing the app variable
 app.use(cors());
 app.use(express.json());
 
-// sets up database configuration
-const dbConfig = {
-    host: 'localhost',
-    user: 'root',
-    password: 'root',
-    database: 'capstone'
-}
+// TODO: take a look at this article: https://medium.com/@gfujii-cmd/getting-started-with-express-typescript-with-mysql-api-b31c5a648aac
 
-const db = new Database(dbConfig);
+
+// TODO: fix this
+const db = new Database();
 
 /*
 * Testing message at index page to ensure application is running
@@ -74,12 +70,13 @@ app.post('/login', async function(req: Request, res: Response) {
 /*
 * Allows user to create an account by registering
 */
-app.post('/register', async function(req, res, next) {
+app.post('/register', async function(req, res) {
     const firstname = req.body.firstname;
     const username = req.body.username;
     const password = req.body.password;
 
     try {
+        // TODO: update this with stored procedure
         const usernameCheck: any = await db.findByUsername(username); // checks if username exists
 
         if(usernameCheck && usernameCheck.length > 0) {
@@ -93,6 +90,7 @@ app.post('/register', async function(req, res, next) {
                 return;
             }
 
+            // TODO: update this with stored
             const insertNewUser = await db.addNewUser(username, firstname, hashedPassword); // adds new user to database
 
             if(!insertNewUser) {
@@ -204,6 +202,7 @@ app.get('/all-sounds', async (req, res) => {
         const allSounds = await db.getAllSounds();
         res.status(200).json(allSounds);
     } catch (error) {
+        console.error("Error retrieving sounds: ", error);
         res.status(500).send("Unable to retrieve sounds from database.");
     }
 
@@ -229,7 +228,7 @@ app.get('/all-favorites', async (req, res) => {
                 const allFavorites = await db.getAllFavoritesFromUser(userID);
 
                 if(!allFavorites) {
-                    return res.status(404).json({ error: 'No favorites found for the user.' });
+                    res.status(404).json({ error: 'No favorites found for the user.' });
                 } else {
                     res.status(200).json(allFavorites);
                 }

@@ -9,11 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// bcrypt
 var bcrypt = require('bcrypt');
-const saltRounds = 10;
-// jwt
 const jwt = require('jsonwebtoken');
+const saltRounds = 10;
 const secretKey = "astrid";
 /**
  * Used to perform all security operations in user login/registration

@@ -30,3 +30,14 @@
 - Dockerize
 - Audio recording functionality
 - Sheet music display
+
+## Startup
+- Ensure Node is installed on your device
+#### Starting Front-End (React)
+- Navigate to *front-end* directory
+- Run `npm install` to install Node packages (only run once)
+- Run `npm start` to start the application
+#### Starting Back-End (Express)
+- Navigate to *back-end* directory
+- Run `npm install` to install Node packages (only run once)
+- Run `node index.js` to run application

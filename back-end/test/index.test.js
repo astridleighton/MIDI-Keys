@@ -1,4 +1,3 @@
-"use strict";
 // TODO: begin implementing tests
 /* import express from 'express';
 import request from 'supertest';

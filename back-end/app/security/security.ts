@@ -1,9 +1,7 @@
-// bcrypt
 var bcrypt = require('bcrypt');
-const saltRounds = 10;
-
-// jwt
 const jwt = require('jsonwebtoken');
+
+const saltRounds = 10;
 const secretKey = "astrid";
 
 /**
@@ -26,8 +24,8 @@ class Security {
                 } else {
                     resolve(token);
                 }
-            })
-        })
+            });
+        });
     }
 
     /**

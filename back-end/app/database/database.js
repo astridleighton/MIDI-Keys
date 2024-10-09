@@ -43,12 +43,25 @@ class Database {
     findPasswordAndNameByUsername(username) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
-                this.connection.query("SELECT password, firstname FROM users WHERE username = ?", [username], (error, results) => {
+                this.connection.query("CALL getUserByUsername(?)", [username], (error, results) => {
                     if (error) {
+                        console.log("Error in findPasswordAndNameByUsername().");
                         reject(error);
                     }
                     else {
-                        resolve(results);
+                        if (results && results[0] != null && results[0][0] != null) {
+                            const userData = results[0][0];
+                            const user = {
+                                username: userData.username,
+                                password: userData.password,
+                                firstname: userData.firstname
+                            };
+                            resolve(user);
+                        }
+                        else {
+                            console.log("Username does not exist.");
+                            resolve(null);
+                        }
                     }
                 });
             });
@@ -182,16 +195,17 @@ class Database {
         });
     }
     /**
-    * Gets all sounds from the user at specified username
-    * @param {*} connection
-    * @param {*} username
-    * @returns all sounds from user on success, error message on failure
-    */
+     * Gets all sounds from the user at specified username
+     * @param {*} connection
+     * @param {*} username
+     * @returns all sounds from user on success, error message on failure
+     */
     getAllSounds() {
         return __awaiter(this, void 0, void 0, function* () {
+            // TODO: astrid have this return as a sound object
             return new Promise((resolve, reject) => {
                 try {
-                    this.connection.query("SELECT * FROM sounds", (error, results) => {
+                    this.connection.query("CALL getAllSounds()", (error, results) => {
                         if (error) {
                             reject(error);
                         }

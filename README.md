@@ -1,4 +1,4 @@
-# Project Status (version 1.1)
+# Project Status
 
 ![Dynamic JSON Badge](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fastridleighton%2FMIDI-Keys%2Fmain%2Ffront-end%2Fpackage.json&query=%24.version&label=version)
 
@@ -20,7 +20,8 @@
 
 # Future Updates
 
-### Upcoming Features (Version 1.2, June 2024)
+### Upcoming Features (Version 1.2, in progress)
+- Performance improvements
 - Chord display
 - Dynamic note lengths
 - TypeScript compatibility fixes

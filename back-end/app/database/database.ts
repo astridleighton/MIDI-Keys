@@ -1,36 +1,16 @@
 import mysql, {Connection} from 'mysql';
-
-
-interface User {
-    username: string;
-    firstname: string;
-    password: string;
-}
+import {User} from "../models/User";
+import {Sound} from "../models/Sound";
 
 /**
  * Contains all database operations for back-end
  */
 class Database {
 
-    private connection: mysql.Connection;
+    private connection: Connection;
 
     constructor(config: mysql.ConnectionConfig) {
         this.connection = mysql.createConnection(config);
-    }
-
-    connect(): void {
-        this.connection.connect((err: any) => {
-            if (err) {
-                console.error('Error connecting to the database:', err);
-            } else {
-                console.log('Connected to the database');
-            }
-        })
-    }
-
-    disconnect(): void {
-        this.connection.end();
-        console.log("Disconnected from the database.");
     }
 
     /**
@@ -39,7 +19,7 @@ class Database {
      * @param {*} username
      * @returns SQL results on success, error message on fail
      */
-    public async findPasswordAndNameByUsername(username: string): Promise<User | null> {
+    public async getUserByUsername(username: string): Promise<User | null> {
         return new Promise((resolve, reject) => {
             this.connection.query("CALL getUserByUsername(?)", [username], (error, results) => {
                 if (error) {
@@ -69,13 +49,15 @@ class Database {
      * @param {*} username
      * @returns SQL results on success, error message on fail
      */
-    async findByUsername(username) {
+    public async checkUserExists(username): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            this.connection.query("SELECT * FROM users WHERE username = ?", [username], (error, results) => {
+            this.connection.query("CALL checkUsernameExists(?)", [username], (error, results) => {
                 if (error) {
                     reject(error);
                 } else {
-                    resolve(results);
+                    // TODO: astrid ensure this logic works as expected
+                    const exists = results && results[0] && results[0][0] && results[0][0].exists === 1;
+                    resolve(exists);
                 }
             })
         })
@@ -89,9 +71,9 @@ class Database {
      * @param {*} password
      * @returns new user information on success, error message on fail
      */
-    async addNewUser(username, firstname, password) {
+    public async addNewUser(user:User): Promise<User> {
         return new Promise((resolve, reject) => {
-            this.connection.query("INSERT INTO users (username, firstname, password) VALUES (?, ?, ?)", [username, firstname, password], (error, results) => {
+            this.connection.query("CALL createUser(?,?,?)", [user.username, user.firstname, user.password], (error, results) => {
                 if (error) {
                     reject(error);
                 } else {
@@ -107,9 +89,10 @@ class Database {
      * @param {*} username
      * @param {*} sound
      */
-    async removeFavorite(userID, soundID) {
+    public async removeFavorite(userID, soundID) {
+        // TODO: astrid fix return type
         return new Promise((resolve, reject) => {
-            this.connection.query("DELETE FROM favorites WHERE userID = ? AND soundID = ?", [userID, soundID], (error, results) => {
+            this.connection.query("CALL deleteFavorite(?,?)", [userID, soundID], (error, results) => {
                 if (error) {
                     reject(error);
                 } else {
@@ -125,10 +108,10 @@ class Database {
      * @param {*} username
      * @param {*} sound
      */
-    async addFavorite(userID, soundID) {
+    public async addFavorite(userID, soundID) {
         return new Promise((resolve, reject) => {
 
-            this.connection.query("INSERT INTO favorites (userID, soundID) VALUES (?, ?)", [userID, soundID], (error, results) => {
+            this.connection.query("CALL createFavorite(?,?)", [userID, soundID], (error, results) => {
                 if (error) {
                     reject(error);
                 } else {
@@ -146,10 +129,11 @@ class Database {
      * @param {*} username
      * @param {*} sound
      */
-    async findFavoriteByUserAndSound(userID, soundID) {
-        return new Promise((resolve, reject) => {
+    public async findFavoriteByUserAndSound(userID, soundID) {
 
-            this.connection.query("SELECT * FROM favorites WHERE userID = ? AND soundID = ?", [userID, soundID], (error, results) => {
+        return new Promise((resolve, reject) => {
+            // TODO: astrid update return types to be sounds
+            this.connection.query("CALL checkFavoriteExists(?,?)", [userID, soundID], (error, results) => {
                 if (error) {
                     reject(error);
                 } else {
@@ -167,10 +151,11 @@ class Database {
      * @param {*} username
      * @returns all sounds from user on success, error message on failure
      */
-    async getAllFavoritesFromUser(username) {
+    public async getAllFavoritesFromUser(username) {
+        // TODO: astrid change return type to sound
         return new Promise((resolve, reject) => {
             try {
-                this.connection.query("SELECT sounds.id, sounds.name, sounds.source FROM sounds JOIN favorites ON sounds.id = favorites.soundID WHERE favorites.userID = ?;", [username], (error, results) => {
+                this.connection.query("CALL getAllFavoritesForUser(?);", [username], (error, results) => {
                     if (error) {
                         reject(error);
                     } else {
@@ -215,9 +200,9 @@ class Database {
      * @param {*} username
      * @returns SQL results on success, error message on fail
      */
-    async getIDFromUser(username) {
+    public async getIDFromUser(username): Promise<string> {
         return new Promise((resolve, reject) => {
-            this.connection.query("SELECT ID FROM users WHERE username = ?", [username], (error, results) => {
+            this.connection.query("CALL getIDFromUser(?)", [username], (error, results) => {
                 if (error) {
                     reject(error);
                 } else {
@@ -234,14 +219,17 @@ class Database {
      * @param {*} username
      * @returns SQL results on success, error message on fail
      */
-    async getIDFromSound(sound) {
+    public async getIDFromSound(sound): Promise<Sound> {
         return new Promise((resolve, reject) => {
-            this.connection.query("SELECT id FROM sounds WHERE name = ?", [sound], (error, results) => {
+            this.connection.query("CALL getIDFromSound(?)", [sound], (error, results) => {
                 if (error) {
                     reject(error);
                 } else {
-                    const soundID = results[0].id.toString();
-                    resolve(soundID);
+                    const sound: Sound = {
+                        id: results[0].id,
+                        name: results[0].name.toString()
+                    }
+                    resolve(sound);
                 }
             })
         })

@@ -40,7 +40,7 @@ class Database {
      * @param {*} username
      * @returns SQL results on success, error message on fail
      */
-    findPasswordAndNameByUsername(username) {
+    getUserByUsername(username) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
                 this.connection.query("CALL getUserByUsername(?)", [username], (error, results) => {
@@ -98,7 +98,7 @@ class Database {
     addNewUser(username, firstname, password) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
-                this.connection.query("INSERT INTO users (username, firstname, password) VALUES (?, ?, ?)", [username, firstname, password], (error, results) => {
+                this.connection.query("CALL createUser(?,?,?)", [username, firstname, password], (error, results) => {
                     if (error) {
                         reject(error);
                     }

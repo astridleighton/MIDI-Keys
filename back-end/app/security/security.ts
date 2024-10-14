@@ -7,7 +7,7 @@ const secretKey = "astrid";
 /**
  * Used to perform all security operations in user login/registration
  */
-class Security {
+export default class Security {
 
     /**
      * Generates token using JWT and sets expiration for 1 hour
@@ -85,10 +85,9 @@ class Security {
     * @param {*} token 
     * @returns decoded token on success, error message and null on failure
     */
-   static async getUserNameFromToken(token) {
+   static async getUserNameFromToken(token): Promise<string> {
        try {
            const decoded = jwt.verify(token, secretKey);
-           console.log("test");
            return decoded.username;
        } catch (error) {
            console.error('Token verification error.', error);
@@ -98,4 +97,4 @@ class Security {
 
 }
 
-export default Security;
+// export default Security;

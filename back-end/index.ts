@@ -1,8 +1,11 @@
-const express  = require('express');
+import {User} from "./app/models/User";
+
+const express = require('express');
 // const {Request, Response} = require('express');
 const cors = require('cors');
-const Security = require('./app/security/security');
 import Database from './app/database/database';
+import Security from './app/security/security';
+import {Sound} from "./app/models/Sound";
 
 const app = express();
 app.use(cors());
@@ -40,7 +43,7 @@ app.post('/login', async function (req, res) {
         }
 
         try {
-            const storedUser = await db.findPasswordAndNameByUsername(username);
+            const storedUser = await db.getUserByUsername(username);
 
             if (storedUser == null) {
                 res.status(404).json({message: 'Username does not exist or returned null from database.', status: 404});
@@ -48,11 +51,8 @@ app.post('/login', async function (req, res) {
                 // Extract the stored password and first name
                 const firstName = storedUser.firstname;
 
-                // TODO: astrid fix these class function references -- remove these values
-                const token = "test";
-                const validPassword = true;
-                /* const token = await Security.generateToken(payload);
-                const validPassword = await Security.comparePasswords(password, storedUser.password); */
+                const token = await Security.generateToken(payload);
+                const validPassword = await Security.comparePasswords(password, storedUser.password);
 
                 if (validPassword) {
                     res.status(200).json({message: 'Login successful.', status: 200, token, firstName});
@@ -71,28 +71,32 @@ app.post('/login', async function (req, res) {
 * Allows user to create an account by registering
 */
 app.post('/register', async function (req, res) {
-    const firstname = req.body.firstname;
-    const username = req.body.username;
-    const password = req.body.password;
-
     try {
-        const usernameCheck: any = await db.findByUsername(username); // checks if username exists
+        const user: User = {
+            username: req.body.username,
+            password: req.body.password,
+            firstname: req.body.firstname
+        };
+        // check if the username already exists in the database
+        const checkUserExists: boolean = await db.checkUserExists(user.username);
 
-        if (usernameCheck && usernameCheck.length > 0) {
+        if (checkUserExists) {
             res.status(403).send("Username already exists.");
-            return;
         } else {
-            const hashedPassword = await Security.hashPassword(password); // hashes password
+            // hash the user password for insertion in the database
+            const hashedPassword = await Security.hashPassword(user.password);
 
             if (!hashedPassword) {
-                res.status(500).json({error: "Password hashing failed. "});
+                res.status(500).json({error: "Password hashing failed."});
                 return;
             }
 
-            const insertNewUser = await db.addNewUser(username, firstname, hashedPassword); // adds new user to database
+            // update password to hashed password for database insertion
+            user.password = hashedPassword;
+            const insertNewUser = await db.addNewUser(user);
 
             if (!insertNewUser) {
-                res.status(500).json({error: "Database error. "});
+                res.status(500).json({error: "Database error. Could not register user."});
                 return;
             }
             res.json({message: 'Registration successful.', status: 200});
@@ -154,20 +158,20 @@ app.delete('/remove-favorite/:sound', async (req, res) => {
 
     if (req.headers.authorization) {
         console.log('has token');
-        const sound = req.params.sound;
+        const soundName:string = req.params.sound;
         const token = req.headers.authorization.split(' ')[1]; // Extract token from Authorization header
 
         try {
 
-            const username: any = await Security.getUserNameFromToken(token); // get username from token
+            const username: string = await Security.getUserNameFromToken(token); // get username from token
 
             console.log(username && username.length > 0);
 
             if (username) {
 
-                const userID = await db.getIDFromUser(username);
-                const soundID = await db.getIDFromSound(sound);
-                const removeFavorite = await db.removeFavorite(userID, soundID);
+                const userID: string = await db.getIDFromUser(username);
+                const sound: Sound = await db.getIDFromSound(soundName);
+                const removeFavorite = await db.removeFavorite(userID, sound.id);
 
                 if (removeFavorite) {
                     res.status(200).json({message: "Removed favorite successfully."});
@@ -177,7 +181,6 @@ app.delete('/remove-favorite/:sound', async (req, res) => {
             } else {
                 res.status(401).json({message: "Unauthorized to remove favorite. Please log in."});
             }
-
 
         } catch (error) {
             console.error(error);
@@ -213,7 +216,7 @@ app.get('/all-favorites', async (req, res) => {
         console.log("Token: " + token);
 
         const username = await Security.getUserNameFromToken(token); // get username from token
-        const usernameCheck = await db.findByUsername(username); // checks if username exists
+        const usernameCheck = await db.checkUserExists(username); // checks if username exists
 
         if (!usernameCheck) {
             res.status(403).send("Invalid token or username not found.");

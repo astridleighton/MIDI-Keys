@@ -15,8 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express = require('express');
 // const {Request, Response} = require('express');
 const cors = require('cors');
-const Security = require('./app/security/security');
 const database_1 = __importDefault(require("./app/database/database"));
+const security_1 = __importDefault(require("./app/security/security"));
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -47,18 +47,15 @@ app.post('/login', function (req, res) {
                 username: username,
             };
             try {
-                const storedUser = yield db.findPasswordAndNameByUsername(username);
+                const storedUser = yield db.getUserByUsername(username);
                 if (storedUser == null) {
                     res.status(404).json({ message: 'Username does not exist or returned null from database.', status: 404 });
                 }
                 else {
                     // Extract the stored password and first name
                     const firstName = storedUser.firstname;
-                    // TODO: astrid fix these class function references -- remove these values
-                    const token = "test";
-                    const validPassword = true;
-                    /* const token = await Security.generateToken(payload);
-                    const validPassword = await Security.comparePasswords(password, storedUser.password); */
+                    const token = yield security_1.default.generateToken(payload);
+                    const validPassword = yield security_1.default.comparePasswords(password, storedUser.password);
                     if (validPassword) {
                         res.status(200).json({ message: 'Login successful.', status: 200, token, firstName });
                     }
@@ -83,15 +80,15 @@ app.post('/register', function (req, res) {
         const username = req.body.username;
         const password = req.body.password;
         try {
-            const usernameCheck = yield db.findByUsername(username); // checks if username exists
-            if (usernameCheck && usernameCheck.length > 0) {
+            const storedUser = yield db.getUserByUsername(username); // checks if username exists
+            if (storedUser != null) {
                 res.status(403).send("Username already exists.");
                 return;
             }
             else {
-                const hashedPassword = yield Security.hashPassword(password); // hashes password
+                const hashedPassword = yield security_1.default.hashPassword(password); // hashes password
                 if (!hashedPassword) {
-                    res.status(500).json({ error: "Password hashing failed. " });
+                    res.status(500).json({ error: "Password hashing failed." });
                     return;
                 }
                 const insertNewUser = yield db.addNewUser(username, firstname, hashedPassword); // adds new user to database
@@ -117,7 +114,7 @@ app.post('/add-favorite/:sound', function (req, res) {
             const token = req.headers.authorization.split(' ')[1]; // Extract token from Authorization header
             const sound = req.params.sound;
             try {
-                const username = yield Security.getUserNameFromToken(token); // get username from token
+                const username = yield security_1.default.getUserNameFromToken(token); // get username from token
                 if (username && username.length > 0) { // if token is valid
                     const userID = yield db.getIDFromUser(username);
                     const soundID = yield db.getIDFromSound(sound);
@@ -158,7 +155,7 @@ app.delete('/remove-favorite/:sound', (req, res) => __awaiter(void 0, void 0, vo
         const sound = req.params.sound;
         const token = req.headers.authorization.split(' ')[1]; // Extract token from Authorization header
         try {
-            const username = yield Security.getUserNameFromToken(token); // get username from token
+            const username = yield security_1.default.getUserNameFromToken(token); // get username from token
             console.log(username && username.length > 0);
             if (username) {
                 const userID = yield db.getIDFromUser(username);
@@ -203,7 +200,7 @@ app.get('/all-favorites', (req, res) => __awaiter(void 0, void 0, void 0, functi
     if (req.headers.authorization) {
         const token = req.headers.authorization.split(' ')[1]; // Extract token from Authorization header
         console.log("Token: " + token);
-        const username = yield Security.getUserNameFromToken(token); // get username from token
+        const username = yield security_1.default.getUserNameFromToken(token); // get username from token
         const usernameCheck = yield db.findByUsername(username); // checks if username exists
         if (!usernameCheck) {
             res.status(403).send("Invalid token or username not found.");
